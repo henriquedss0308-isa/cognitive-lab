@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
+  --color-lab-bg: #0a0e14;
+  --color-lab-surface: #111820;
+  --color-lab-surface-2: #1a2332;
+  --color-lab-border: #2a3548;
+  --color-lab-text: #e8edf4;
+  --color-lab-muted: #8b9bb4;
+  --color-lab-accent: #4a9eff;
+  --color-lab-accent-dim: #2d6cb5;
+  --color-lab-success: #3dd68c;
+  --color-lab-warning: #f5a623;
+  --color-lab-danger: #f56565;
+  --color-lab-purple: #a78bfa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  background: var(--color-lab-bg);
+  color: var(--color-lab-text);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-lab-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-lab-border);
+  border-radius: 4px;
+}
+
+.card {
+  background: var(--color-lab-surface);
+  border: 1px solid var(--color-lab-border);
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background: var(--color-lab-accent);
+  color: #fff;
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover {
+  background: var(--color-lab-accent-dim);
+}
+
+.btn-secondary {
+  background: var(--color-lab-surface-2);
+  color: var(--color-lab-text);
+  padding: 0.625rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-lab-border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-secondary:hover {
+  background: var(--color-lab-border);
+}
+
+.kbd {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  background: var(--color-lab-surface-2);
+  border: 1px solid var(--color-lab-border);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}

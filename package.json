@@ -1,0 +1,41 @@
+{
+  "name": "cognitive-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vite/bin/vite.js",
+    "build": "tsc -b && node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vite/bin/vite.js build",
+    "lint": "oxlint",
+    "preview": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vite/bin/vite.js preview --port 5173 --host localhost",
+    "desktop": "powershell -ExecutionPolicy Bypass -File scripts/launch.ps1",
+    "desktop:install": "python scripts/convert-icon.py && powershell -ExecutionPolicy Bypass -File scripts/create-desktop-shortcut.ps1",
+    "test": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vitest/vitest.mjs run --pool=threads --maxWorkers=1 --no-file-parallelism",
+    "test:watch": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vitest/vitest.mjs --pool=threads --maxWorkers=1 --no-file-parallelism"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "idb": "^8.0.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.0",
+    "recharts": "^3.9.0",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "jsdom": "^29.1.1",
+    "oxlint": "^1.69.0",
+    "tailwindcss": "^4.3.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.0",
+    "vitest": "^4.1.9"
+  }
+}
