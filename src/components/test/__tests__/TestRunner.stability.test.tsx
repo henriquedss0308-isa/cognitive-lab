@@ -487,6 +487,61 @@ describe('TestRunner stability', () => {
     expect(record.invalidReason).toBe('omission')
   })
 
+  it('Go/No-Go response and timeout preserve the pre-generated trial order', async () => {
+    const test = makeTest('gonogo', [
+      {
+        blockIndex: 0,
+        trialIndex: 0,
+        condition: 'go',
+        stimulus: 'green_circle',
+        expectedResponse: 'space',
+        isiMs: 0,
+        metadata: { responseWindowMs: 200 },
+      },
+      {
+        blockIndex: 0,
+        trialIndex: 1,
+        condition: 'nogo',
+        stimulus: 'red_circle',
+        expectedResponse: 'none',
+        isiMs: 0,
+        metadata: { responseWindowMs: 200 },
+      },
+      {
+        blockIndex: 0,
+        trialIndex: 2,
+        condition: 'go',
+        stimulus: 'green_circle',
+        expectedResponse: 'space',
+        isiMs: 0,
+        metadata: { responseWindowMs: 200 },
+      },
+    ])
+    const { onTrialRecorded, onComplete } = renderRunner({ test })
+
+    await startStandardTrial()
+    await pressKey(' ')
+    await advance(400)
+
+    await advance(400)
+    await advance(200)
+    await advance(400)
+
+    await pressKey(' ')
+    await advance(400)
+
+    expect(onTrialRecorded).toHaveBeenCalledTimes(3)
+    expect(onComplete).toHaveBeenCalledTimes(1)
+    expect(onTrialRecorded.mock.calls.map(([record]) => (record as TrialRecord).trialIndex)).toEqual([0, 1, 2])
+    expect(onTrialRecorded.mock.calls.map(([record]) => (record as TrialRecord).condition)).toEqual(['go', 'nogo', 'go'])
+    expect(onTrialRecorded.mock.calls.map(([record]) => (record as TrialRecord).stimulus)).toEqual([
+      'green_circle',
+      'red_circle',
+      'green_circle',
+    ])
+    expect((onTrialRecorded.mock.calls[1][0] as TrialRecord).actualResponse).toBe('none')
+  })
+
   it('Corsi saves adaptive state after a correct response', async () => {
     const seed = 123
     const state = createCorsiAdaptiveState(seed)

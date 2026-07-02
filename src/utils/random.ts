@@ -33,32 +33,70 @@ export function pseudoRandomSequence(
   random: () => number,
   maxConsecutive: number = 4
 ): boolean[] {
+  const targetGo = Math.round(goRatio * total)
+  const targetNoGo = total - targetGo
+  const maxConsecutiveGo = Math.max(maxConsecutive, Math.ceil(targetGo / (targetNoGo + 1)))
+  const maxConsecutiveNoGo = Math.max(
+    1,
+    maxConsecutive - 1,
+    Math.ceil(targetNoGo / (targetGo + 1))
+  )
   const result: boolean[] = []
-  let consecutiveGo = 0
-  let consecutiveNoGo = 0
+
+  const canComplete = (
+    goLeft: number,
+    noGoLeft: number,
+    last: boolean | null,
+    streak: number
+  ): boolean => {
+    if (goLeft < 0 || noGoLeft < 0) return false
+    if (goLeft === 0 && noGoLeft === 0) return true
+
+    const firstGoRunCapacity = last === true ? maxConsecutiveGo - streak : maxConsecutiveGo
+    const firstNoGoRunCapacity = last === false ? maxConsecutiveNoGo - streak : maxConsecutiveNoGo
+    const goCapacity = firstGoRunCapacity + noGoLeft * maxConsecutiveGo
+    const noGoCapacity = firstNoGoRunCapacity + goLeft * maxConsecutiveNoGo
+
+    return goLeft <= goCapacity && noGoLeft <= noGoCapacity
+  }
+
+  let goLeft = targetGo
+  let noGoLeft = targetNoGo
+  let last: boolean | null = null
+  let streak = 0
 
   for (let i = 0; i < total; i++) {
-    let isGo = random() < goRatio
+    const nextIfGoStreak = last === true ? streak + 1 : 1
+    const nextIfNoGoStreak = last === false ? streak + 1 : 1
+    const canPlaceGo =
+      goLeft > 0 &&
+      nextIfGoStreak <= maxConsecutiveGo &&
+      canComplete(goLeft - 1, noGoLeft, true, nextIfGoStreak)
+    const canPlaceNoGo =
+      noGoLeft > 0 &&
+      nextIfNoGoStreak <= maxConsecutiveNoGo &&
+      canComplete(goLeft, noGoLeft - 1, false, nextIfNoGoStreak)
 
-    if (isGo && consecutiveGo >= maxConsecutive) isGo = false
-    if (!isGo && consecutiveNoGo >= maxConsecutive - 1) isGo = true
-
-    const remaining = total - i
-    const remainingGo = Math.round(goRatio * total) - result.filter(Boolean).length
-    const remainingNoGo = total - Math.round(goRatio * total) - result.filter((v) => !v).length
-
-    if (remainingGo <= 0) isGo = false
-    if (remainingNoGo <= 0) isGo = true
-    if (remaining === remainingGo) isGo = true
-    if (remaining === remainingNoGo) isGo = false
+    let isGo: boolean
+    if (canPlaceGo && canPlaceNoGo) {
+      isGo = random() < goLeft / (goLeft + noGoLeft)
+    } else if (canPlaceGo) {
+      isGo = true
+    } else if (canPlaceNoGo) {
+      isGo = false
+    } else {
+      throw new Error('Unable to generate constrained pseudo-random sequence')
+    }
 
     result.push(isGo)
     if (isGo) {
-      consecutiveGo++
-      consecutiveNoGo = 0
+      goLeft--
+      streak = last === true ? streak + 1 : 1
+      last = true
     } else {
-      consecutiveNoGo++
-      consecutiveGo = 0
+      noGoLeft--
+      streak = last === false ? streak + 1 : 1
+      last = false
     }
   }
 

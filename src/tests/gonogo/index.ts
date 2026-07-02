@@ -1,12 +1,15 @@
 import type { DeviceInfo, TestMode, TrialRecord } from '../../types'
 import { buildBaseResult, conditionRTAndAccuracy } from '../../scoring/common'
 import { computeSDT } from '../../statistics/signalDetection'
-import { seededRandom, pseudoRandomSequence, randomInt } from '../../utils/random'
+import { seededRandom, randomInt } from '../../utils/random'
 import type { CognitiveTestDefinition, GeneratedTrial, ProtocolConfig } from '../types'
 
 const PROTOCOL_VERSION = 'gonogo.standard.v1.0'
 
 const GO_RATIO = 0.75
+const MAX_CONSECUTIVE_GO = 4
+const GAP_RANDOMIZATION_STEPS_PER_NO_GO = 6
+const BALANCED_ROTATION_ATTEMPTS = 2000
 
 const CLEANING = {
   anticipationThresholdMs: 150,
@@ -39,18 +42,151 @@ function blockSizes(totalTrials: number, blocks: number): number[] {
   return Array.from({ length: blocks }, (_, i) => base + (i < remainder ? 1 : 0))
 }
 
+function randomUnit(random: () => number): number {
+  return Math.min(random(), 1 - Number.EPSILON)
+}
+
+function randomIndex(length: number, random: () => number): number {
+  return Math.floor(randomUnit(random) * length)
+}
+
+function shuffledIndexes(length: number, random: () => number): number[] {
+  const indexes = Array.from({ length }, (_, index) => index)
+  for (let i = indexes.length - 1; i > 0; i--) {
+    const j = randomIndex(i + 1, random)
+    ;[indexes[i], indexes[j]] = [indexes[j], indexes[i]]
+  }
+  return indexes
+}
+
+function rotateSequence(sequence: boolean[], offset: number): boolean[] {
+  return [...sequence.slice(offset), ...sequence.slice(0, offset)]
+}
+
+function maxConsecutiveGo(sequence: boolean[]): number {
+  let current = 0
+  let max = 0
+  for (const isGo of sequence) {
+    current = isGo ? current + 1 : 0
+    max = Math.max(max, current)
+  }
+  return max
+}
+
+function expectedNoGoCount(size: number): number {
+  return Math.round((1 - GO_RATIO) * size)
+}
+
+function circularGoGaps(goCount: number, noGoCount: number, random: () => number): number[] {
+  const baseGap = Math.floor(goCount / noGoCount)
+  const gaps = Array.from({ length: noGoCount }, () => baseGap)
+  let remainingGo = goCount - baseGap * noGoCount
+
+  while (remainingGo > 0) {
+    const receivers = gaps
+      .map((gap, index) => (gap < MAX_CONSECUTIVE_GO ? index : -1))
+      .filter((index) => index >= 0)
+    if (receivers.length === 0) {
+      throw new Error('Go/No-Go ratio cannot satisfy the maximum Go streak')
+    }
+    gaps[receivers[randomIndex(receivers.length, random)]]++
+    remainingGo--
+  }
+
+  const steps = noGoCount * GAP_RANDOMIZATION_STEPS_PER_NO_GO
+  for (let step = 0; step < steps; step++) {
+    const donors = gaps
+      .map((gap, index) => (gap > 0 ? index : -1))
+      .filter((index) => index >= 0)
+    const receivers = gaps
+      .map((gap, index) => (gap < MAX_CONSECUTIVE_GO ? index : -1))
+      .filter((index) => index >= 0)
+
+    const donor = donors[randomIndex(donors.length, random)]
+    let receiver = receivers[randomIndex(receivers.length, random)]
+    if (receiver === donor && receivers.length > 1) {
+      const currentIndex = receivers.indexOf(receiver)
+      const offset = 1 + randomIndex(receivers.length - 1, random)
+      receiver = receivers[(currentIndex + offset) % receivers.length]
+    }
+
+    if (receiver !== donor) {
+      gaps[donor]--
+      gaps[receiver]++
+    }
+  }
+
+  return gaps
+}
+
+function circularSequenceFromGaps(gaps: number[]): boolean[] {
+  const sequence: boolean[] = []
+  for (const gap of gaps) {
+    sequence.push(false)
+    for (let i = 0; i < gap; i++) sequence.push(true)
+  }
+  return sequence
+}
+
+function hasExpectedBlockCounts(sequence: boolean[], sizes: number[]): boolean {
+  let start = 0
+  for (const size of sizes) {
+    const block = sequence.slice(start, start + size)
+    const noGoCount = block.filter((isGo) => !isGo).length
+    if (noGoCount !== expectedNoGoCount(size)) {
+      return false
+    }
+    start += size
+  }
+  return true
+}
+
+function splitBlocks(sequence: boolean[], sizes: number[]): boolean[][] {
+  const blocks: boolean[][] = []
+  let start = 0
+  for (const size of sizes) {
+    blocks.push(sequence.slice(start, start + size))
+    start += size
+  }
+  return blocks
+}
+
+function blockConditionSequences(sizes: number[], random: () => number): boolean[][] {
+  const totalTrials = sizes.reduce((sum, size) => sum + size, 0)
+  const totalNoGo = sizes.reduce((sum, size) => sum + expectedNoGoCount(size), 0)
+  const totalGo = totalTrials - totalNoGo
+
+  for (let attempt = 0; attempt < BALANCED_ROTATION_ATTEMPTS; attempt++) {
+    const gaps = circularGoGaps(totalGo, totalNoGo, random)
+    const circularSequence = circularSequenceFromGaps(gaps)
+
+    for (const rotation of shuffledIndexes(totalTrials, random)) {
+      const sequence = rotateSequence(circularSequence, rotation)
+      if (hasExpectedBlockCounts(sequence, sizes)) {
+        if (maxConsecutiveGo(sequence) > MAX_CONSECUTIVE_GO) {
+          throw new Error('Go/No-Go balanced sequence exceeded the maximum Go streak')
+        }
+        return splitBlocks(sequence, sizes)
+      }
+    }
+  }
+
+  throw new Error('Unable to generate balanced Go/No-Go sequence')
+}
+
 function generateTrials(mode: TestMode, seed: number): GeneratedTrial[] {
   const config = mode === 'assessment' ? ASSESSMENT_CONFIG : PRACTICE_CONFIG
   const random = seededRandom(seed)
-  const goSequence = pseudoRandomSequence(GO_RATIO, config.trialCount, random)
   const sizes = blockSizes(config.trialCount, config.blocks)
+  const blockSequences = blockConditionSequences(sizes, random)
   const trials: GeneratedTrial[] = []
   let trialIndex = 0
-  let seqIndex = 0
 
   for (let blockIndex = 0; blockIndex < config.blocks; blockIndex++) {
+    const goSequence = blockSequences[blockIndex]
+
     for (let i = 0; i < sizes[blockIndex]; i++) {
-      const isGo = goSequence[seqIndex++]
+      const isGo = goSequence[i]
       trials.push({
         blockIndex,
         trialIndex,
