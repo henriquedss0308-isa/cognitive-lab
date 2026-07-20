@@ -138,4 +138,13 @@ export const testDefinition: CognitiveTestDefinition = {
     'simple.medianRT': 'TR mediano',
     'simple.accuracy': 'Precisão',
   },
+  metricDirections: {
+    medianCorrectRT: -1,
+    rtCV: -1,
+    lapseRate: -1,
+    anticipationRate: -1,
+    postErrorSlowing: -1,
+    'simple.medianRT': -1,
+    'simple.accuracy': 1,
+  },
 }

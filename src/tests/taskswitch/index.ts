@@ -328,4 +328,13 @@ export const testDefinition: CognitiveTestDefinition = {
     medianCorrectRT: 'TR mediano (corretos)',
     accuracy: 'Precisão global',
   },
+  metricDirections: {
+    switchCostRT: -1,
+    mixingCostRT: -1,
+    switchCostAccuracy: -1,
+    mixingCostAccuracy: -1,
+    postErrorSlowing: -1,
+    medianCorrectRT: -1,
+    accuracy: 1,
+  },
 }

@@ -101,6 +101,7 @@ function makeTest(
     primaryMetricKey: 'medianCorrectRT',
     baselineMetricKeys: ['medianCorrectRT'],
     metricLabels: {},
+    metricDirections: {},
   }
 }
 

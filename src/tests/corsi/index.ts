@@ -200,4 +200,11 @@ export const testDefinition: CognitiveTestDefinition = {
     partialScore: 'Pontuação parcial (itens)',
     partialScoreRate: 'Pontuação parcial (%)',
   },
+  metricDirections: {
+    confirmedSpan: 1,
+    maxSpan: 1,
+    totalCorrectSequences: 1,
+    partialScore: 1,
+    partialScoreRate: 1,
+  },
 }

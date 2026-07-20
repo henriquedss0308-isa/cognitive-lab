@@ -312,4 +312,15 @@ export const testDefinition: CognitiveTestDefinition = {
     accuracy1Back: 'Precisão 1-back',
     accuracy2Back: 'Precisão 2-back',
   },
+  metricDirections: {
+    dPrime: 1,
+    hitRate: 1,
+    falseAlarmRate: -1,
+    dPrime1Back: 1,
+    dPrime2Back: 1,
+    medianRT1Back: -1,
+    medianRT2Back: -1,
+    accuracy1Back: 1,
+    accuracy2Back: 1,
+  },
 }

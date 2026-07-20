@@ -211,4 +211,13 @@ export const testDefinition: CognitiveTestDefinition = {
     postErrorSlowing: 'Abrandamento pós-erro (ms)',
     accuracy: 'Precisão global',
   },
+  metricDirections: {
+    commissionErrorRate: -1,
+    medianCorrectRT: -1,
+    dPrime: 1,
+    hitRate: 1,
+    falseAlarmRate: -1,
+    postErrorSlowing: -1,
+    accuracy: 1,
+  },
 }

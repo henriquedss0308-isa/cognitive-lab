@@ -171,4 +171,15 @@ export const testDefinition: CognitiveTestDefinition = {
     'left.accuracy': 'Precisão (esquerda)',
     'right.accuracy': 'Precisão (direita)',
   },
+  metricDirections: {
+    medianCorrectRT: -1,
+    accuracy: 1,
+    rtCV: -1,
+    leftRightAsymmetry: -1,
+    postErrorSlowing: -1,
+    'left.medianRT': -1,
+    'right.medianRT': -1,
+    'left.accuracy': 1,
+    'right.accuracy': 1,
+  },
 }

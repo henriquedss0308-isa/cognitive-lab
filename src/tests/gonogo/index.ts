@@ -323,4 +323,14 @@ export const testDefinition: CognitiveTestDefinition = {
     'go.accuracy': 'Precisão (Go)',
     'nogo.accuracy': 'Precisão (No-Go)',
   },
+  metricDirections: {
+    dPrime: 1,
+    hitRate: 1,
+    falseAlarmRate: -1,
+    commissionErrorRate: -1,
+    commissionErrors: -1,
+    'go.medianRT': -1,
+    'go.accuracy': 1,
+    'nogo.accuracy': 1,
+  },
 }

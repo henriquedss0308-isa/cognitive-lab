@@ -5,7 +5,8 @@ import { getTest } from '../tests/registry'
 import { MetricCard } from '../components/common/MetricTooltip'
 import { BlockChart, RTDistribution } from '../components/charts/SessionCharts'
 import { TestConditionsForm } from '../components/test/TestConditionsForm'
-import { computeBaselineStats, robustZScore } from '../statistics'
+import { computeBaselineStats } from '../statistics'
+import { evaluatePrimaryZ } from '../statistics/zscore'
 import { getSession } from '../storage/repository'
 import { loadResultsSession, type ResultsLoadState } from '../storage/resultsLoader'
 import type { SessionRecord, TestConditions } from '../types'
@@ -121,14 +122,7 @@ export function Results() {
   const primaryValue = result.customMetrics[test.primaryMetricKey] ??
     result.rtMetrics.medianCorrectRT
 
-  const zScore = baseline.metrics[test.primaryMetricKey]
-    ? robustZScore(
-        primaryValue ?? 0,
-        baseline.metrics[test.primaryMetricKey].median,
-        baseline.metrics[test.primaryMetricKey].mad,
-        test.primaryMetricKey.includes('accuracy') ? 1 : -1
-      )
-    : null
+  const zOutcome = evaluatePrimaryZ(primaryValue, baseline, test)
 
   const handleConditionsSave = async (conditions: TestConditions) => {
     if (!session) return
@@ -194,13 +188,22 @@ export function Results() {
         <MetricCard metric="rtCV" label="Variabilidade (CV)" value={result.rtMetrics.rtCoefficientOfVariation} />
       </div>
 
-      {zScore !== null && baseline.phase === 'monitoring' && (
+      {zOutcome.kind === 'ok' && (
         <div className="card p-4 mb-6">
           <h3 className="text-sm font-medium">Comparado ao seu próprio baseline</h3>
-          <p className="text-2xl font-mono mt-1">z = {zScore.toFixed(2)}</p>
+          <p className="text-2xl font-mono mt-1">z = {zOutcome.z.toFixed(2)}</p>
           <p className="text-xs text-lab-muted mt-1">
-            Baseado em {baseline.metrics[test.primaryMetricKey]?.n ?? 0} sessões de baseline.
+            z positivo = melhor que o seu habitual nesta métrica.
+            Baseado em {zOutcome.n} sessões de baseline.
             Diferenças pequenas podem não ser significativas.
+          </p>
+        </div>
+      )}
+      {zOutcome.kind === 'value_missing' && (
+        <div className="card p-4 mb-6">
+          <h3 className="text-sm font-medium">Comparado ao seu próprio baseline</h3>
+          <p className="text-sm text-lab-muted mt-1">
+            A métrica principal não pôde ser calculada nesta sessão — comparação indisponível.
           </p>
         </div>
       )}

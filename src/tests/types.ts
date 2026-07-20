@@ -76,4 +76,10 @@ export interface CognitiveTestDefinition {
   primaryMetricKey: string
   baselineMetricKeys: string[]
   metricLabels: Record<string, string>
+  /**
+   * Direção de interpretação por métrica: +1 = valor maior é melhor,
+   * -1 = valor menor é melhor. Obrigatória para toda métrica usada em
+   * z-score; proibido inferir direção por heurística de nome.
+   */
+  metricDirections: Record<string, 1 | -1>
 }

@@ -231,4 +231,16 @@ export const testDefinition: CognitiveTestDefinition = {
     'incongruent.accuracy': 'Precisão (incongruente)',
     'neutral.accuracy': 'Precisão (neutro)',
   },
+  metricDirections: {
+    stroopCostRT: -1,
+    stroopCostAccuracy: -1,
+    incongruentNeutralCostRT: -1,
+    accuracy: 1,
+    'congruent.medianRT': -1,
+    'incongruent.medianRT': -1,
+    'neutral.medianRT': -1,
+    'congruent.accuracy': 1,
+    'incongruent.accuracy': 1,
+    'neutral.accuracy': 1,
+  },
 }
