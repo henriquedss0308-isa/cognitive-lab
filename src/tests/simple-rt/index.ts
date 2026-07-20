@@ -90,6 +90,7 @@ function scoreSession(
   }
 
   base.customMetrics = {
+    ...base.customMetrics,
     postErrorSlowing: postErrorSlowing(trials),
   }
 
@@ -130,6 +131,7 @@ export const testDefinition: CognitiveTestDefinition = {
   primaryMetricKey: 'medianCorrectRT',
   baselineMetricKeys: ['medianCorrectRT', 'rtCV', 'lapseRate', 'anticipationRate', 'postErrorSlowing'],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     medianCorrectRT: 'TR mediano (corretos)',
     rtCV: 'Coeficiente de variação do TR',
     lapseRate: 'Taxa de lapsos',
@@ -139,6 +141,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'simple.accuracy': 'Precisão',
   },
   metricDirections: {
+    isiEarlyPresses: -1,
     medianCorrectRT: -1,
     rtCV: -1,
     lapseRate: -1,

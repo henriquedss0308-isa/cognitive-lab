@@ -143,6 +143,7 @@ function scoreSartSession(
       },
     },
     customMetrics: {
+      ...base.customMetrics,
       commissionErrorRate,
       dPrime: sdtMetrics.dPrime,
       criterion: sdtMetrics.criterion,
@@ -202,6 +203,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'accuracy',
   ],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     commissionErrorRate: 'Erros de comissão (%)',
     medianCorrectRT: 'TR mediano (corretos)',
     dPrime: "d' (sensibilidade)",
@@ -212,6 +214,7 @@ export const testDefinition: CognitiveTestDefinition = {
     accuracy: 'Precisão global',
   },
   metricDirections: {
+    isiEarlyPresses: -1,
     commissionErrorRate: -1,
     medianCorrectRT: -1,
     dPrime: 1,

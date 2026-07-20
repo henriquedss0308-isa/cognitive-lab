@@ -262,6 +262,7 @@ function scoreSession(
   const commissionErrorRate = nogoTrials.length > 0 ? commissionErrors / nogoTrials.length : null
 
   base.customMetrics = {
+    ...base.customMetrics,
     dPrime: sdt.dPrime,
     criterion: sdt.criterion,
     hitRate: sdt.hitRate,
@@ -313,6 +314,7 @@ export const testDefinition: CognitiveTestDefinition = {
   primaryMetricKey: 'dPrime',
   baselineMetricKeys: ['dPrime', 'falseAlarmRate', 'hitRate', 'commissionErrorRate', 'go.medianRT'],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     dPrime: "d' (sensibilidade)",
     criterion: 'Critério de resposta',
     hitRate: 'Taxa de acertos (Go)',
@@ -324,6 +326,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'nogo.accuracy': 'Precisão (No-Go)',
   },
   metricDirections: {
+    isiEarlyPresses: -1,
     dPrime: 1,
     hitRate: 1,
     falseAlarmRate: -1,

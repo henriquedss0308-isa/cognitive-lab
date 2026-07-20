@@ -117,6 +117,7 @@ function scoreSession(
     leftRT !== null && rightRT !== null ? Math.abs(leftRT - rightRT) : null
 
   base.customMetrics = {
+    ...base.customMetrics,
     postErrorSlowing: postErrorSlowing(trials),
     leftRightAsymmetry: asymmetry,
   }
@@ -161,6 +162,7 @@ export const testDefinition: CognitiveTestDefinition = {
   primaryMetricKey: 'medianCorrectRT',
   baselineMetricKeys: ['medianCorrectRT', 'accuracy', 'rtCV', 'leftRightAsymmetry', 'postErrorSlowing'],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     medianCorrectRT: 'TR mediano (corretos)',
     accuracy: 'Precisão global',
     rtCV: 'Coeficiente de variação do TR',
@@ -172,6 +174,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'right.accuracy': 'Precisão (direita)',
   },
   metricDirections: {
+    isiEarlyPresses: -1,
     medianCorrectRT: -1,
     accuracy: 1,
     rtCV: -1,

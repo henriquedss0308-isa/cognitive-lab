@@ -93,6 +93,9 @@ export function TestRunner({
   const trialToken = useRef(0)
   const trialClaimed = useRef(false)
   const trialFinalized = useRef(false)
+  // Teclas de resposta pressionadas durante fixação/ISI do trial corrente
+  // (spec §14) — contadas sem criar trial nem RT.
+  const earlyPresses = useRef(0)
   const pendingRecordPromise = useRef<Promise<TrialRecord> | null>(null)
   const interruptionTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const loopAbort = useRef<AbortController | null>(null)
@@ -129,6 +132,7 @@ export function TestRunner({
     stimulusOnset.current = 0
     pendingCorrectness.current = null
     pendingRecordPromise.current = null
+    earlyPresses.current = 0
     return { token: trialToken.current, signal: loopAbort.current.signal }
   }, [])
 
@@ -336,6 +340,8 @@ export function TestRunner({
           windowFocused: focusTracker.current.isFocused,
           visibilityState: document.visibilityState,
           cleaning: config.cleaningRules,
+          extraMeta:
+            earlyPresses.current > 0 ? { earlyPressCount: earlyPresses.current } : undefined,
         })
         pendingRecordPromise.current = recordPromise
         const record = await recordPromise
@@ -481,14 +487,27 @@ export function TestRunner({
 
       if (e.repeat) return
       if (test.id === 'corsi') return
+
+      const isSpaceTest = ['simple_rt', 'gonogo', 'sart', 'nback'].includes(test.id)
+      const isKeyTest = ['choice_rt', 'stroop', 'taskswitch'].includes(test.id)
+      const isResponseKey =
+        (isSpaceTest && key === ' ') || (isKeyTest && ['f', 'g', 'h', 'j'].includes(key))
+
+      // Antecipação fora da janela: tecla de resposta durante fixação/ISI é
+      // contada no trial corrente (spec §14) — sem trial, sem RT.
+      if (phase === 'fixation' || phase === 'isi') {
+        if (isResponseKey) {
+          if (key === ' ') e.preventDefault()
+          earlyPresses.current += 1
+        }
+        return
+      }
+
       if (phase !== 'stimulus' && phase !== 'response') return
 
       const token = trialToken.current
       const trial = test.isAdaptive ? corsiTrialMeta : trialsRef.current[trialIdx]
       if (!trial || responded.current || isStale(token)) return
-
-      const isSpaceTest = ['simple_rt', 'gonogo', 'sart', 'nback'].includes(test.id)
-      const isKeyTest = ['choice_rt', 'stroop', 'taskswitch'].includes(test.id)
 
       let response: string | null = null
       if (isSpaceTest && key === ' ') {
@@ -535,6 +554,8 @@ export function TestRunner({
           windowFocused: focusTracker.current.isFocused,
           visibilityState: document.visibilityState,
           cleaning: config.cleaningRules,
+          extraMeta:
+            earlyPresses.current > 0 ? { earlyPressCount: earlyPresses.current } : undefined,
         })
         pendingRecordPromise.current = recordPromise
         const record = await recordPromise

@@ -167,6 +167,7 @@ function scoreSession(
   }
 
   base.customMetrics = {
+    ...base.customMetrics,
     stroopCostRT: stroopCostRT(congruent.validRTs, incongruent.validRTs),
     stroopCostAccuracy: stroopCostAccuracy(congruent.accuracy, incongruent.accuracy),
     incongruentNeutralCostRT: stroopCostRT(neutral.validRTs, incongruent.validRTs),
@@ -220,6 +221,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'accuracy',
   ],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     stroopCostRT: 'Custo Stroop (TR)',
     stroopCostAccuracy: 'Custo Stroop (precisão)',
     incongruentNeutralCostRT: 'Custo incongruente vs neutro (TR)',
@@ -232,6 +234,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'neutral.accuracy': 'Precisão (neutro)',
   },
   metricDirections: {
+    isiEarlyPresses: -1,
     stroopCostRT: -1,
     stroopCostAccuracy: -1,
     incongruentNeutralCostRT: -1,
