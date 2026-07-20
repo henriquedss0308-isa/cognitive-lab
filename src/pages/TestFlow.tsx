@@ -22,6 +22,7 @@ import {
 } from '../storage/repository'
 import {
   completeAssessmentSession,
+  mergeCompletionRecord,
   SessionPersistenceError,
 } from '../storage/sessionCompletion'
 import { canResumeSession } from '../storage/sessionRecovery'
@@ -228,7 +229,10 @@ export function TestFlow() {
     }
 
     try {
-      await completeAssessmentSession(session)
+      // Preserva checkIn/bateria/dispositivo do registro criado no início
+      // da sessão (essencial no resume, que não repassa pelo formulário).
+      const existing = await getSession(sessionId)
+      await completeAssessmentSession(mergeCompletionRecord(session, existing))
       await refresh()
       navigate(`/results/${sessionId}`)
     } catch (err) {

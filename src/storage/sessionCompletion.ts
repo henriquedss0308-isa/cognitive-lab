@@ -2,6 +2,77 @@ import type { SessionRecord } from '../types'
 import { getSession, saveSession } from './repository'
 import { prepareSessionForStorage } from './sanitize'
 
+/**
+ * Combina o registro final produzido em handleComplete com o registro
+ * já persistido da MESMA sessão (criado no início ou retomado).
+ *
+ * Invariantes (spec §7):
+ * - checkIn/batteryId/batteryPosition/startedAt do registro original nunca
+ *   são perdidos silenciosamente (o resume não passa pelo formulário de
+ *   condições — antes desta função, o check-in original era apagado);
+ * - deviceInfo autoritativo é o do INÍCIO da sessão; se o dispositivo da
+ *   conclusão divergir (deviceType/inputMethod), a sessão recebe flag e
+ *   aviso e é rebaixada para valid_with_warnings.
+ */
+export function mergeCompletionRecord(
+  fresh: SessionRecord,
+  existing: SessionRecord | undefined
+): SessionRecord {
+  if (!existing || existing.sessionId !== fresh.sessionId) return fresh
+
+  const checkIn = fresh.checkIn ?? existing.checkIn
+  const batteryId = fresh.batteryId ?? existing.batteryId
+  const batteryPosition = fresh.batteryPosition ?? existing.batteryPosition
+  const startedAt = existing.startedAt ?? fresh.startedAt
+  const originalDevice = existing.deviceInfo ?? fresh.deviceInfo
+
+  const deviceChanged =
+    originalDevice.deviceType !== fresh.deviceInfo.deviceType
+  const inputChanged =
+    originalDevice.inputMethod !== fresh.deviceInfo.inputMethod
+
+  const flags = { ...fresh.flags }
+  const flagMessages = [...fresh.flagMessages]
+  if (deviceChanged) {
+    flags.differentDevice = true
+    flagMessages.push('Dispositivo mudou entre o início e a conclusão da sessão.')
+  }
+  if (inputChanged) {
+    flags.differentInputMethod = true
+    flagMessages.push('Método de entrada mudou entre o início e a conclusão da sessão.')
+  }
+
+  const quality =
+    (deviceChanged || inputChanged) && fresh.quality === 'valid'
+      ? 'valid_with_warnings'
+      : fresh.quality
+
+  return {
+    ...fresh,
+    startedAt,
+    checkIn,
+    batteryId,
+    batteryPosition,
+    deviceInfo: originalDevice,
+    quality,
+    flags,
+    flagMessages,
+    result: fresh.result
+      ? {
+          ...fresh.result,
+          startedAt,
+          checkIn,
+          batteryId,
+          batteryPosition,
+          deviceInfo: originalDevice,
+          quality,
+          flags,
+          flagMessages,
+        }
+      : fresh.result,
+  }
+}
+
 export class SessionPersistenceError extends Error {
   readonly sessionId: string
 
