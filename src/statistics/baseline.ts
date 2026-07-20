@@ -70,6 +70,7 @@ export function computeBaselineStats(
     sessionCount: valid.length,
     familiarizationCount: Math.min(valid.length, FAMILIARIZATION_SESSIONS),
     baselineCount: Math.max(0, Math.min(valid.length - FAMILIARIZATION_SESSIONS, BASELINE_SESSIONS)),
+    warningCount: baselineSessions.filter((s) => s.quality === 'valid_with_warnings').length,
     metrics,
   }
 }

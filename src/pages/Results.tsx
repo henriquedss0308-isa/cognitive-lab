@@ -188,23 +188,40 @@ export function Results() {
         <MetricCard metric="rtCV" label="Variabilidade (CV)" value={result.rtMetrics.rtCoefficientOfVariation} />
       </div>
 
-      {zOutcome.kind === 'ok' && (
+      {zOutcome.kind !== 'not_monitoring' && zOutcome.kind !== 'no_baseline_metric' && (
         <div className="card p-4 mb-6">
           <h3 className="text-sm font-medium">Comparado ao seu próprio baseline</h3>
-          <p className="text-2xl font-mono mt-1">z = {zOutcome.z.toFixed(2)}</p>
-          <p className="text-xs text-lab-muted mt-1">
-            z positivo = melhor que o seu habitual nesta métrica.
-            Baseado em {zOutcome.n} sessões de baseline.
-            Diferenças pequenas podem não ser significativas.
-          </p>
-        </div>
-      )}
-      {zOutcome.kind === 'value_missing' && (
-        <div className="card p-4 mb-6">
-          <h3 className="text-sm font-medium">Comparado ao seu próprio baseline</h3>
-          <p className="text-sm text-lab-muted mt-1">
-            A métrica principal não pôde ser calculada nesta sessão — comparação indisponível.
-          </p>
+          {zOutcome.kind === 'ok' && (
+            <>
+              <p className="text-2xl font-mono mt-1">z = {zOutcome.z.toFixed(2)}</p>
+              <p className="text-xs text-lab-muted mt-1">
+                z positivo = melhor que o seu habitual nesta métrica.
+                Baseado em {zOutcome.n} de {baseline.baselineCount} sessões de baseline
+                {baseline.warningCount > 0 && ` (${baseline.warningCount} com avisos)`}.
+                Diferenças pequenas podem não ser significativas.
+              </p>
+            </>
+          )}
+          {zOutcome.kind === 'value_missing' && (
+            <p className="text-sm text-lab-muted mt-1">
+              A métrica principal não pôde ser calculada nesta sessão — comparação indisponível.
+            </p>
+          )}
+          {zOutcome.kind === 'insufficient_n' && (
+            <p className="text-sm text-lab-muted mt-1">
+              Baseline com poucos valores nesta métrica ({zOutcome.n} de {baseline.baselineCount})
+              — comparação por desvio suprimida para evitar conclusões instáveis.
+            </p>
+          )}
+          {zOutcome.kind === 'zero_mad' && (
+            <p className="text-sm text-lab-muted mt-1">
+              A variabilidade do seu baseline nesta métrica é ≈ 0 (valores quase idênticos), então o
+              desvio padronizado não é informativo. Mediana do baseline: {zOutcome.median?.toFixed(2)}
+              {zOutcome.delta !== null &&
+                ` · diferença desta sessão: ${zOutcome.delta > 0 ? '+' : ''}${zOutcome.delta.toFixed(2)}`}
+              .
+            </p>
+          )}
         </div>
       )}
 

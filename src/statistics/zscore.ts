@@ -2,12 +2,16 @@ import type { BaselineStats } from '../types'
 import type { CognitiveTestDefinition } from '../tests/types'
 import { robustZScore } from './basic'
 
+/** Mínimo de valores no baseline para z interpretável (spec §3.2). */
+export const MIN_BASELINE_N = 6
+
 export type PrimaryZOutcome =
   | { kind: 'ok'; z: number; n: number }
   | { kind: 'not_monitoring' }
   | { kind: 'value_missing' }
   | { kind: 'no_baseline_metric' }
   | { kind: 'no_direction' }
+  | { kind: 'insufficient_n'; n: number }
   | { kind: 'zero_mad'; median: number | null; delta: number | null; n: number }
 
 /**
@@ -29,6 +33,10 @@ export function evaluatePrimaryZ(
 
   if (primaryValue === null || primaryValue === undefined || !Number.isFinite(primaryValue)) {
     return { kind: 'value_missing' }
+  }
+
+  if (stats.n < MIN_BASELINE_N) {
+    return { kind: 'insufficient_n', n: stats.n }
   }
 
   if (stats.mad === 0 && stats.median !== null) {

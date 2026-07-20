@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  computeBaselineStats,
   getBaselinePhase,
   getValidAssessmentSessions,
   recomputeStoredBaselinePhases,
@@ -162,5 +163,30 @@ describe('recomputeStoredBaselinePhases — fronteiras da regra 3/8', () => {
     expect(eligible).toHaveLength(12)
     const phases = recomputeStoredBaselinePhases(sessions)
     expect(phases.get(eligible[11].sessionId)).toBe('monitoring')
+  })
+})
+
+describe('computeBaselineStats — janela e composição (spec §2/§3)', () => {
+  it('em monitoring, a janela são exatamente as elegíveis 4–11 e warningCount conta só nelas', () => {
+    const sessions = Array.from({ length: 13 }, (_, i) =>
+      makeSession(i + 1, {
+        // nº 5 (dentro da janela) e nº 13 (monitoring, fora) com avisos
+        quality: i + 1 === 5 || i + 1 === 13 ? 'valid_with_warnings' : 'valid',
+      })
+    )
+    const stats = computeBaselineStats(sessions, 'simple_rt', 'reaction.simple.v1.0', ['medianCorrectRT'])
+    expect(stats.phase).toBe('monitoring')
+    expect(stats.baselineCount).toBe(8)
+    expect(stats.warningCount).toBe(1)
+    expect(stats.metrics.medianCorrectRT.n).toBe(8)
+  })
+
+  it('sessões novas em monitoring NÃO alteram a janela (estabilidade posicional)', () => {
+    const eleven = Array.from({ length: 11 }, (_, i) => makeSession(i + 1))
+    const withTwelve = [...eleven, makeSession(12)]
+    const a = computeBaselineStats(eleven, 'simple_rt', 'reaction.simple.v1.0', ['medianCorrectRT'])
+    const b = computeBaselineStats(withTwelve, 'simple_rt', 'reaction.simple.v1.0', ['medianCorrectRT'])
+    expect(a.metrics.medianCorrectRT.median).toBe(b.metrics.medianCorrectRT.median)
+    expect(a.metrics.medianCorrectRT.mad).toBe(b.metrics.medianCorrectRT.mad)
   })
 })

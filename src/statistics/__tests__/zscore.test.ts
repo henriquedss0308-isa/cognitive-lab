@@ -16,6 +16,7 @@ function baselineFor(
     sessionCount: 12,
     familiarizationCount: 3,
     baselineCount: 8,
+    warningCount: 0,
     metrics: { [test.primaryMetricKey]: metric },
   }
 }
@@ -91,5 +92,16 @@ describe('evaluatePrimaryZ', () => {
     const base = baselineFor(gonogo, { median: 2, mad: 0.3, n: 8 })
     base.metrics = {}
     expect(evaluatePrimaryZ(3.0, base, gonogo).kind).toBe('no_baseline_metric')
+  })
+
+  it('n abaixo do mínimo suprime o z com motivo (spec §3.2)', () => {
+    const out = evaluatePrimaryZ(3.0, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 5 }), gonogo)
+    expect(out.kind).toBe('insufficient_n')
+    if (out.kind === 'insufficient_n') expect(out.n).toBe(5)
+  })
+
+  it('n exatamente no mínimo ainda produz z', () => {
+    const out = evaluatePrimaryZ(3.0, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 6 }), gonogo)
+    expect(out.kind).toBe('ok')
   })
 })
