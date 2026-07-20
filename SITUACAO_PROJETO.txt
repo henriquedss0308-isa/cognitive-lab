@@ -80,11 +80,19 @@ Essa edicao altera somente o contexto descritivo da sessao. Ela nao muda:
 Baseline pessoal
 ----------------
 O baseline e independente para cada teste e para cada versao de protocolo.
-Ele considera apenas sessoes de avaliacao validas.
+Ele considera sessoes de avaliacao elegiveis: completas, com resultado,
+qualidade valid ou valid_with_warnings, nao demo e com treino valido.
+A regra normativa completa esta em docs/ESPECIFICACAO.md.
 
-- Sessoes validas 1 a 3: familiarizacao; nao entram no baseline.
-- Sessoes validas 4 a 11: constroem o baseline (8 sessoes).
-- A partir da 11a sessao valida: monitoramento longitudinal.
+- Sessoes elegiveis 1 a 3: familiarizacao; nao entram no baseline.
+- Sessoes elegiveis 4 a 11: constroem o baseline (janela fixa de 8).
+- A partir da 12a sessao elegivel: monitoramento longitudinal (z-score).
+
+Sessoes valid_with_warnings entram no baseline e a interface mostra a
+composicao ("N sessoes, K com avisos"). O z-score usa direcao explicita
+por metrica (z positivo = melhor que o habitual) e so aparece com MAD > 0
+e pelo menos 6 valores no baseline; com MAD = 0 a interface mostra a
+mediana e a diferenca bruta, com explicacao.
 
 As metricas do baseline usam mediana e MAD, uma abordagem robusta a valores
 extremos. Por isso, uma sessao com interferencia externa deve ser anotada;
@@ -99,11 +107,15 @@ Historico, analise e dados
 - Graficos de tendencia longitudinal quando ha dados suficientes.
 - Baterias predefinidas: Check-in Rapido, Bateria Diaria, Bateria Padrao e
   Bateria Personalizada.
-- Dados de demonstracao para explorar a interface.
+- Dados de demonstracao para explorar a interface (nunca entram no
+  baseline, nas tendencias nem nas sugestoes de condicoes).
 - Exportacao de backup JSON completo.
 - Exportacao CSV de trials individuais.
 - Exportacao CSV de resultados por sessao.
-- Importacao de backup.
+- Importacao de backup: validada por sessao (estrutura e enums),
+  idempotente (sessao ja existente e mantida, nunca sobrescrita) e com
+  relatorio de importadas/mantidas/rejeitadas. Importar sessoes anteriores
+  as locais gera aviso de possivel recomposicao do baseline.
 
 Privacidade e recuperacao
 -------------------------
@@ -115,8 +127,19 @@ JSON periodico e a forma recomendada de preservar e transferir os dados.
 Estado das sessoes interrompidas
 --------------------------------
 O Corsi pode continuar uma sessao interrompida porque possui estado adaptativo
-salvo. Os demais protocolos exigem reiniciar a avaliacao interrompida, para
-preservar as regras do teste e a interpretacao dos resultados.
+salvo; ao retomar, o check-in original e o dispositivo de inicio sao
+preservados (divergencia de dispositivo gera aviso). Os demais protocolos
+exigem reiniciar a avaliacao interrompida, para preservar as regras do teste
+e a interpretacao dos resultados.
+
+Recarregar ou fechar a aba durante uma avaliacao deixa a sessao "em
+andamento"; na proxima inicializacao do aplicativo ela e arquivada como
+interrompida (invalida, com aviso). Em Dados e Configuracoes e possivel
+arquivar uma sessao incompleta (preserva os ensaios) ou exclui-la
+permanentemente (acao separada, com confirmacao).
+
+Sessoes concluidas tem status terminal: nada as rebaixa depois (um ESC
+tardio, por exemplo, nao transforma uma sessao concluida em abandonada).
 
 Limitacoes metodologicas importantes
 ------------------------------------
@@ -127,6 +150,12 @@ Limitacoes metodologicas importantes
 - Perda de foco, aba em segundo plano, throttling e variacoes de renderizacao
   podem introduzir ruido nos tempos de resposta.
 - O projeto registra sinais desses eventos para ajudar na avaliacao da qualidade.
+- Teclas de resposta pressionadas antes do estimulo (durante fixacao/ISI)
+  sao contadas como metrica separada (isiEarlyPresses), sem alterar a taxa
+  de antecipacao classica.
+- Sessoes feitas em dispositivo ou metodo de entrada diferente do habitual
+  recebem aviso e qualidade "valida com avisos"; a comparacao nao e
+  normalizada entre dispositivos.
 - A comparacao e pessoal: nao ha percentis populacionais ou diagnostico clinico.
 
 Como executar o projeto
