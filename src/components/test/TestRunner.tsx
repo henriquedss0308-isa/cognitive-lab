@@ -113,6 +113,7 @@ export function TestRunner({
   const [corsiHighlight, setCorsiHighlight] = useState(-1)
   const [corsiTrialMeta, setCorsiTrialMeta] = useState<GeneratedTrial | null>(null)
   const [droppedFramesWarning, setDroppedFramesWarning] = useState(false)
+  const [fatalError, setFatalError] = useState<string | null>(null)
 
   const inputMethod = test.id === 'corsi' ? 'mouse' : 'keyboard'
   const currentTrial = test.isAdaptive ? corsiTrialMeta : trialsRef.current[trialIdx]
@@ -146,7 +147,21 @@ export function TestRunner({
   const persistTrial = useCallback(
     async (trial: TrialRecord) => {
       recordedTrials.current.push(trial)
-      await onTrialRecorded?.(trial)
+      try {
+        await onTrialRecorded?.(trial)
+      } catch (err) {
+        // Falha de armazenamento não pode congelar a sessão em silêncio:
+        // para o loop e mostra estado de erro recuperável (spec/P1-6).
+        if (import.meta.env.DEV) {
+          console.error('[persistTrial] falha ao gravar ensaio', err)
+        }
+        running.current = false
+        loopAbort.current?.abort()
+        setFatalError(
+          'Falha ao gravar o ensaio no armazenamento local. A sessão foi interrompida; os ensaios já gravados foram preservados.'
+        )
+        throw new DOMException('Aborted', 'AbortError')
+      }
     },
     [onTrialRecorded]
   )
@@ -370,7 +385,11 @@ export function TestRunner({
         await runFixedTrial(token, signal)
       }
     } catch (e) {
-      if ((e as Error).name !== 'AbortError') throw e
+      if ((e as Error).name !== 'AbortError') {
+        if (import.meta.env.DEV) console.error('[runTrialLoop]', e)
+        running.current = false
+        setFatalError('Erro inesperado durante o ensaio. A sessão foi interrompida.')
+      }
     }
   }, [beginTrialLoop, test.isAdaptive, runCorsiSequence, runFixedTrial])
 
@@ -527,7 +546,12 @@ export function TestRunner({
         } else {
           finalizeTrialOnce(token, mode === 'training' ? record.correct : null)
         }
-      })()
+      })().catch((e) => {
+        if ((e as Error).name !== 'AbortError') {
+          running.current = false
+          setFatalError('Erro ao registrar a resposta. A sessão foi interrompida.')
+        }
+      })
     },
     [
       phase,
@@ -608,7 +632,12 @@ export function TestRunner({
       corsiState.current = nextState
 
       finalizeTrialOnce(token, mode === 'training' ? false : null)
-      })()
+      })().catch((e) => {
+        if ((e as Error).name !== 'AbortError') {
+          running.current = false
+          setFatalError('Erro ao registrar a resposta. A sessão foi interrompida.')
+        }
+      })
       return
     }
 
@@ -650,7 +679,12 @@ export function TestRunner({
       corsiState.current = nextState
 
       finalizeTrialOnce(token, mode === 'training' ? true : null)
-      })()
+      })().catch((e) => {
+        if ((e as Error).name !== 'AbortError') {
+          running.current = false
+          setFatalError('Erro ao registrar a resposta. A sessão foi interrompida.')
+        }
+      })
     }
   }
 
@@ -663,6 +697,16 @@ export function TestRunner({
   const showStimulus = phase === 'stimulus' || phase === 'response' || phase === 'feedback'
   // Fixation cross only for tests that use it (not SART, which has no inter-trial gap)
   const showFixationCross = (phase === 'isi' || phase === 'fixation') && config.advancePolicy !== 'fixed-duration'
+
+  if (fatalError) {
+    return (
+      <div className="fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50 p-8">
+        <h2 className="text-xl font-medium mb-2 text-lab-danger">Sessão interrompida</h2>
+        <p className="text-lab-muted mb-6 max-w-md text-center">{fatalError}</p>
+        <button className="btn-primary" onClick={abortRun}>Sair do teste</button>
+      </div>
+    )
+  }
 
   if (phase === 'block_break') {
     return (
