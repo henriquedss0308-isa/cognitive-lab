@@ -11,7 +11,7 @@ Aplicação web local-first para testes cognitivos padronizados, acompanhamento 
 | Framework | Vite + React + TypeScript | SPA rápida, offline após carregamento |
 | Estilo | Tailwind CSS v4 | Utilitários, tema escuro científico |
 | Gráficos | Recharts | Integração React, gráficos claros |
-| Persistência | IndexedDB (idb) | Local-first, ensaios individuais |
+| Persistência | IndexedDB (idb) | Local-first; 1 registro por sessão com trials embutidos |
 | Roteamento | React Router v7 | Navegação multi-página |
 | Testes unitários | Vitest | Validação estatística e backup |
 | Autenticação | Nenhuma (v1) | Arquitetura preparada para backend futuro |
@@ -33,29 +33,38 @@ Cada teste possui **Modo Treino** (feedback imediato) e **Modo Avaliação** (se
 
 ```
 src/
-├── tests/          # Definições dos 8 testes (gerador, scoring, instruções)
-├── protocols/      # Versionamento (embutido nos testes)
-├── scoring/        # Validação de sessão, scoring comum
-├── statistics/     # Mediana, MAD, d', custos, baseline
-├── storage/        # IndexedDB, export/import
-├── charts/         # Visualizações Recharts
+├── tests/          # Definições dos 8 testes (gerador, scoring, instruções, versão de protocolo)
+├── engine/         # Registro/classificação de trials, critério de treino
+├── scoring/        # Validação de sessão, scoring comum, comparação de dispositivo
+├── statistics/     # Mediana, MAD, d', custos, baseline, z-score
+├── storage/        # IndexedDB, migrações, export/import, conclusão/recuperação de sessão
 ├── batteries/      # Baterias pré-definidas
 ├── demo/           # Dados de demonstração
-├── components/     # UI (layout, test runner, métricas)
+├── components/     # UI (layout, test runner, gráficos, métricas)
 ├── pages/          # Dashboard, catálogo, histórico, etc.
+├── context/        # Estado global (sessões + configurações)
 └── types/          # Tipos centrais
+
+docs/               # AUDITORIA.md · ESPECIFICACAO.md (normativa) · PLANO.md
 ```
 
 ## Baseline pessoal
 
-- Primeiras **3** sessões válidas: familiarização
-- Próximas **8** sessões: construção do baseline
-- Depois: monitoramento longitudinal
-- Z-score robusto: `direction × (value - median) / (1.4826 × MAD)`
+Contagem por teste **e por versão de protocolo** (regra normativa em `docs/ESPECIFICACAO.md`):
+
+- Sessões elegíveis **1–3**: familiarização (não entram no baseline)
+- Sessões elegíveis **4–11**: construção do baseline (janela posicional fixa de 8 sessões)
+- A partir da **12ª**: monitoramento longitudinal (z-score exibido)
+- Z-score robusto: `direction × (value − median) / (1.4826 × MAD)`, com **direção explícita por métrica** (`metricDirections`; z positivo = melhor que o habitual)
+- O z só é exibido com fase de monitoramento, valor presente, **MAD > 0** e **n ≥ 6** valores no baseline; MAD = 0 mostra mediana e delta bruto com explicação
+- Importar sessões anteriores às locais pode recompor a janela — o import avisa quando isso é possível
 
 ## Qualidade das sessões
 
-Sessões marcadas como `valid`, `valid_with_warnings` ou `invalid`. Sessões inválidas são armazenadas mas não entram no baseline automaticamente.
+Sessões marcadas como `valid`, `valid_with_warnings` ou `invalid`.
+- `invalid` (incompleta, poucos trials válidos, precisão ao acaso, interrompida/abandonada): armazenada, nunca entra no baseline nem nas tendências.
+- `valid_with_warnings` (perda de foco, troca de aba, dispositivo/entrada divergente do habitual, excesso de antecipações/omissões): **entra no baseline**, e a interface mostra a composição ("N sessões, K com avisos").
+- Sessões demo e sem treino válido nunca entram no baseline.
 
 ## Como executar
 
@@ -73,14 +82,14 @@ Em **Dados e Configurações**:
 - Backup JSON completo
 - CSV de ensaios individuais
 - CSV de resultados por sessão
-- Importação de backup
+- Importação de backup — **validada por sessão** (estrutura e enums), **idempotente** (sessão já existente é mantida, nunca sobrescrita) e com relatório de importadas/mantidas/rejeitadas; settings do backup só são aplicados em banco vazio
 
 ## Limitações de timing (navegador)
 
 O registro de tempo de reação em SPA web tem limites metodológicos inerentes:
 
 - **`stimulusOnsetTimestamp`** usa duplo `requestAnimationFrame` após `setState` do estímulo — referência ao frame de pintura, não ao instante da chamada de render.
-- Respostas antes do onset válido são registradas como **antecipação** (`beforeOnset`), sem RT.
+- Respostas antes do onset válido são registradas como **antecipação** (`beforeOnset`), sem RT. Teclas de resposta pressionadas durante **fixação/ISI** são contadas separadamente (`isiEarlyPresses`, por trial em `metadata.earlyPressCount`) sem criar trial — não alteram `anticipationRate`.
 - A janela de resposta só abre após o onset registrado; timeouts usam `waitCancellable` abortável.
 - **`droppedFramesEstimate`** compara intervalos entre frames com o refresh estimado — é uma **estimativa**, não medição absoluta de frames perdidos.
 - Perda de foco da aba, throttling em background, React Strict Mode (double mount em dev) e rerenders podem introduzir jitter; o motor usa `trialToken`, `AbortController` e remoção de listeners para evitar trials duplicados ou respostas residuais.
@@ -89,10 +98,11 @@ O registro de tempo de reação em SPA web tem limites metodológicos inerentes:
 ## Limitações conhecidas (v1)
 
 - Sem backend/autenticação
-- Continuar sessão interrompida: apenas Corsi (protocolo adaptativo com estado salvo); demais testes exigem reinício
-- Baterias executam testes individualmente (sem fluxo contínuo automático)
-- Correlações contextuais requerem ≥10 observações (preparado, UI básica)
-- Comparação mobile/desktop registrada mas não normalizada
+- Continuar sessão interrompida: apenas Corsi (protocolo adaptativo com estado salvo); demais testes exigem reinício. Reload/fechamento de aba deixa a sessão `in_progress`; na próxima inicialização ela é arquivada como `interrupted`
+- Baterias executam testes individualmente (sem fluxo contínuo automático; campos `batteryId`/rotação ainda não orquestrados)
+- Correlações contextuais ainda não implementadas
+- Comparação entre dispositivos/método de entrada é **sinalizada** (flag + aviso + `valid_with_warnings`), mas não normalizada
+- 7 dos 8 testes exigem teclado físico (sem alvos de toque); Corsi aceita clique/toque
 
 ## Princípios
 

@@ -35,11 +35,31 @@ export function Settings() {
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const text = await file.text()
-    const data = JSON.parse(text)
-    const result = await importBackup(data)
-    alert(result.message)
-    window.location.reload()
+    e.target.value = ''
+    let data: unknown
+    try {
+      data = JSON.parse(await file.text())
+    } catch {
+      alert('Arquivo não é um JSON válido — nada foi importado.')
+      return
+    }
+    try {
+      const result = await importBackup(data)
+      const detail =
+        result.rejected.length > 0
+          ? '\n\nRejeitadas:\n' +
+            result.rejected
+              .slice(0, 10)
+              .map((r) => `· ${r.sessionId}: ${r.reason}`)
+              .join('\n')
+          : ''
+      alert(result.message + detail)
+      if (result.imported > 0) window.location.reload()
+    } catch (err) {
+      alert(
+        `Falha ao importar: ${err instanceof Error ? err.message : 'erro desconhecido'}. Nenhum dado local foi alterado.`
+      )
+    }
   }
 
   return (
@@ -90,18 +110,32 @@ export function Settings() {
                         </Link>
                       )}
                       <button
-                        className="btn-secondary text-sm text-lab-danger"
+                        className="btn-secondary text-sm"
                         onClick={async () => {
                           await updateSessionStatus(s.sessionId, 'abandoned', {
-                            flags: { incomplete: true },
+                            flags: { ...s.flags, incomplete: true },
                             quality: 'invalid',
-                            flagMessages: ['Sessão descartada pelo usuário.'],
+                            flagMessages: [...s.flagMessages, 'Sessão arquivada pelo usuário.'],
                           })
-                          await removeSession(s.sessionId)
                           await refresh()
                         }}
                       >
-                        Descartar
+                        Arquivar
+                      </button>
+                      <button
+                        className="btn-secondary text-sm text-lab-danger"
+                        onClick={async () => {
+                          if (
+                            confirm(
+                              `Excluir permanentemente esta sessão e seus ${s.trials.length} ensaios? Esta ação não pode ser desfeita.`
+                            )
+                          ) {
+                            await removeSession(s.sessionId)
+                            await refresh()
+                          }
+                        }}
+                      >
+                        Excluir
                       </button>
                     </div>
                   </div>

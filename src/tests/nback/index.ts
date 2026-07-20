@@ -221,6 +221,7 @@ function scoreNBackSession(
   }
 
   const customMetrics: Record<string, number | null> = {
+    ...base.customMetrics,
     dPrime: sdtMetrics.dPrime,
     criterion: sdtMetrics.criterion,
     hitRate: sdtMetrics.hitRate,
@@ -301,6 +302,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'falseAlarmRate',
   ],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     dPrime: "d' global",
     criterion: 'Critério (c)',
     hitRate: 'Taxa de acertos (alvos)',
@@ -311,5 +313,17 @@ export const testDefinition: CognitiveTestDefinition = {
     medianRT2Back: 'TR mediano 2-back',
     accuracy1Back: 'Precisão 1-back',
     accuracy2Back: 'Precisão 2-back',
+  },
+  metricDirections: {
+    isiEarlyPresses: -1,
+    dPrime: 1,
+    hitRate: 1,
+    falseAlarmRate: -1,
+    dPrime1Back: 1,
+    dPrime2Back: 1,
+    medianRT1Back: -1,
+    medianRT2Back: -1,
+    accuracy1Back: 1,
+    accuracy2Back: 1,
   },
 }

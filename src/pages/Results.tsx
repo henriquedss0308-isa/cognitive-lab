@@ -4,10 +4,12 @@ import { useApp } from '../context/AppContext'
 import { getTest } from '../tests/registry'
 import { MetricCard } from '../components/common/MetricTooltip'
 import { BlockChart, RTDistribution } from '../components/charts/SessionCharts'
-import { computeBaselineStats, robustZScore } from '../statistics'
+import { TestConditionsForm } from '../components/test/TestConditionsForm'
+import { computeBaselineStats } from '../statistics'
+import { evaluatePrimaryZ } from '../statistics/zscore'
 import { getSession } from '../storage/repository'
 import { loadResultsSession, type ResultsLoadState } from '../storage/resultsLoader'
-import type { SessionRecord } from '../types'
+import type { SessionRecord, TestConditions } from '../types'
 
 const PHASE_LABELS: Record<string, string> = {
   familiarization: 'Familiarização — não entra no baseline',
@@ -57,10 +59,13 @@ function renderConditionSection(title: string, data: any) {
 
 export function Results() {
   const { sessionId } = useParams()
-  const { sessions, loading: appLoading, refresh } = useApp()
+  const { sessions, loading: appLoading, refresh, editSessionConditions } = useApp()
   const [loadState, setLoadState] = useState<ResultsLoadState>('loading')
   const [session, setSession] = useState<SessionRecord | undefined>()
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [editingConditions, setEditingConditions] = useState(false)
+  const [savingConditions, setSavingConditions] = useState(false)
+  const [conditionsSaved, setConditionsSaved] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -117,14 +122,30 @@ export function Results() {
   const primaryValue = result.customMetrics[test.primaryMetricKey] ??
     result.rtMetrics.medianCorrectRT
 
-  const zScore = baseline.metrics[test.primaryMetricKey]
-    ? robustZScore(
-        primaryValue ?? 0,
-        baseline.metrics[test.primaryMetricKey].median,
-        baseline.metrics[test.primaryMetricKey].mad,
-        test.primaryMetricKey.includes('accuracy') ? 1 : -1
-      )
-    : null
+  // Sessão demo nunca é comparada ao baseline real do usuário.
+  const zOutcome = session.isDemo
+    ? ({ kind: 'not_monitoring' } as const)
+    : evaluatePrimaryZ(primaryValue, baseline, test)
+
+  const handleConditionsSave = async (conditions: TestConditions) => {
+    if (!session) return
+    setSavingConditions(true)
+    setConditionsSaved(false)
+    await editSessionConditions(session.sessionId, conditions)
+    setSession({
+      ...session,
+      checkIn: conditions,
+      result: session.result
+        ? {
+            ...session.result,
+            checkIn: conditions,
+          }
+        : session.result,
+    })
+    setSavingConditions(false)
+    setEditingConditions(false)
+    setConditionsSaved(true)
+  }
 
   return (
     <div className="p-8 max-w-4xl">
@@ -170,14 +191,40 @@ export function Results() {
         <MetricCard metric="rtCV" label="Variabilidade (CV)" value={result.rtMetrics.rtCoefficientOfVariation} />
       </div>
 
-      {zScore !== null && baseline.phase === 'monitoring' && (
+      {zOutcome.kind !== 'not_monitoring' && zOutcome.kind !== 'no_baseline_metric' && (
         <div className="card p-4 mb-6">
           <h3 className="text-sm font-medium">Comparado ao seu próprio baseline</h3>
-          <p className="text-2xl font-mono mt-1">z = {zScore.toFixed(2)}</p>
-          <p className="text-xs text-lab-muted mt-1">
-            Baseado em {baseline.metrics[test.primaryMetricKey]?.n ?? 0} sessões de baseline.
-            Diferenças pequenas podem não ser significativas.
-          </p>
+          {zOutcome.kind === 'ok' && (
+            <>
+              <p className="text-2xl font-mono mt-1">z = {zOutcome.z.toFixed(2)}</p>
+              <p className="text-xs text-lab-muted mt-1">
+                z positivo = melhor que o seu habitual nesta métrica.
+                Baseado em {zOutcome.n} de {baseline.baselineCount} sessões de baseline
+                {baseline.warningCount > 0 && ` (${baseline.warningCount} com avisos)`}.
+                Diferenças pequenas podem não ser significativas.
+              </p>
+            </>
+          )}
+          {zOutcome.kind === 'value_missing' && (
+            <p className="text-sm text-lab-muted mt-1">
+              A métrica principal não pôde ser calculada nesta sessão — comparação indisponível.
+            </p>
+          )}
+          {zOutcome.kind === 'insufficient_n' && (
+            <p className="text-sm text-lab-muted mt-1">
+              Baseline com poucos valores nesta métrica ({zOutcome.n} de {baseline.baselineCount})
+              — comparação por desvio suprimida para evitar conclusões instáveis.
+            </p>
+          )}
+          {zOutcome.kind === 'zero_mad' && (
+            <p className="text-sm text-lab-muted mt-1">
+              A variabilidade do seu baseline nesta métrica é ≈ 0 (valores quase idênticos), então o
+              desvio padronizado não é informativo. Mediana do baseline: {zOutcome.median?.toFixed(2)}
+              {zOutcome.delta !== null &&
+                ` · diferença desta sessão: ${zOutcome.delta > 0 ? '+' : ''}${zOutcome.delta.toFixed(2)}`}
+              .
+            </p>
+          )}
         </div>
       )}
 
@@ -218,18 +265,47 @@ export function Results() {
           <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
         </summary>
         <div className="p-4 pt-0 border-t border-lab-border text-sm text-lab-muted mt-4">
-          {!session.checkIn || Object.keys(session.checkIn).length === 0 ? (
-            <p>Condições não registradas.</p>
+          <div className="flex justify-end mb-4">
+            <button
+              type="button"
+              className="btn-secondary text-xs"
+              onClick={() => {
+                setEditingConditions((value) => !value)
+                setConditionsSaved(false)
+              }}
+            >
+              {editingConditions ? 'Cancelar edicao' : 'Editar condicoes'}
+            </button>
+          </div>
+
+          {conditionsSaved && (
+            <p className="text-lab-success mb-4">Condicoes atualizadas.</p>
+          )}
+
+          {editingConditions ? (
+            <TestConditionsForm
+              compact
+              showLoadPrevious={false}
+              initialConditions={session.checkIn}
+              title="Editar condicoes"
+              description="Atualize apenas o contexto da sessao. Os trials e as metricas nao serao recalculados."
+              confirmLabel={savingConditions ? 'Salvando...' : 'Salvar condicoes'}
+              skipLabel="Cancelar"
+              onConfirm={handleConditionsSave}
+              onSkip={() => setEditingConditions(false)}
+            />
+          ) : !session.checkIn || Object.keys(session.checkIn).length === 0 ? (
+            <p>Condicoes nao registradas.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {renderConditionSection('Sono', session.checkIn.sleep)}
               {renderConditionSection('Estado Atual', session.checkIn.currentState)}
-              {renderConditionSection('Substâncias', session.checkIn.substances)}
-              {renderConditionSection('Alimentação', session.checkIn.nutrition)}
+              {renderConditionSection('Substancias', session.checkIn.substances)}
+              {renderConditionSection('Alimentacao', session.checkIn.nutrition)}
               {renderConditionSection('Ambiente', session.checkIn.environment)}
               {session.checkIn.notes && (
                 <div className="col-span-full">
-                  <h4 className="text-lab-fg font-medium mb-1">Observações</h4>
+                  <h4 className="text-lab-fg font-medium mb-1">Observacoes</h4>
                   <p>{session.checkIn.notes}</p>
                 </div>
               )}

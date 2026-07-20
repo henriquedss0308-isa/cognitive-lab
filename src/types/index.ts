@@ -207,6 +207,8 @@ export interface BaselineStats {
   sessionCount: number
   familiarizationCount: number
   baselineCount: number
+  /** Sessões da janela de baseline com quality 'valid_with_warnings' (spec §2). */
+  warningCount: number
   metrics: Record<string, { median: number | null; mad: number | null; n: number }>
 }
 

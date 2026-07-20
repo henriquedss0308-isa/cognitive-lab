@@ -8,7 +8,8 @@ import { generateId } from '../utils/id'
 import { useApp } from '../context/AppContext'
 import type { TestConditions } from '../types'
 import { TestConditionsForm } from '../components/test/TestConditionsForm'
-import { getBaselinePhase } from '../statistics/baseline'
+import { getBaselinePhase, getValidAssessmentSessions } from '../statistics/baseline'
+import { compareDeviceToHistory } from '../scoring/deviceComparison'
 import {
   evaluatePractice,
   DEFAULT_PRACTICE_CRITERIA,
@@ -22,6 +23,7 @@ import {
 } from '../storage/repository'
 import {
   completeAssessmentSession,
+  mergeCompletionRecord,
   SessionPersistenceError,
 } from '../storage/sessionCompletion'
 import { canResumeSession } from '../storage/sessionRecovery'
@@ -161,27 +163,30 @@ export function TestFlow() {
     }
 
     const scored = test.scoreSession(trials, mode, deviceInfo, flags as Record<string, boolean>)
-    const validSessions = sessions.filter(
-      (s) =>
-        s.testId === test.id &&
-        s.mode === 'assessment' &&
-        s.quality !== 'invalid' &&
-        !s.isDemo &&
-        (!s.status || s.status === 'completed')
-    )
-    const phase = getBaselinePhase(
-      validSessions.length + (scored.quality !== 'invalid' ? 1 : 0)
-    )
+    // Fase da sessão corrente = contagem de sessões elegíveis ANTERIORES
+    // (mesma régua do baseline; a própria sessão nunca conta — spec §1.1).
+    const priorEligible = getValidAssessmentSessions(sessions, test.id, test.protocolVersion)
+    const phase = getBaselinePhase(priorEligible.length)
+
+    const deviceCmp = compareDeviceToHistory(deviceInfo, priorEligible)
 
     const sessionFlags = { ...scored.flags, ...flags }
     const skipPractice = settings.developerMode && !practiceCompleted
     if (skipPractice) {
       sessionFlags.insufficientPractice = true
     }
+    if (deviceCmp.differentDevice) sessionFlags.differentDevice = true
+    if (deviceCmp.differentInputMethod) sessionFlags.differentInputMethod = true
+
+    const quality =
+      scored.quality === 'valid' && (deviceCmp.differentDevice || deviceCmp.differentInputMethod)
+        ? 'valid_with_warnings'
+        : scored.quality
 
     const completedAt = new Date().toISOString()
     const flagMessages = [
       ...scored.flagMessages,
+      ...deviceCmp.messages,
       ...(sessionFlags.insufficientPractice
         ? ['Avaliação sem treino válido (modo desenvolvedor). Excluída do baseline.']
         : []),
@@ -208,7 +213,7 @@ export function TestFlow() {
       status: 'completed',
       startedAt: meta.startedAt,
       completedAt,
-      quality: scored.quality,
+      quality,
       flags: sessionFlags,
       flagMessages,
       trials,
@@ -228,13 +233,17 @@ export function TestFlow() {
         completedAt,
         isDemo: false,
         baselinePhase: phase,
+        quality,
         flags: sessionFlags,
         flagMessages,
       },
     }
 
     try {
-      await completeAssessmentSession(session)
+      // Preserva checkIn/bateria/dispositivo do registro criado no início
+      // da sessão (essencial no resume, que não repassa pelo formulário).
+      const existing = await getSession(sessionId)
+      await completeAssessmentSession(mergeCompletionRecord(session, existing))
       await refresh()
       navigate(`/results/${sessionId}`)
     } catch (err) {

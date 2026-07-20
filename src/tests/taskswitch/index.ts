@@ -262,6 +262,7 @@ function scoreTaskSwitchSession(
       },
     },
     customMetrics: {
+      ...base.customMetrics,
       switchCostRT,
       mixingCostRT,
       switchCostAccuracy,
@@ -320,6 +321,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'postErrorSlowing',
   ],
   metricLabels: {
+    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
     switchCostRT: 'Custo de alternância TR (ms)',
     mixingCostRT: 'Custo de mistura TR (ms)',
     switchCostAccuracy: 'Custo de alternância (precisão)',
@@ -327,5 +329,15 @@ export const testDefinition: CognitiveTestDefinition = {
     postErrorSlowing: 'Abrandamento pós-erro (ms)',
     medianCorrectRT: 'TR mediano (corretos)',
     accuracy: 'Precisão global',
+  },
+  metricDirections: {
+    isiEarlyPresses: -1,
+    switchCostRT: -1,
+    mixingCostRT: -1,
+    switchCostAccuracy: -1,
+    mixingCostAccuracy: -1,
+    postErrorSlowing: -1,
+    medianCorrectRT: -1,
+    accuracy: 1,
   },
 }

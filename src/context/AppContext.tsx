@@ -7,15 +7,17 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import type { AppSettings, SessionRecord } from '../types'
+import type { AppSettings, SessionRecord, TestConditions } from '../types'
 import {
   deleteAllSessions,
   deleteDemoSessions,
   deleteSession,
   getAllSessions,
   getSettings,
+  markStaleInProgressAsInterrupted,
   saveSession,
   saveSettings,
+  updateSessionConditions,
 } from '../storage/repository'
 
 interface AppContextValue {
@@ -25,6 +27,7 @@ interface AppContextValue {
   refresh: () => Promise<void>
   addSession: (session: SessionRecord) => Promise<void>
   removeSession: (id: string) => Promise<void>
+  editSessionConditions: (id: string, conditions: TestConditions) => Promise<void>
   clearAll: () => Promise<void>
   clearDemo: () => Promise<void>
   updateSettings: (s: Partial<AppSettings>) => Promise<void>
@@ -50,7 +53,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    refresh().finally(() => setLoading(false))
+    markStaleInProgressAsInterrupted()
+      .catch(() => 0)
+      .then(() => refresh())
+      .finally(() => setLoading(false))
   }, [refresh])
 
   const addSession = useCallback(
@@ -64,6 +70,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const removeSession = useCallback(
     async (id: string) => {
       await deleteSession(id)
+      await refresh()
+    },
+    [refresh]
+  )
+
+  const editSessionConditions = useCallback(
+    async (id: string, conditions: TestConditions) => {
+      await updateSessionConditions(id, conditions)
       await refresh()
     },
     [refresh]
@@ -97,6 +111,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       refresh,
       addSession,
       removeSession,
+      editSessionConditions,
       clearAll,
       clearDemo,
       updateSettings,
@@ -108,6 +123,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       refresh,
       addSession,
       removeSession,
+      editSessionConditions,
       clearAll,
       clearDemo,
       updateSettings,

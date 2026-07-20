@@ -4,6 +4,18 @@ import type { RTCleaningConfig } from '../statistics/rtProcessing'
 import { validateSession } from './sessionValidation'
 import { median } from '../statistics/basic'
 
+/**
+ * Total de teclas de resposta pressionadas durante fixação/ISI (spec §14).
+ * Métrica separada de anticipationRate — não altera a comparabilidade com
+ * sessões antigas (que simplesmente não a possuem).
+ */
+export function countIsiEarlyPresses(trials: TrialRecord[]): number {
+  return trials.reduce((sum, t) => {
+    const count = t.metadata?.earlyPressCount
+    return sum + (typeof count === 'number' && Number.isFinite(count) ? count : 0)
+  }, 0)
+}
+
 export function buildBaseResult(
   trials: TrialRecord[],
   testId: TrialRecord['testId'],
@@ -44,7 +56,9 @@ export function buildBaseResult(
     accuracyMetrics,
     conditionMetrics: {} as Record<string, Record<string, number | null>>,
     blockMetrics: computeBlockMetrics(trials, cleaning),
-    customMetrics: {} as Record<string, number | null>,
+    customMetrics: {
+      isiEarlyPresses: countIsiEarlyPresses(trials),
+    } as Record<string, number | null>,
     deviceInfo,
     processedTrials: rtMetrics.processedTrials,
     scoringVersion: 'sdt-hautus-1',

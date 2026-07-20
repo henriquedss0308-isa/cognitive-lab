@@ -71,7 +71,83 @@ export async function updateSessionStatus(
   const db = await getDB()
   const existing = await db.get('sessions', sessionId)
   if (!existing) return
-  await db.put('sessions', { ...existing, ...extra, status })
+  // Invariante (spec §8): status terminal nunca é sobrescrito — protege
+  // contra ESC/interrupções tardias rebaixando uma sessão já concluída.
+  const current = existing.status ?? 'completed'
+  if (TERMINAL_STATUSES.includes(current) && status !== current) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        `[updateSessionStatus] ignorado — sessão ${sessionId} é terminal (${current}), tentativa: ${status}`
+      )
+    }
+    return
+  }
+  await db.put('sessions', prepareSessionForStorage({ ...existing, ...extra, status }))
+}
+
+export async function updateSessionConditions(
+  sessionId: string,
+  checkIn: TestConditions
+): Promise<SessionRecord | undefined> {
+  const db = await getDB()
+  const existing = await db.get('sessions', sessionId)
+  if (!existing) return undefined
+
+  const updated: SessionRecord = {
+    ...existing,
+    checkIn,
+    result: existing.result
+      ? {
+          ...existing.result,
+          checkIn,
+        }
+      : existing.result,
+  }
+
+  const record = prepareSessionForStorage(normalizeSession(updated))
+  await db.put('sessions', record)
+  return record
+}
+
+/**
+ * Reload/fechamento de aba não desmontam o TestRunner, então sessões de
+ * avaliação podem ficar 'in_progress' para sempre. Na inicialização do app,
+ * qualquer in_progress mais antiga que maxAgeMs vira 'interrupted'
+ * (spec §7). Se outra aba ainda estiver rodando a sessão, o próximo
+ * appendTrialToSession a revive para in_progress — transitório inofensivo.
+ */
+export async function markStaleInProgressAsInterrupted(
+  maxAgeMs = 60_000,
+  now = Date.now()
+): Promise<number> {
+  const db = await getDB()
+  const all = await db.getAll('sessions')
+  const stale = all.filter((s) => {
+    if ((s.status ?? 'completed') !== 'in_progress') return false
+    const started = new Date(s.startedAt).getTime()
+    return Number.isFinite(started) && now - started > maxAgeMs
+  })
+  if (stale.length === 0) return 0
+
+  const tx = db.transaction('sessions', 'readwrite')
+  await Promise.all([
+    ...stale.map((s) =>
+      tx.store.put(
+        prepareSessionForStorage({
+          ...s,
+          status: 'interrupted',
+          quality: 'invalid',
+          flags: { ...s.flags, incomplete: true },
+          flagMessages: [
+            ...(s.flagMessages ?? []),
+            'Sessão interrompida (aplicação fechada ou recarregada).',
+          ],
+        })
+      )
+    ),
+    tx.done,
+  ])
+  return stale.length
 }
 
 export async function getIncompleteSessions(): Promise<SessionRecord[]> {
@@ -135,7 +211,35 @@ export async function saveSettings(settings: AppSettings): Promise<void> {
 export async function importSessions(sessions: SessionRecord[]): Promise<void> {
   const db = await getDB()
   const tx = db.transaction('sessions', 'readwrite')
-  await Promise.all([...sessions.map((s) => tx.store.put(normalizeSession(s))), tx.done])
+  await Promise.all([
+    ...sessions.map((s) => tx.store.put(prepareSessionForStorage(normalizeSession(s)))),
+    tx.done,
+  ])
+}
+
+/**
+ * Importação idempotente: sessionId já existente é IGNORADO (dados locais
+ * nunca são sobrescritos por backup — spec §10). Retorna o que aconteceu.
+ */
+export async function importSessionsSkipExisting(
+  sessions: SessionRecord[]
+): Promise<{ added: string[]; skipped: string[] }> {
+  const db = await getDB()
+  const tx = db.transaction('sessions', 'readwrite')
+  const existing = new Set(await tx.store.getAllKeys())
+  const added: string[] = []
+  const skipped: string[] = []
+  const writes: Promise<unknown>[] = []
+  for (const s of sessions) {
+    if (existing.has(s.sessionId)) {
+      skipped.push(s.sessionId)
+      continue
+    }
+    writes.push(tx.store.put(prepareSessionForStorage(normalizeSession(s))))
+    added.push(s.sessionId)
+  }
+  await Promise.all([...writes, tx.done])
+  return { added, skipped }
 }
 
 export function filterSessions(
@@ -166,8 +270,9 @@ export async function getLatestConditions(): Promise<TestConditions | undefined>
   const db = await getDB()
   const all = await db.getAll('sessions')
   const withConditions = all
-    .filter((s) => s.checkIn && Object.keys(s.checkIn).length > 0)
+    // Sessões demo carregam check-ins fictícios — nunca reaproveitar.
+    .filter((s) => !s.isDemo && s.checkIn && Object.keys(s.checkIn).length > 0)
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
-  
+
   return withConditions[0]?.checkIn
 }

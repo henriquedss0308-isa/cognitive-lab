@@ -1,0 +1,188 @@
+COGNITIVE LAB - SITUACAO ATUAL DO PROJETO
+===========================================
+
+Visao geral
+-----------
+O Cognitive Lab e uma aplicacao web local-first para realizar testes
+cognitivos padronizados, acompanhar o desempenho ao longo do tempo e
+comparar cada pessoa com o proprio baseline. O projeto e voltado a uso
+pessoal e educacional; ele nao fornece diagnosticos clinicos, de TDAH,
+QI ou transtornos.
+
+Tecnologias e arquitetura
+-------------------------
+- Interface: React 19 + TypeScript + Vite.
+- Estilos: Tailwind CSS.
+- Roteamento: React Router.
+- Graficos: Recharts.
+- Banco local: IndexedDB, por meio da biblioteca idb.
+- Testes automatizados: Vitest.
+- Dados: ficam no navegador/dispositivo; a versao atual nao possui
+  servidor, login, sincronizacao na nuvem ou autenticacao.
+
+Estrutura principal
+-------------------
+- src/tests: definicoes de cada teste, instrucoes, geracao e scoring.
+- src/engine: execucao dos trials e registro das respostas.
+- src/scoring: validacao de qualidade e metricas comuns.
+- src/statistics: mediana, MAD, d-prime, custos e baseline.
+- src/storage: IndexedDB, backup, importacao e exportacao.
+- src/pages e src/components: telas, navegacao e interface.
+- src/batteries: baterias predefinidas de testes.
+
+Testes cognitivos disponiveis
+-----------------------------
+1. Tempo de Reacao Simples.
+2. Tempo de Reacao de Escolha.
+3. Teste de Stroop.
+4. Tarefa Go/No-Go.
+5. SART - Atencao Sustentada.
+6. N-Back Espacial.
+7. Corsi - Blocos.
+8. Alternancia de Tarefas (Task Switching).
+
+Cada teste possui dois modos:
+- Treino: tem feedback imediato e prepara a pessoa para o protocolo.
+- Avaliacao: registra a sessao no historico e pode contribuir para o
+  baseline, desde que a sessao seja valida.
+
+Sessao, resultados e qualidade
+------------------------------
+Cada sessao guarda os trials individuais, tempos de resposta, acertos,
+erros, metricas calculadas, versao do protocolo, dispositivo e eventos
+relevantes de qualidade. Uma sessao pode ser classificada como:
+- valid;
+- valid_with_warnings;
+- invalid.
+
+Sessoes invalidas, interrompidas, de demonstracao ou feitas sem treino
+valido nao entram automaticamente no baseline. Alertas como perda de foco,
+troca de aba, sessao incompleta e pausas ajudam a interpretar os resultados.
+
+Condicoes da sessao
+-------------------
+Antes da avaliacao, a pessoa pode registrar contexto como sono, humor,
+estresse, cafeina, medicamentos/substancias, alimentacao e observacoes.
+
+Tambem e possivel editar essas condicoes depois que a sessao terminou, na
+tela de resultados, em "Condicoes da Sessao" > "Editar condicoes". Isso e
+util quando acontece algo durante a avaliacao - por exemplo, barulho,
+interrupcao, conversa ou distracao - e so se torna relevante depois.
+
+Essa edicao altera somente o contexto descritivo da sessao. Ela nao muda:
+- trials ja registrados;
+- tempos de resposta;
+- acertos, erros ou scoring;
+- duracao ou protocolo do teste;
+- metricas calculadas;
+- quantidade de sessoes que compoe o baseline.
+
+Baseline pessoal
+----------------
+O baseline e independente para cada teste e para cada versao de protocolo.
+Ele considera sessoes de avaliacao elegiveis: completas, com resultado,
+qualidade valid ou valid_with_warnings, nao demo e com treino valido.
+A regra normativa completa esta em docs/ESPECIFICACAO.md.
+
+- Sessoes elegiveis 1 a 3: familiarizacao; nao entram no baseline.
+- Sessoes elegiveis 4 a 11: constroem o baseline (janela fixa de 8).
+- A partir da 12a sessao elegivel: monitoramento longitudinal (z-score).
+
+Sessoes valid_with_warnings entram no baseline e a interface mostra a
+composicao ("N sessoes, K com avisos"). O z-score usa direcao explicita
+por metrica (z positivo = melhor que o habitual) e so aparece com MAD > 0
+e pelo menos 6 valores no baseline; com MAD = 0 a interface mostra a
+mediana e a diferenca bruta, com explicacao.
+
+As metricas do baseline usam mediana e MAD, uma abordagem robusta a valores
+extremos. Por isso, uma sessao com interferencia externa deve ser anotada;
+se o desempenho ficou claramente comprometido, ela deve ser interpretada
+com cautela ao decidir se representa bem o funcionamento habitual.
+
+Historico, analise e dados
+--------------------------
+- Dashboard e catalogo de testes.
+- Historico de sessoes e tela detalhada de resultados.
+- Metricas de velocidade, precisao e variabilidade apresentadas separadamente.
+- Graficos de tendencia longitudinal quando ha dados suficientes.
+- Baterias predefinidas: Check-in Rapido, Bateria Diaria, Bateria Padrao e
+  Bateria Personalizada.
+- Dados de demonstracao para explorar a interface (nunca entram no
+  baseline, nas tendencias nem nas sugestoes de condicoes).
+- Exportacao de backup JSON completo.
+- Exportacao CSV de trials individuais.
+- Exportacao CSV de resultados por sessao.
+- Importacao de backup: validada por sessao (estrutura e enums),
+  idempotente (sessao ja existente e mantida, nunca sobrescrita) e com
+  relatorio de importadas/mantidas/rejeitadas. Importar sessoes anteriores
+  as locais gera aviso de possivel recomposicao do baseline.
+
+Privacidade e recuperacao
+-------------------------
+Os dados sao armazenados localmente no IndexedDB do navegador. Como nao ha
+servidor, limpar dados do navegador, trocar de perfil ou usar outro
+dispositivo pode deixar o historico indisponivel naquele ambiente. O backup
+JSON periodico e a forma recomendada de preservar e transferir os dados.
+
+Estado das sessoes interrompidas
+--------------------------------
+O Corsi pode continuar uma sessao interrompida porque possui estado adaptativo
+salvo; ao retomar, o check-in original e o dispositivo de inicio sao
+preservados (divergencia de dispositivo gera aviso). Os demais protocolos
+exigem reiniciar a avaliacao interrompida, para preservar as regras do teste
+e a interpretacao dos resultados.
+
+Recarregar ou fechar a aba durante uma avaliacao deixa a sessao "em
+andamento"; na proxima inicializacao do aplicativo ela e arquivada como
+interrompida (invalida, com aviso). Em Dados e Configuracoes e possivel
+arquivar uma sessao incompleta (preserva os ensaios) ou exclui-la
+permanentemente (acao separada, com confirmacao).
+
+Sessoes concluidas tem status terminal: nada as rebaixa depois (um ESC
+tardio, por exemplo, nao transforma uma sessao concluida em abandonada).
+
+Limitacoes metodologicas importantes
+------------------------------------
+- O timing do navegador e adequado para acompanhamento pessoal, mas nao
+  garante precisao sub-milissegundo.
+- Comparacoes devem preferir o mesmo dispositivo, navegador e condicoes de
+  uso sempre que possivel.
+- Perda de foco, aba em segundo plano, throttling e variacoes de renderizacao
+  podem introduzir ruido nos tempos de resposta.
+- O projeto registra sinais desses eventos para ajudar na avaliacao da qualidade.
+- Teclas de resposta pressionadas antes do estimulo (durante fixacao/ISI)
+  sao contadas como metrica separada (isiEarlyPresses), sem alterar a taxa
+  de antecipacao classica.
+- Sessoes feitas em dispositivo ou metodo de entrada diferente do habitual
+  recebem aviso e qualidade "valida com avisos"; a comparacao nao e
+  normalizada entre dispositivos.
+- A comparacao e pessoal: nao ha percentis populacionais ou diagnostico clinico.
+
+Como executar o projeto
+-----------------------
+No diretorio do projeto:
+
+  npm install
+  npm run dev
+
+Depois, abra o endereco informado pelo Vite, normalmente
+http://localhost:5173.
+
+Comandos de verificacao
+-----------------------
+  npm test
+  npx tsc -b
+  npm run lint
+  npm run build
+
+Proximos cuidados recomendados
+------------------------------
+- Fazer backup JSON regularmente, especialmente antes de limpar o navegador.
+- Usar o mesmo ambiente de teste para reduzir variacao de timing.
+- Registrar condicoes incomuns na sessao, inclusive apos o termino quando
+  necessario.
+- Tratar resultados isolados com cautela; o valor principal do projeto esta
+  na comparacao longitudinal com o proprio baseline.
+
+Documento de referencia do estado atual do projeto Cognitive Lab.
+

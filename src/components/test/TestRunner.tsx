@@ -93,6 +93,9 @@ export function TestRunner({
   const trialToken = useRef(0)
   const trialClaimed = useRef(false)
   const trialFinalized = useRef(false)
+  // Teclas de resposta pressionadas durante fixação/ISI do trial corrente
+  // (spec §14) — contadas sem criar trial nem RT.
+  const earlyPresses = useRef(0)
   const pendingRecordPromise = useRef<Promise<TrialRecord> | null>(null)
   const interruptionTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const loopAbort = useRef<AbortController | null>(null)
@@ -113,6 +116,7 @@ export function TestRunner({
   const [corsiHighlight, setCorsiHighlight] = useState(-1)
   const [corsiTrialMeta, setCorsiTrialMeta] = useState<GeneratedTrial | null>(null)
   const [droppedFramesWarning, setDroppedFramesWarning] = useState(false)
+  const [fatalError, setFatalError] = useState<string | null>(null)
 
   const inputMethod = test.id === 'corsi' ? 'mouse' : 'keyboard'
   const currentTrial = test.isAdaptive ? corsiTrialMeta : trialsRef.current[trialIdx]
@@ -128,6 +132,7 @@ export function TestRunner({
     stimulusOnset.current = 0
     pendingCorrectness.current = null
     pendingRecordPromise.current = null
+    earlyPresses.current = 0
     return { token: trialToken.current, signal: loopAbort.current.signal }
   }, [])
 
@@ -146,7 +151,21 @@ export function TestRunner({
   const persistTrial = useCallback(
     async (trial: TrialRecord) => {
       recordedTrials.current.push(trial)
-      await onTrialRecorded?.(trial)
+      try {
+        await onTrialRecorded?.(trial)
+      } catch (err) {
+        // Falha de armazenamento não pode congelar a sessão em silêncio:
+        // para o loop e mostra estado de erro recuperável (spec/P1-6).
+        if (import.meta.env.DEV) {
+          console.error('[persistTrial] falha ao gravar ensaio', err)
+        }
+        running.current = false
+        loopAbort.current?.abort()
+        setFatalError(
+          'Falha ao gravar o ensaio no armazenamento local. A sessão foi interrompida; os ensaios já gravados foram preservados.'
+        )
+        throw new DOMException('Aborted', 'AbortError')
+      }
     },
     [onTrialRecorded]
   )
@@ -321,6 +340,8 @@ export function TestRunner({
           windowFocused: focusTracker.current.isFocused,
           visibilityState: document.visibilityState,
           cleaning: config.cleaningRules,
+          extraMeta:
+            earlyPresses.current > 0 ? { earlyPressCount: earlyPresses.current } : undefined,
         })
         pendingRecordPromise.current = recordPromise
         const record = await recordPromise
@@ -370,7 +391,11 @@ export function TestRunner({
         await runFixedTrial(token, signal)
       }
     } catch (e) {
-      if ((e as Error).name !== 'AbortError') throw e
+      if ((e as Error).name !== 'AbortError') {
+        if (import.meta.env.DEV) console.error('[runTrialLoop]', e)
+        running.current = false
+        setFatalError('Erro inesperado durante o ensaio. A sessão foi interrompida.')
+      }
     }
   }, [beginTrialLoop, test.isAdaptive, runCorsiSequence, runFixedTrial])
 
@@ -452,6 +477,9 @@ export function TestRunner({
     (e: KeyboardEvent) => {
       const key = e.key.toLowerCase()
       if (key === 'escape') {
+        // Após 'done' a sessão já está sendo concluída — ESC tardio não pode
+        // rebaixá-la para abandonada (spec §8).
+        if (phase === 'done' || completedRef.current) return
         e.preventDefault()
         abortRun()
         return
@@ -459,14 +487,27 @@ export function TestRunner({
 
       if (e.repeat) return
       if (test.id === 'corsi') return
+
+      const isSpaceTest = ['simple_rt', 'gonogo', 'sart', 'nback'].includes(test.id)
+      const isKeyTest = ['choice_rt', 'stroop', 'taskswitch'].includes(test.id)
+      const isResponseKey =
+        (isSpaceTest && key === ' ') || (isKeyTest && ['f', 'g', 'h', 'j'].includes(key))
+
+      // Antecipação fora da janela: tecla de resposta durante fixação/ISI é
+      // contada no trial corrente (spec §14) — sem trial, sem RT.
+      if (phase === 'fixation' || phase === 'isi') {
+        if (isResponseKey) {
+          if (key === ' ') e.preventDefault()
+          earlyPresses.current += 1
+        }
+        return
+      }
+
       if (phase !== 'stimulus' && phase !== 'response') return
 
       const token = trialToken.current
       const trial = test.isAdaptive ? corsiTrialMeta : trialsRef.current[trialIdx]
       if (!trial || responded.current || isStale(token)) return
-
-      const isSpaceTest = ['simple_rt', 'gonogo', 'sart', 'nback'].includes(test.id)
-      const isKeyTest = ['choice_rt', 'stroop', 'taskswitch'].includes(test.id)
 
       let response: string | null = null
       if (isSpaceTest && key === ' ') {
@@ -513,6 +554,8 @@ export function TestRunner({
           windowFocused: focusTracker.current.isFocused,
           visibilityState: document.visibilityState,
           cleaning: config.cleaningRules,
+          extraMeta:
+            earlyPresses.current > 0 ? { earlyPressCount: earlyPresses.current } : undefined,
         })
         pendingRecordPromise.current = recordPromise
         const record = await recordPromise
@@ -524,7 +567,12 @@ export function TestRunner({
         } else {
           finalizeTrialOnce(token, mode === 'training' ? record.correct : null)
         }
-      })()
+      })().catch((e) => {
+        if ((e as Error).name !== 'AbortError') {
+          running.current = false
+          setFatalError('Erro ao registrar a resposta. A sessão foi interrompida.')
+        }
+      })
     },
     [
       phase,
@@ -605,7 +653,12 @@ export function TestRunner({
       corsiState.current = nextState
 
       finalizeTrialOnce(token, mode === 'training' ? false : null)
-      })()
+      })().catch((e) => {
+        if ((e as Error).name !== 'AbortError') {
+          running.current = false
+          setFatalError('Erro ao registrar a resposta. A sessão foi interrompida.')
+        }
+      })
       return
     }
 
@@ -647,7 +700,12 @@ export function TestRunner({
       corsiState.current = nextState
 
       finalizeTrialOnce(token, mode === 'training' ? true : null)
-      })()
+      })().catch((e) => {
+        if ((e as Error).name !== 'AbortError') {
+          running.current = false
+          setFatalError('Erro ao registrar a resposta. A sessão foi interrompida.')
+        }
+      })
     }
   }
 
@@ -660,6 +718,16 @@ export function TestRunner({
   const showStimulus = phase === 'stimulus' || phase === 'response' || phase === 'feedback'
   // Fixation cross only for tests that use it (not SART, which has no inter-trial gap)
   const showFixationCross = (phase === 'isi' || phase === 'fixation') && config.advancePolicy !== 'fixed-duration'
+
+  if (fatalError) {
+    return (
+      <div className="fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50 p-8">
+        <h2 className="text-xl font-medium mb-2 text-lab-danger">Sessão interrompida</h2>
+        <p className="text-lab-muted mb-6 max-w-md text-center">{fatalError}</p>
+        <button className="btn-primary" onClick={abortRun}>Sair do teste</button>
+      </div>
+    )
+  }
 
   if (phase === 'block_break') {
     return (
