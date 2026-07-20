@@ -4,21 +4,43 @@ import { getLatestConditions } from '../../storage/repository'
 
 interface Props {
   onConfirm: (conditions: TestConditions) => void
-  onSkip: () => void
+  onSkip?: () => void
+  initialConditions?: TestConditions
+  title?: string
+  description?: string
+  confirmLabel?: string
+  skipLabel?: string
+  showLoadPrevious?: boolean
+  compact?: boolean
 }
 
-export function TestConditionsForm({ onConfirm, onSkip }: Props) {
-  const [form, setForm] = useState<TestConditions>({})
+export function TestConditionsForm({
+  onConfirm,
+  onSkip,
+  initialConditions,
+  title = 'Condicoes do Teste',
+  description = 'Estes dados sao opcionais e ajudam a contextualizar o seu desempenho. Preencha apenas o que achar relevante.',
+  confirmLabel = 'Registrar e Continuar',
+  skipLabel = 'Iniciar sem registrar condicoes',
+  showLoadPrevious = true,
+  compact = false,
+}: Props) {
+  const [form, setForm] = useState<TestConditions>(initialConditions ?? {})
   const [loadingLatest, setLoadingLatest] = useState(false)
   const [hasPrevious, setHasPrevious] = useState(false)
 
   useEffect(() => {
+    if (!showLoadPrevious) return
     getLatestConditions().then((cond) => {
       if (cond && Object.keys(cond).length > 0) {
         setHasPrevious(true)
       }
     })
-  }, [])
+  }, [showLoadPrevious])
+
+  useEffect(() => {
+    setForm(initialConditions ?? {})
+  }, [initialConditions])
 
   const handleLoadPrevious = async () => {
     setLoadingLatest(true)
@@ -56,13 +78,13 @@ export function TestConditionsForm({ onConfirm, onSkip }: Props) {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto w-full">
-      <h1 className="text-2xl font-semibold mb-2">Condições do Teste</h1>
-      <p className="text-lab-muted text-sm mb-6">
-        Estes dados são opcionais e ajudam a contextualizar o seu desempenho. Preencha apenas o que achar relevante.
-      </p>
+    <div className={compact ? 'w-full' : 'p-8 max-w-2xl mx-auto w-full'}>
+      <h1 className={compact ? 'text-lg font-semibold mb-2' : 'text-2xl font-semibold mb-2'}>
+        {title}
+      </h1>
+      <p className="text-lab-muted text-sm mb-6">{description}</p>
 
-      {hasPrevious && (
+      {showLoadPrevious && hasPrevious && (
         <button
           type="button"
           onClick={handleLoadPrevious}
@@ -300,8 +322,10 @@ export function TestConditionsForm({ onConfirm, onSkip }: Props) {
         </label>
 
         <div className="flex flex-col sm:flex-row gap-3 pt-6">
-          <button type="submit" className="btn-primary flex-1">Registrar e Continuar</button>
-          <button type="button" className="btn-secondary" onClick={onSkip}>Iniciar sem registrar condições</button>
+          <button type="submit" className="btn-primary flex-1">{confirmLabel}</button>
+          {onSkip && (
+            <button type="button" className="btn-secondary" onClick={onSkip}>{skipLabel}</button>
+          )}
         </div>
       </form>
     </div>

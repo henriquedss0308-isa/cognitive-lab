@@ -74,6 +74,30 @@ export async function updateSessionStatus(
   await db.put('sessions', { ...existing, ...extra, status })
 }
 
+export async function updateSessionConditions(
+  sessionId: string,
+  checkIn: TestConditions
+): Promise<SessionRecord | undefined> {
+  const db = await getDB()
+  const existing = await db.get('sessions', sessionId)
+  if (!existing) return undefined
+
+  const updated: SessionRecord = {
+    ...existing,
+    checkIn,
+    result: existing.result
+      ? {
+          ...existing.result,
+          checkIn,
+        }
+      : existing.result,
+  }
+
+  const record = prepareSessionForStorage(normalizeSession(updated))
+  await db.put('sessions', record)
+  return record
+}
+
 export async function getIncompleteSessions(): Promise<SessionRecord[]> {
   const db = await getDB()
   const all = await db.getAll('sessions')

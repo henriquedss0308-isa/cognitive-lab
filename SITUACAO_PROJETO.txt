@@ -1,0 +1,159 @@
+COGNITIVE LAB - SITUACAO ATUAL DO PROJETO
+===========================================
+
+Visao geral
+-----------
+O Cognitive Lab e uma aplicacao web local-first para realizar testes
+cognitivos padronizados, acompanhar o desempenho ao longo do tempo e
+comparar cada pessoa com o proprio baseline. O projeto e voltado a uso
+pessoal e educacional; ele nao fornece diagnosticos clinicos, de TDAH,
+QI ou transtornos.
+
+Tecnologias e arquitetura
+-------------------------
+- Interface: React 19 + TypeScript + Vite.
+- Estilos: Tailwind CSS.
+- Roteamento: React Router.
+- Graficos: Recharts.
+- Banco local: IndexedDB, por meio da biblioteca idb.
+- Testes automatizados: Vitest.
+- Dados: ficam no navegador/dispositivo; a versao atual nao possui
+  servidor, login, sincronizacao na nuvem ou autenticacao.
+
+Estrutura principal
+-------------------
+- src/tests: definicoes de cada teste, instrucoes, geracao e scoring.
+- src/engine: execucao dos trials e registro das respostas.
+- src/scoring: validacao de qualidade e metricas comuns.
+- src/statistics: mediana, MAD, d-prime, custos e baseline.
+- src/storage: IndexedDB, backup, importacao e exportacao.
+- src/pages e src/components: telas, navegacao e interface.
+- src/batteries: baterias predefinidas de testes.
+
+Testes cognitivos disponiveis
+-----------------------------
+1. Tempo de Reacao Simples.
+2. Tempo de Reacao de Escolha.
+3. Teste de Stroop.
+4. Tarefa Go/No-Go.
+5. SART - Atencao Sustentada.
+6. N-Back Espacial.
+7. Corsi - Blocos.
+8. Alternancia de Tarefas (Task Switching).
+
+Cada teste possui dois modos:
+- Treino: tem feedback imediato e prepara a pessoa para o protocolo.
+- Avaliacao: registra a sessao no historico e pode contribuir para o
+  baseline, desde que a sessao seja valida.
+
+Sessao, resultados e qualidade
+------------------------------
+Cada sessao guarda os trials individuais, tempos de resposta, acertos,
+erros, metricas calculadas, versao do protocolo, dispositivo e eventos
+relevantes de qualidade. Uma sessao pode ser classificada como:
+- valid;
+- valid_with_warnings;
+- invalid.
+
+Sessoes invalidas, interrompidas, de demonstracao ou feitas sem treino
+valido nao entram automaticamente no baseline. Alertas como perda de foco,
+troca de aba, sessao incompleta e pausas ajudam a interpretar os resultados.
+
+Condicoes da sessao
+-------------------
+Antes da avaliacao, a pessoa pode registrar contexto como sono, humor,
+estresse, cafeina, medicamentos/substancias, alimentacao e observacoes.
+
+Tambem e possivel editar essas condicoes depois que a sessao terminou, na
+tela de resultados, em "Condicoes da Sessao" > "Editar condicoes". Isso e
+util quando acontece algo durante a avaliacao - por exemplo, barulho,
+interrupcao, conversa ou distracao - e so se torna relevante depois.
+
+Essa edicao altera somente o contexto descritivo da sessao. Ela nao muda:
+- trials ja registrados;
+- tempos de resposta;
+- acertos, erros ou scoring;
+- duracao ou protocolo do teste;
+- metricas calculadas;
+- quantidade de sessoes que compoe o baseline.
+
+Baseline pessoal
+----------------
+O baseline e independente para cada teste e para cada versao de protocolo.
+Ele considera apenas sessoes de avaliacao validas.
+
+- Sessoes validas 1 a 3: familiarizacao; nao entram no baseline.
+- Sessoes validas 4 a 11: constroem o baseline (8 sessoes).
+- A partir da 11a sessao valida: monitoramento longitudinal.
+
+As metricas do baseline usam mediana e MAD, uma abordagem robusta a valores
+extremos. Por isso, uma sessao com interferencia externa deve ser anotada;
+se o desempenho ficou claramente comprometido, ela deve ser interpretada
+com cautela ao decidir se representa bem o funcionamento habitual.
+
+Historico, analise e dados
+--------------------------
+- Dashboard e catalogo de testes.
+- Historico de sessoes e tela detalhada de resultados.
+- Metricas de velocidade, precisao e variabilidade apresentadas separadamente.
+- Graficos de tendencia longitudinal quando ha dados suficientes.
+- Baterias predefinidas: Check-in Rapido, Bateria Diaria, Bateria Padrao e
+  Bateria Personalizada.
+- Dados de demonstracao para explorar a interface.
+- Exportacao de backup JSON completo.
+- Exportacao CSV de trials individuais.
+- Exportacao CSV de resultados por sessao.
+- Importacao de backup.
+
+Privacidade e recuperacao
+-------------------------
+Os dados sao armazenados localmente no IndexedDB do navegador. Como nao ha
+servidor, limpar dados do navegador, trocar de perfil ou usar outro
+dispositivo pode deixar o historico indisponivel naquele ambiente. O backup
+JSON periodico e a forma recomendada de preservar e transferir os dados.
+
+Estado das sessoes interrompidas
+--------------------------------
+O Corsi pode continuar uma sessao interrompida porque possui estado adaptativo
+salvo. Os demais protocolos exigem reiniciar a avaliacao interrompida, para
+preservar as regras do teste e a interpretacao dos resultados.
+
+Limitacoes metodologicas importantes
+------------------------------------
+- O timing do navegador e adequado para acompanhamento pessoal, mas nao
+  garante precisao sub-milissegundo.
+- Comparacoes devem preferir o mesmo dispositivo, navegador e condicoes de
+  uso sempre que possivel.
+- Perda de foco, aba em segundo plano, throttling e variacoes de renderizacao
+  podem introduzir ruido nos tempos de resposta.
+- O projeto registra sinais desses eventos para ajudar na avaliacao da qualidade.
+- A comparacao e pessoal: nao ha percentis populacionais ou diagnostico clinico.
+
+Como executar o projeto
+-----------------------
+No diretorio do projeto:
+
+  npm install
+  npm run dev
+
+Depois, abra o endereco informado pelo Vite, normalmente
+http://localhost:5173.
+
+Comandos de verificacao
+-----------------------
+  npm test
+  npx tsc -b
+  npm run lint
+  npm run build
+
+Proximos cuidados recomendados
+------------------------------
+- Fazer backup JSON regularmente, especialmente antes de limpar o navegador.
+- Usar o mesmo ambiente de teste para reduzir variacao de timing.
+- Registrar condicoes incomuns na sessao, inclusive apos o termino quando
+  necessario.
+- Tratar resultados isolados com cautela; o valor principal do projeto esta
+  na comparacao longitudinal com o proprio baseline.
+
+Documento de referencia do estado atual do projeto Cognitive Lab.
+
