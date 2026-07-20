@@ -126,3 +126,73 @@ export function serializeCorsiState(state: CorsiAdaptiveState): Record<string, u
 export function deserializeCorsiState(data: Record<string, unknown>): CorsiAdaptiveState {
   return data as unknown as CorsiAdaptiveState
 }
+
+export function parseClickSequence(response: string): number[] {
+  if (!response || response === 'none') return []
+  return response
+    .split(',')
+    .map((v) => parseInt(v.trim(), 10))
+    .filter((v) => !Number.isNaN(v))
+}
+
+export function longestCorrectPrefix(expected: number[], actual: number[]): number {
+  let correct = 0
+  for (let i = 0; i < Math.min(expected.length, actual.length); i++) {
+    if (expected[i] !== actual[i]) break
+    correct++
+  }
+  return correct
+}
+
+export interface CorsiReplayInput {
+  trialIndex: number
+  expectedResponse: string
+  actualResponse: string
+}
+
+export interface CorsiReplayOutcome {
+  finalState: CorsiAdaptiveState
+  totalItems: number
+}
+
+/**
+ * Reconstrói o estado adaptativo final aplicando applyCorsiResult sobre os
+ * trials gravados — FONTE ÚNICA das regras (spec §13). O scoring nunca deve
+ * reimplementar avanço/término/confirmação em paralelo: era exatamente essa
+ * duplicação que fazia o resultado exibido divergir do protocolo executado.
+ *
+ * A correção de cada trial é DERIVADA de expected/actual (idêntica à regra
+ * do engine no clique), tornando o replay puro e independente de flags
+ * gravadas.
+ */
+export function replayCorsiTrials(
+  trials: CorsiReplayInput[],
+  mode: 'assessment' | 'training',
+  practiceLimit: number,
+  seed = 0
+): CorsiReplayOutcome {
+  const ordered = [...trials].sort((a, b) => a.trialIndex - b.trialIndex)
+  let state = createCorsiAdaptiveState(seed)
+  let totalItems = 0
+
+  for (const trial of ordered) {
+    if (state.ended) break
+    const expected = parseClickSequence(trial.expectedResponse)
+    const actual = parseClickSequence(trial.actualResponse)
+    const prefix = longestCorrectPrefix(expected, actual)
+    const correct = expected.length > 0 && actual.length === expected.length && prefix === expected.length
+    totalItems += expected.length
+    state = applyCorsiResult(
+      state,
+      {
+        correct,
+        partialPositionsCorrect: correct ? expected.length : prefix,
+        userResponse: trial.actualResponse,
+      },
+      mode,
+      practiceLimit
+    )
+  }
+
+  return { finalState: state, totalItems }
+}
