@@ -452,6 +452,9 @@ export function TestRunner({
     (e: KeyboardEvent) => {
       const key = e.key.toLowerCase()
       if (key === 'escape') {
+        // Após 'done' a sessão já está sendo concluída — ESC tardio não pode
+        // rebaixá-la para abandonada (spec §8).
+        if (phase === 'done' || completedRef.current) return
         e.preventDefault()
         abortRun()
         return

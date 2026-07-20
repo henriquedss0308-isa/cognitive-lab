@@ -110,18 +110,32 @@ export function Settings() {
                         </Link>
                       )}
                       <button
-                        className="btn-secondary text-sm text-lab-danger"
+                        className="btn-secondary text-sm"
                         onClick={async () => {
                           await updateSessionStatus(s.sessionId, 'abandoned', {
-                            flags: { incomplete: true },
+                            flags: { ...s.flags, incomplete: true },
                             quality: 'invalid',
-                            flagMessages: ['Sessão descartada pelo usuário.'],
+                            flagMessages: [...s.flagMessages, 'Sessão arquivada pelo usuário.'],
                           })
-                          await removeSession(s.sessionId)
                           await refresh()
                         }}
                       >
-                        Descartar
+                        Arquivar
+                      </button>
+                      <button
+                        className="btn-secondary text-sm text-lab-danger"
+                        onClick={async () => {
+                          if (
+                            confirm(
+                              `Excluir permanentemente esta sessão e seus ${s.trials.length} ensaios? Esta ação não pode ser desfeita.`
+                            )
+                          ) {
+                            await removeSession(s.sessionId)
+                            await refresh()
+                          }
+                        }}
+                      >
+                        Excluir
                       </button>
                     </div>
                   </div>

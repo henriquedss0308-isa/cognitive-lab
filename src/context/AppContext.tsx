@@ -14,6 +14,7 @@ import {
   deleteSession,
   getAllSessions,
   getSettings,
+  markStaleInProgressAsInterrupted,
   saveSession,
   saveSettings,
   updateSessionConditions,
@@ -52,7 +53,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    refresh().finally(() => setLoading(false))
+    markStaleInProgressAsInterrupted()
+      .catch(() => 0)
+      .then(() => refresh())
+      .finally(() => setLoading(false))
   }, [refresh])
 
   const addSession = useCallback(

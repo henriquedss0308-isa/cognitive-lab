@@ -71,7 +71,18 @@ export async function updateSessionStatus(
   const db = await getDB()
   const existing = await db.get('sessions', sessionId)
   if (!existing) return
-  await db.put('sessions', { ...existing, ...extra, status })
+  // Invariante (spec §8): status terminal nunca é sobrescrito — protege
+  // contra ESC/interrupções tardias rebaixando uma sessão já concluída.
+  const current = existing.status ?? 'completed'
+  if (TERMINAL_STATUSES.includes(current) && status !== current) {
+    if (import.meta.env.DEV) {
+      console.warn(
+        `[updateSessionStatus] ignorado — sessão ${sessionId} é terminal (${current}), tentativa: ${status}`
+      )
+    }
+    return
+  }
+  await db.put('sessions', prepareSessionForStorage({ ...existing, ...extra, status }))
 }
 
 export async function updateSessionConditions(
@@ -96,6 +107,47 @@ export async function updateSessionConditions(
   const record = prepareSessionForStorage(normalizeSession(updated))
   await db.put('sessions', record)
   return record
+}
+
+/**
+ * Reload/fechamento de aba não desmontam o TestRunner, então sessões de
+ * avaliação podem ficar 'in_progress' para sempre. Na inicialização do app,
+ * qualquer in_progress mais antiga que maxAgeMs vira 'interrupted'
+ * (spec §7). Se outra aba ainda estiver rodando a sessão, o próximo
+ * appendTrialToSession a revive para in_progress — transitório inofensivo.
+ */
+export async function markStaleInProgressAsInterrupted(
+  maxAgeMs = 60_000,
+  now = Date.now()
+): Promise<number> {
+  const db = await getDB()
+  const all = await db.getAll('sessions')
+  const stale = all.filter((s) => {
+    if ((s.status ?? 'completed') !== 'in_progress') return false
+    const started = new Date(s.startedAt).getTime()
+    return Number.isFinite(started) && now - started > maxAgeMs
+  })
+  if (stale.length === 0) return 0
+
+  const tx = db.transaction('sessions', 'readwrite')
+  await Promise.all([
+    ...stale.map((s) =>
+      tx.store.put(
+        prepareSessionForStorage({
+          ...s,
+          status: 'interrupted',
+          quality: 'invalid',
+          flags: { ...s.flags, incomplete: true },
+          flagMessages: [
+            ...(s.flagMessages ?? []),
+            'Sessão interrompida (aplicação fechada ou recarregada).',
+          ],
+        })
+      )
+    ),
+    tx.done,
+  ])
+  return stale.length
 }
 
 export async function getIncompleteSessions(): Promise<SessionRecord[]> {
