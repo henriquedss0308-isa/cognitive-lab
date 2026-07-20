@@ -159,7 +159,35 @@ export async function saveSettings(settings: AppSettings): Promise<void> {
 export async function importSessions(sessions: SessionRecord[]): Promise<void> {
   const db = await getDB()
   const tx = db.transaction('sessions', 'readwrite')
-  await Promise.all([...sessions.map((s) => tx.store.put(normalizeSession(s))), tx.done])
+  await Promise.all([
+    ...sessions.map((s) => tx.store.put(prepareSessionForStorage(normalizeSession(s)))),
+    tx.done,
+  ])
+}
+
+/**
+ * Importação idempotente: sessionId já existente é IGNORADO (dados locais
+ * nunca são sobrescritos por backup — spec §10). Retorna o que aconteceu.
+ */
+export async function importSessionsSkipExisting(
+  sessions: SessionRecord[]
+): Promise<{ added: string[]; skipped: string[] }> {
+  const db = await getDB()
+  const tx = db.transaction('sessions', 'readwrite')
+  const existing = new Set(await tx.store.getAllKeys())
+  const added: string[] = []
+  const skipped: string[] = []
+  const writes: Promise<unknown>[] = []
+  for (const s of sessions) {
+    if (existing.has(s.sessionId)) {
+      skipped.push(s.sessionId)
+      continue
+    }
+    writes.push(tx.store.put(prepareSessionForStorage(normalizeSession(s))))
+    added.push(s.sessionId)
+  }
+  await Promise.all([...writes, tx.done])
+  return { added, skipped }
 }
 
 export function filterSessions(

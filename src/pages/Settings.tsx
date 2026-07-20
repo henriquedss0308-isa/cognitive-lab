@@ -35,11 +35,31 @@ export function Settings() {
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const text = await file.text()
-    const data = JSON.parse(text)
-    const result = await importBackup(data)
-    alert(result.message)
-    window.location.reload()
+    e.target.value = ''
+    let data: unknown
+    try {
+      data = JSON.parse(await file.text())
+    } catch {
+      alert('Arquivo não é um JSON válido — nada foi importado.')
+      return
+    }
+    try {
+      const result = await importBackup(data)
+      const detail =
+        result.rejected.length > 0
+          ? '\n\nRejeitadas:\n' +
+            result.rejected
+              .slice(0, 10)
+              .map((r) => `· ${r.sessionId}: ${r.reason}`)
+              .join('\n')
+          : ''
+      alert(result.message + detail)
+      if (result.imported > 0) window.location.reload()
+    } catch (err) {
+      alert(
+        `Falha ao importar: ${err instanceof Error ? err.message : 'erro desconhecido'}. Nenhum dado local foi alterado.`
+      )
+    }
   }
 
   return (
