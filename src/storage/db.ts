@@ -1,5 +1,6 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import type { AppSettings, SessionRecord } from '../types'
+import { recomputeStoredBaselinePhases } from '../statistics/baseline'
 
 interface CognitiveLabDB extends DBSchema {
   sessions: {
@@ -19,7 +20,7 @@ interface CognitiveLabDB extends DBSchema {
 }
 
 const DB_NAME = 'cognitive-lab'
-const DB_VERSION = 2
+const DB_VERSION = 3
 
 let dbPromise: Promise<IDBPDatabase<CognitiveLabDB>> | null = null
 
@@ -44,6 +45,24 @@ export function getDB(): Promise<IDBPDatabase<CognitiveLabDB>> {
             const val = cursor.value as SessionRecord
             if (!val.status) {
               val.status = 'completed'
+              await cursor.update(val)
+            }
+            cursor = await cursor.continue()
+          }
+        }
+
+        // v3: corrige result.baselinePhase gravado com off-by-one
+        // (rótulo derivável — migração idempotente e re-executável).
+        if (oldVersion >= 1 && oldVersion < 3) {
+          const store = transaction.objectStore('sessions')
+          const all = (await store.getAll()) as SessionRecord[]
+          const phases = recomputeStoredBaselinePhases(all)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            const val = cursor.value as SessionRecord
+            const correct = phases.get(val.sessionId)
+            if (val.result && correct && val.result.baselinePhase !== correct) {
+              val.result = { ...val.result, baselinePhase: correct }
               await cursor.update(val)
             }
             cursor = await cursor.continue()

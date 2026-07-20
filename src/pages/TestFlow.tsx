@@ -8,7 +8,7 @@ import { generateId } from '../utils/id'
 import { useApp } from '../context/AppContext'
 import type { TestConditions } from '../types'
 import { TestConditionsForm } from '../components/test/TestConditionsForm'
-import { getBaselinePhase } from '../statistics/baseline'
+import { getBaselinePhase, getValidAssessmentSessions } from '../statistics/baseline'
 import {
   evaluatePractice,
   DEFAULT_PRACTICE_CRITERIA,
@@ -161,16 +161,10 @@ export function TestFlow() {
     }
 
     const scored = test.scoreSession(trials, mode, deviceInfo, flags as Record<string, boolean>)
-    const validSessions = sessions.filter(
-      (s) =>
-        s.testId === test.id &&
-        s.mode === 'assessment' &&
-        s.quality !== 'invalid' &&
-        !s.isDemo &&
-        (!s.status || s.status === 'completed')
-    )
+    // Fase da sessão corrente = contagem de sessões elegíveis ANTERIORES
+    // (mesma régua do baseline; a própria sessão nunca conta — spec §1.1).
     const phase = getBaselinePhase(
-      validSessions.length + (scored.quality !== 'invalid' ? 1 : 0)
+      getValidAssessmentSessions(sessions, test.id, test.protocolVersion).length
     )
 
     const sessionFlags = { ...scored.flags, ...flags }

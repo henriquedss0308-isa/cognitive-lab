@@ -94,4 +94,44 @@ function getMetricValue(session: SessionRecord, key: string): number | null {
   return null
 }
 
+/**
+ * Rótulo de fase de UMA sessão = fase dada pela contagem de sessões
+ * elegíveis estritamente ANTERIORES a ela (a própria sessão nunca conta).
+ * Ordem determinística: (startedAt, sessionId).
+ *
+ * Usada na gravação (TestFlow) e na migração v3 que corrige rótulos
+ * gravados com off-by-one (a 3ª válida saía 'baseline_building' e a 11ª
+ * saía 'monitoring').
+ */
+export function recomputeStoredBaselinePhases(
+  sessions: SessionRecord[]
+): Map<string, BaselinePhase> {
+  const byKey = (s: SessionRecord) => `${s.testId}::${s.protocolVersion}`
+  const order = (a: SessionRecord, b: SessionRecord) => {
+    const t = new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
+    return t !== 0 ? t : a.sessionId.localeCompare(b.sessionId)
+  }
+
+  const groups = new Map<string, SessionRecord[]>()
+  for (const s of sessions) {
+    const key = byKey(s)
+    if (!groups.has(key)) groups.set(key, [])
+    groups.get(key)!.push(s)
+  }
+
+  const phases = new Map<string, BaselinePhase>()
+  for (const group of groups.values()) {
+    const eligible = getValidAssessmentSessions(group, group[0].testId, group[0].protocolVersion)
+      .sort(order)
+    for (const s of group) {
+      if (!s.result) continue
+      const priorCount = eligible.filter(
+        (e) => e.sessionId !== s.sessionId && order(e, s) < 0
+      ).length
+      phases.set(s.sessionId, getBaselinePhase(priorCount))
+    }
+  }
+  return phases
+}
+
 export { FAMILIARIZATION_SESSIONS, BASELINE_SESSIONS }
