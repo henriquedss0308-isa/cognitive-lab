@@ -122,7 +122,10 @@ export function Results() {
   const primaryValue = result.customMetrics[test.primaryMetricKey] ??
     result.rtMetrics.medianCorrectRT
 
-  const zOutcome = evaluatePrimaryZ(primaryValue, baseline, test)
+  // Sessão demo nunca é comparada ao baseline real do usuário.
+  const zOutcome = session.isDemo
+    ? ({ kind: 'not_monitoring' } as const)
+    : evaluatePrimaryZ(primaryValue, baseline, test)
 
   const handleConditionsSave = async (conditions: TestConditions) => {
     if (!session) return

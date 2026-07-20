@@ -3,6 +3,7 @@ import {
   BarChart, Bar, ScatterChart, Scatter, CartesianGrid, Legend,
 } from 'recharts'
 import type { SessionRecord } from '../../types'
+import { selectTrendSessions } from './chartSelectors'
 
 interface Props {
   session: SessionRecord
@@ -72,9 +73,8 @@ interface LongitudinalProps {
 }
 
 export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalProps) {
-  const data = sessions
-    .filter((s) => s.result && s.mode === 'assessment' && !s.isDemo)
-    .sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime())
+  const selection = selectTrendSessions(sessions)
+  const data = selection.sessions
     .map((s, i) => {
       let value: number | null = null
       if (metricKey === 'medianCorrectRT') value = s.result!.rtMetrics.medianCorrectRT
@@ -89,10 +89,20 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
     })
     .filter((d) => d.value !== null)
 
+  const hiddenNote = [
+    selection.hiddenInvalid > 0 ? `${selection.hiddenInvalid} inválida(s) não plotada(s)` : null,
+    selection.hiddenOtherVersions > 0
+      ? `${selection.hiddenOtherVersions} de versão anterior do protocolo oculta(s)`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
   if (data.length < 2) {
     return (
       <div className="card p-4 text-lab-muted text-sm">
         Dados insuficientes para tendência ({data.length} sessão{data.length !== 1 ? 'ões' : ''}).
+        {hiddenNote && <span className="block mt-1">{hiddenNote}.</span>}
       </div>
     )
   }
@@ -100,7 +110,10 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
   return (
     <div className="card p-4">
       <h3 className="text-sm font-medium mb-4">{label} — tendência longitudinal</h3>
-      <p className="text-xs text-lab-muted mb-2">Comparado às suas sessões anteriores. {data.length} sessões.</p>
+      <p className="text-xs text-lab-muted mb-2">
+        Comparado às suas sessões anteriores. {data.length} sessões.
+        {hiddenNote && ` ${hiddenNote}.`}
+      </p>
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#2a3548" />
@@ -119,8 +132,8 @@ interface SpeedAccuracyProps {
 }
 
 export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
-  const data = sessions
-    .filter((s) => s.result && s.mode === 'assessment')
+  const data = selectTrendSessions(sessions)
+    .sessions
     .map((s) => ({
       id: s.sessionId.slice(0, 8),
       speed: s.result!.rtMetrics.medianCorrectRT,

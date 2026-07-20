@@ -270,8 +270,9 @@ export async function getLatestConditions(): Promise<TestConditions | undefined>
   const db = await getDB()
   const all = await db.getAll('sessions')
   const withConditions = all
-    .filter((s) => s.checkIn && Object.keys(s.checkIn).length > 0)
+    // Sessões demo carregam check-ins fictícios — nunca reaproveitar.
+    .filter((s) => !s.isDemo && s.checkIn && Object.keys(s.checkIn).length > 0)
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
-  
+
   return withConditions[0]?.checkIn
 }
