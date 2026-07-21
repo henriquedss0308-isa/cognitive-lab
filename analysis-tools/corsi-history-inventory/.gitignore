@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+reports/
+*-report.json
+*-report.md
+*.corsi-inventory-report.json
