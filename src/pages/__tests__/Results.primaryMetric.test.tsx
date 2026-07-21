@@ -37,11 +37,12 @@ const DEVICE: SessionRecord['deviceInfo'] = {
 }
 
 function makeSession(
-  testId: 'stroop' | 'taskswitch',
+  testId: 'stroop' | 'taskswitch' | 'corsi',
   sessionId: string,
   day: number,
   primaryValue: number | null,
-  medianCorrectRT: number
+  medianCorrectRT: number,
+  options: { scoringVersion?: string; baselinePhase?: 'monitoring' } = {}
 ): SessionRecord {
   const test = TEST_MAP[testId]
   const startedAt = `2026-06-${String(day).padStart(2, '0')}T10:00:00.000Z`
@@ -97,6 +98,8 @@ function makeSession(
       conditionMetrics: {},
       blockMetrics: [],
       customMetrics,
+      scoringVersion: options.scoringVersion,
+      baselinePhase: options.baselinePhase,
       isDemo: false,
       deviceInfo: DEVICE,
     },
@@ -153,5 +156,44 @@ describe('Results — métrica primária ausente', () => {
   it('não usa 500 ms como switchCostRT nem calcula z falso', async () => {
     await renderMissingPrimary('taskswitch')
     expectMissingPrimaryWithoutRtFallback()
+  })
+})
+
+describe('Results — série de scoring da sessão', () => {
+  beforeEach(() => {
+    appState.sessions = []
+    appState.refresh.mockClear()
+    appState.editSessionConditions.mockClear()
+  })
+
+  it('mostra familiarização current e preserva aviso sobre 6 sessões legacy', async () => {
+    const legacy = Array.from({ length: 6 }, (_, index) =>
+      makeSession('corsi', `legacy-${index + 1}`, index + 1, 5, 900, {
+        scoringVersion: 'sdt-hautus-1',
+      })
+    )
+    const current = makeSession('corsi', 'current-1', 20, 6, 910, {
+      scoringVersion: 'sdt-hautus-1;corsi-replay-1',
+      // Simula o rótulo persistido antes da proteção; a tela deve derivar a
+      // fase compatível sem regravar o registro.
+      baselinePhase: 'monitoring',
+    })
+    appState.sessions = [current, ...legacy]
+
+    render(
+      <MemoryRouter initialEntries={[`/results/${current.sessionId}`]}>
+        <Routes>
+          <Route path="/results/:sessionId" element={<Results />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await screen.findByRole('heading', { name: TEST_MAP.corsi.name })
+    expect(screen.getByText('Familiarização — não entra no baseline')).toBeInTheDocument()
+    expect(screen.getByRole('note')).toHaveTextContent(
+      /Existem 6 sessões históricas deste protocolo com outra regra de scoring/i
+    )
+    expect(screen.queryByText(/^z =/i)).not.toBeInTheDocument()
+    expect(current.result?.baselinePhase).toBe('monitoring')
   })
 })

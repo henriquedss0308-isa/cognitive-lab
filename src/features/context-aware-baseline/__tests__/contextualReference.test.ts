@@ -3,7 +3,7 @@ import { buildContextualReference, buildGeneralReference } from '../contextualRe
 import { computeBaselineStats } from '../../../statistics/baseline'
 import { evaluatePrimaryZ, MIN_BASELINE_N } from '../../../statistics/zscore'
 import { getTest } from '../../../tests/registry'
-import { METRIC_KEYS, PROTOCOL, TEST_ID, makeSession, sequence } from './fixtures'
+import { LEGACY_SERIES, METRIC_KEYS, PROTOCOL, TEST_ID, makeSession, sequence } from './fixtures'
 import type { SessionRecord } from '../../../types'
 
 const ids = (sessions: { sessionId: string }[]) => sessions.map((s) => s.sessionId)
@@ -180,7 +180,7 @@ describe('regras estatísticas preservadas na referência contextual', () => {
     const reference = contextualWith([300, null, null, null, 340, 360, 380, null])
     expect(reference.stats.metrics.medianCorrectRT.n).toBeLessThan(MIN_BASELINE_N)
 
-    const outcome = evaluatePrimaryZ(310, reference.stats, test)
+    const outcome = evaluatePrimaryZ(310, reference.stats, test, LEGACY_SERIES)
     expect(outcome.kind).toBe('insufficient_n')
   })
 
@@ -188,7 +188,7 @@ describe('regras estatísticas preservadas na referência contextual', () => {
     const reference = contextualWith([300, 300, 300, 300, 300, 300, 300, 300])
     expect(reference.stats.metrics.medianCorrectRT.mad).toBe(0)
 
-    const outcome = evaluatePrimaryZ(330, reference.stats, test)
+    const outcome = evaluatePrimaryZ(330, reference.stats, test, LEGACY_SERIES)
     expect(outcome.kind).toBe('zero_mad')
     if (outcome.kind === 'zero_mad') {
       expect(outcome.median).toBe(300)
@@ -198,8 +198,8 @@ describe('regras estatísticas preservadas na referência contextual', () => {
 
   it('métrica ausente na sessão avaliada não vira z fabricado', () => {
     const reference = contextualWith([300, 310, 320, 330, 340, 350, 360, 370])
-    expect(evaluatePrimaryZ(null, reference.stats, test).kind).toBe('value_missing')
-    expect(evaluatePrimaryZ(undefined, reference.stats, test).kind).toBe('value_missing')
+    expect(evaluatePrimaryZ(null, reference.stats, test, LEGACY_SERIES).kind).toBe('value_missing')
+    expect(evaluatePrimaryZ(undefined, reference.stats, test, LEGACY_SERIES).kind).toBe('value_missing')
   })
 
   it('nenhuma estatística produz NaN ou Infinity', () => {
@@ -216,7 +216,7 @@ describe('regras estatísticas preservadas na referência contextual', () => {
 
   it('z contextual usa a mediana do próprio contexto', () => {
     const reference = contextualWith([300, 310, 320, 330, 340, 350, 360, 370])
-    const outcome = evaluatePrimaryZ(335, reference.stats, test)
+    const outcome = evaluatePrimaryZ(335, reference.stats, test, LEGACY_SERIES)
     expect(outcome.kind).toBe('ok')
     if (outcome.kind === 'ok') {
       // medianCorrectRT tem direção -1 (menor é melhor): valor acima da

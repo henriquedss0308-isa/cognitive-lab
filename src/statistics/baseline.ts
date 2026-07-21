@@ -157,21 +157,21 @@ export function getMetricValue(session: SessionRecord, key: string): number | nu
 export function recomputeStoredBaselinePhases(
   sessions: SessionRecord[]
 ): Map<string, BaselinePhase> {
-  const byKey = (s: SessionRecord) => `${s.testId}::${s.protocolVersion}`
   const order = (a: SessionRecord, b: SessionRecord) => {
     const t = new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
     return t !== 0 ? t : a.sessionId.localeCompare(b.sessionId)
   }
 
-  const groups = new Map<string, SessionRecord[]>()
+  const groups = new Map<TestId, Map<string, SessionRecord[]>>()
   for (const s of sessions) {
-    const key = byKey(s)
-    if (!groups.has(key)) groups.set(key, [])
-    groups.get(key)!.push(s)
+    if (!groups.has(s.testId)) groups.set(s.testId, new Map())
+    const protocols = groups.get(s.testId)!
+    if (!protocols.has(s.protocolVersion)) protocols.set(s.protocolVersion, [])
+    protocols.get(s.protocolVersion)!.push(s)
   }
 
   const phases = new Map<string, BaselinePhase>()
-  for (const group of groups.values()) {
+  for (const group of [...groups.values()].flatMap((protocols) => [...protocols.values()])) {
     // Migração histórica v3 preservada exatamente como foi executada. Ela
     // não é reaberta para reclassificar resultados já gravados por scoring;
     // a separação nova vale para seleções derivadas e novas conclusões.

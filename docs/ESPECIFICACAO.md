@@ -3,7 +3,7 @@
 Versão 1.0 · 2026-07-19 · Normativa: em conflito entre documentos, ESTA especificação prevalece.
 Palavras-chave: DEVE (obrigatório), NÃO DEVE (proibido), PODE (opcional).
 
-Toda contagem de sessões nesta especificação é **por par (testId, protocolVersion)** e considera apenas **sessões elegíveis** (§2). "Sessão nº N" refere-se à posição 1-indexada na ordem crescente de `startedAt` dentro desse par.
+Toda contagem de sessões nesta especificação é **por identidade longitudinal (testId, protocolVersion, scoringVersion normalizada)** e considera apenas **sessões elegíveis** (§2). "Sessão nº N" refere-se à posição 1-indexada na ordem crescente de `startedAt` dentro dessa série.
 
 ---
 
@@ -40,6 +40,7 @@ Uma sessão é **elegível** sse TODAS as linhas são verdadeiras:
 | isDemo | `false` |
 | flags.insufficientPractice | ausente/false |
 | protocolVersion | igual ao do baseline consultado |
+| scoringVersion | igual à da série consultada; ausência = `legacy-unversioned` |
 
 - `valid_with_warnings` **ENTRA** no baseline (decisão: mediana/MAD são robustos; excluir criaria baseline enviesado para dias "perfeitos"). CONTRAPARTIDA OBRIGATÓRIA: toda exibição de baseline DEVE mostrar a composição — "N sessões (K com avisos)".
 - `interrupted`, `abandoned`, `in_progress`, demo e treino NUNCA entram.
@@ -88,8 +89,9 @@ Estados proibidos: `in_progress` com quality definida (DEVE ser indeterminada at
 
 - Cada sessão grava `deviceInfo` completo. Na conclusão, o sistema DEVE comparar `deviceType`+`inputMethod` com a **moda** das sessões do baseline (ou das anteriores, se em building): divergência ⇒ `flags.differentDevice`/`differentInputMethod` + warning. NÃO DEVE bloquear a sessão.
 - Baseline NÃO É segmentado por dispositivo na v1; a mitigação é a sinalização + recomendação de ambiente constante (documentada).
-- Protocolo: baseline é estritamente por `protocolVersion`. Mudou a versão ⇒ novo ciclo completo (3 familiarização + 8 baseline). A UI DEVE comunicar isso quando uma nova versão entrar em uso. Comparações entre versões NÃO DEVEM ser plotadas na mesma série sem distinção.
-- `scoringVersion` fica congelado no resultado. Se o scoring mudar, sessões antigas NÃO são recalculadas; séries que misturam scoringVersions DEVEM anotar a fronteira.
+- Protocolo: baseline é estritamente por `protocolVersion`. Mudou a versão ⇒ novo ciclo completo (3 familiarização + 8 baseline). A UI DEVE comunicar isso quando uma nova versão entrar em uso.
+- `scoringVersion` fica congelado no resultado e faz parte da identidade longitudinal. Mudou a regra de scoring ⇒ novo ciclo completo, sem recalcular sessões antigas. Ausência, string vazia ou apenas espaços recebe a classificação reservada `legacy-unversioned`, nunca a versão atual.
+- Baseline, referência contextual, z e linha do gráfico NÃO DEVEM cruzar identidades longitudinais. Histórico incompatível continua preservado e visível, com aviso quando ficar fora da série apresentada.
 
 ## 7. Sessões interrompidas e recuperação
 

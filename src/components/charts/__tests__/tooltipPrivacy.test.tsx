@@ -92,6 +92,25 @@ describe('SessionTooltip', () => {
     expect(screen.getByText('100,0%')).toBeInTheDocument()
   })
 
+  it('informa a scoringVersion da série sem exibir identidade interna', () => {
+    const { container } = renderAsRecharts(
+      <SessionTooltip metricKey="confirmedSpan" metricLabel="Amplitude confirmada" />,
+      { payload: { ...POINT, scoringVersion: 'sdt-hautus-1;corsi-replay-1' } }
+    )
+
+    expect(screen.getByText('Scoring: sdt-hautus-1;corsi-replay-1')).toBeInTheDocument()
+    expect(container.textContent).not.toContain(SESSION_ID)
+  })
+
+  it('rotula explicitamente scoring ausente como legado sem versão', () => {
+    renderAsRecharts(
+      <SessionTooltip metricKey="confirmedSpan" metricLabel="Amplitude confirmada" />,
+      { payload: { ...POINT, scoringVersion: 'legacy-unversioned' } }
+    )
+
+    expect(screen.getByText('Scoring: Legado sem versão registrada')).toBeInTheDocument()
+  })
+
   it.each([
     ['dPrime', 2.4, '2,40'],
     ['commissionErrorRate', 0.11, '11,0%'],

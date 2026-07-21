@@ -27,11 +27,7 @@ export function evaluatePrimaryZ(
   primaryValue: number | null | undefined,
   baseline: BaselineStats,
   test: CognitiveTestDefinition,
-  session: LongitudinalSeriesSource = {
-    testId: baseline.testId,
-    protocolVersion: baseline.protocolVersion,
-    result: { scoringVersion: baseline.scoringVersion },
-  }
+  session: LongitudinalSeriesSource
 ): PrimaryZOutcome {
   if (baseline.seriesKey !== getLongitudinalSeriesKey(session)) {
     return { kind: 'incompatible_series' }

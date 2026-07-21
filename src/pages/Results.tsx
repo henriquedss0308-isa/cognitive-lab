@@ -259,9 +259,10 @@ export function Results() {
       {!session.isDemo && baseline.incompatibleScoringCount > 0 && (
         <div className="card p-4 mb-6 border-lab-warning/40" role="note">
           <p className="text-sm text-lab-muted">
-            Existem {baseline.incompatibleScoringCount} sessão
-            {baseline.incompatibleScoringCount === 1 ? '' : 's'} histórica
-            {baseline.incompatibleScoringCount === 1 ? '' : 's'} deste protocolo com outra regra
+            Existem {baseline.incompatibleScoringCount}{' '}
+            {baseline.incompatibleScoringCount === 1
+              ? 'sessão histórica'
+              : 'sessões históricas'} deste protocolo com outra regra
             de scoring. Os registros continuam preservados no histórico, mas não completam nem
             entram nesta referência.
           </p>

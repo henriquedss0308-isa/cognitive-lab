@@ -3,7 +3,14 @@ import { selectReference } from '../referenceSelection'
 import { computeBaselineStats } from '../../../statistics/baseline'
 import { evaluatePrimaryZ } from '../../../statistics/zscore'
 import { getTest } from '../../../tests/registry'
-import { METRIC_KEYS, PROTOCOL, TEST_ID, makeSession, sequence } from './fixtures'
+import {
+  LEGACY_SERIES,
+  METRIC_KEYS,
+  PROTOCOL,
+  TEST_ID,
+  makeSession,
+  sequence,
+} from './fixtures'
 import type { LisdexamfetamineStatus } from '../types'
 import type { SessionRecord } from '../../../types'
 
@@ -53,8 +60,8 @@ describe('referência contextual disponível', () => {
     const withMed = select(sessions, evaluated('taken')).reference
     const withoutMed = select(sessions, evaluated('not_taken')).reference
 
-    const zWith = evaluatePrimaryZ(400, withMed.stats, test)
-    const zWithout = evaluatePrimaryZ(400, withoutMed.stats, test)
+    const zWith = evaluatePrimaryZ(400, withMed.stats, test, LEGACY_SERIES)
+    const zWithout = evaluatePrimaryZ(400, withoutMed.stats, test, LEGACY_SERIES)
     expect(zWith.kind).toBe('ok')
     expect(zWithout.kind).toBe('ok')
     if (zWith.kind === 'ok' && zWithout.kind === 'ok') {
@@ -121,7 +128,9 @@ describe('fallback para a referência geral', () => {
 
     expect(selection.reference.metadata.kind).toBe('general')
     expect(selection.reference.stats.phase).not.toBe('monitoring')
-    expect(evaluatePrimaryZ(300, selection.reference.stats, test).kind).toBe('not_monitoring')
+    expect(
+      evaluatePrimaryZ(300, selection.reference.stats, test, LEGACY_SERIES).kind
+    ).toBe('not_monitoring')
   })
 })
 
@@ -183,7 +192,9 @@ describe('protocolo incompatível', () => {
     )
     const selection = select(sessions, evaluated('taken'))
     expect(selection.reference.metadata.sessionCount).toBe(0)
-    expect(evaluatePrimaryZ(300, selection.reference.stats, test).kind).toBe('not_monitoring')
+    expect(
+      evaluatePrimaryZ(300, selection.reference.stats, test, LEGACY_SERIES).kind
+    ).toBe('not_monitoring')
   })
 })
 
@@ -219,8 +230,8 @@ describe('garantias de regressão', () => {
     const after = select(legacy, evaluated('absent')).reference
 
     expect(after.stats).toEqual(before)
-    expect(evaluatePrimaryZ(320, after.stats, test)).toEqual(
-      evaluatePrimaryZ(320, before, test)
+    expect(evaluatePrimaryZ(320, after.stats, test, LEGACY_SERIES)).toEqual(
+      evaluatePrimaryZ(320, before, test, LEGACY_SERIES)
     )
   })
 

@@ -75,9 +75,10 @@ export function TestDetail() {
       {baseline.incompatibleScoringCount > 0 && (
         <div className="card p-4 mb-6 border-lab-warning/40" role="note">
           <p className="text-sm text-lab-muted">
-            {baseline.incompatibleScoringCount} sessão
-            {baseline.incompatibleScoringCount === 1 ? '' : 's'} histórica
-            {baseline.incompatibleScoringCount === 1 ? '' : 's'} com scoring diferente permanece
+            {baseline.incompatibleScoringCount}{' '}
+            {baseline.incompatibleScoringCount === 1
+              ? 'sessão histórica'
+              : 'sessões históricas'} com scoring diferente permanece
             {baseline.incompatibleScoringCount === 1 ? '' : 'm'}{' '}
             {baseline.incompatibleScoringCount === 1 ? 'visível' : 'visíveis'} no histórico,
             sem compor o
