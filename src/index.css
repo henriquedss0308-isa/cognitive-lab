@@ -44,7 +44,10 @@
   --color-lab-text: #dde3ec;
   --color-lab-fg: #f2f5fa;
   --color-lab-muted: #868f9f;
-  --color-lab-faint: #6b7484;
+  /* `faint` carrega texto de apoio de verdade (.help-text, 12px), não só
+     enfeite — por isso precisa passar 4.5:1 como qualquer corpo de texto. A
+     hierarquia entre muted e faint vem sobretudo do tamanho. */
+  --color-lab-faint: #7c8595;
 
   /* Azul-marinho como cor principal: preenchimento sóbrio + um azul de leitura
      mais claro para texto e ícones, que precisa passar contraste sobre o fundo. */
@@ -58,7 +61,9 @@
   /* Semânticas — presentes, mas contidas. */
   --color-lab-success: #55a37f;
   --color-lab-warning: #c2954f;
-  --color-lab-danger: #cf6b70;
+  /* Um pouco mais clara do que o mínimo sobre superfície lisa, pelo mesmo
+     motivo da versão clara: o fundo tingido do badge come a margem. */
+  --color-lab-danger: #d4757a;
   --color-lab-info: #82a8de;
 
   /* Emotion Lab — fiéis ao nome que a interface dá a cada quadrante. */
@@ -102,7 +107,7 @@
   --color-lab-text: #1e232c;
   --color-lab-fg: #0f1319;
   --color-lab-muted: #5a6270;
-  --color-lab-faint: #7b8391;
+  --color-lab-faint: #5f6776;
 
   --color-lab-primary: #274a80;
   --color-lab-primary-hover: #1d3a67;
@@ -114,9 +119,12 @@
   /* Amarelo e verde precisam ser bem mais escuros no claro que no escuro: sobre
      superfície clara eles perdem contraste rápido. Os valores abaixo passam 4.5:1
      em bg, surface e surface-2 — conferido, não estimado. */
-  --color-lab-success: #2c7656;
-  --color-lab-warning: #7d5c15;
-  --color-lab-danger: #a63f45;
+  /* Mais escuras do que o mínimo sobre superfície lisa: o badge tem fundo com
+     10% da própria cor, e essa lavagem comia a margem — success chegou a medir
+     3.99:1 no elemento renderizado. Ver o teste de contraste sobre tinta. */
+  --color-lab-success: #236044;
+  --color-lab-warning: #6d5110;
+  --color-lab-danger: #98383e;
   --color-lab-info: #2b528d;
 
   --color-lab-emotion-yellow: #856118;

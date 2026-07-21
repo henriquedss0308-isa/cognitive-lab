@@ -58,16 +58,40 @@ function contrast(a: string, b: string): number {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05)
 }
 
+/** Equivalente ao `color-mix(in srgb, fg <ratio>%, bg)` usado nos badges. */
+function mix(fg: string, bg: string, ratio: number): string {
+  const channels = (hexColor: string) => {
+    const h = hexColor.replace('#', '')
+    return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16))
+  }
+  const f = channels(fg)
+  const b = channels(bg)
+  return (
+    '#' +
+    [0, 1, 2]
+      .map((i) => Math.round(f[i] * ratio + b[i] * (1 - ratio)))
+      .map((v) => v.toString(16).padStart(2, '0'))
+      .join('')
+  )
+}
+
 const THEMES: [string, Record<string, string>][] = [
   ['escuro', DARK],
   ['claro', LIGHT],
 ]
 
-/** Texto normal — WCAG AA. */
+/**
+ * Texto normal — WCAG AA.
+ *
+ * `faint` está aqui, e não numa faixa mais frouxa, porque na prática ele
+ * colore `.help-text` a 12px: é corpo de texto, não enfeite. Uma auditoria nos
+ * elementos renderizados pegou ele a 3.91:1 sobre superfície.
+ */
 const TEXT_TOKENS = [
   'text',
   'fg',
   'muted',
+  'faint',
   'accent',
   'success',
   'warning',
@@ -97,14 +121,31 @@ describe.each(THEMES)('contraste — tema %s', (_name, tokens) => {
     }
   })
 
-  it('texto auxiliar (faint) atinge 3:1', () => {
-    for (const bg of SURFACES) {
-      const ratio = contrast(tokens.faint, tokens[bg])
-      expect(
-        Number(ratio.toFixed(2)),
-        `faint sobre ${bg} = ${ratio.toFixed(2)}:1`
-      ).toBeGreaterThanOrEqual(3)
+  /**
+   * Badges pintam o fundo com 10% da própria cor (color-mix no .badge). Essa
+   * lavagem aproxima texto e fundo e derruba o contraste em relação à
+   * superfície lisa — foi assim que `success` passou na conta dos tokens e
+   * ainda assim mediu 3.99:1 no elemento renderizado.
+   */
+  it.each(['success', 'warning', 'danger', 'accent'])(
+    'badge %s mantém 4.5:1 sobre o próprio fundo tingido',
+    (tone) => {
+      for (const bg of SURFACES) {
+        const tinted = mix(tokens[tone], tokens[bg], 0.1)
+        const ratio = contrast(tokens[tone], tinted)
+        expect(
+          Number(ratio.toFixed(2)),
+          `badge ${tone} sobre tinta em ${bg} = ${ratio.toFixed(2)}:1`
+        ).toBeGreaterThanOrEqual(4.5)
+      }
     }
+  )
+
+  it('bordas se distinguem da superfície', () => {
+    // 3:1 é o alvo de elementos não textuais: é o que faz o cartão ter contorno
+    // visível em vez de sumir no fundo.
+    const ratio = contrast(tokens['border-strong'], tokens.surface)
+    expect(Number(ratio.toFixed(2))).toBeGreaterThanOrEqual(1.5)
   })
 
   it('texto sobre o preenchimento primário atinge 4.5:1', () => {
