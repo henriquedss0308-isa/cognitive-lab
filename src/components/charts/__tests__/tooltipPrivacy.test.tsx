@@ -90,6 +90,20 @@ describe('SessionTooltip', () => {
 
     expect(screen.getByText('100,0%')).toBeInTheDocument()
   })
+
+  it.each([
+    ['dPrime', 2.4, '2,40'],
+    ['commissionErrorRate', 0.11, '11,0%'],
+    ['confirmedSpan', 5, '5'],
+    ['stroopCostAccuracy', -0.08, '−8,0 pp'],
+  ] as const)('mantém %s consistente com os cards', (metricKey, value, expected) => {
+    renderAsRecharts(
+      <SessionTooltip metricKey={metricKey} metricLabel="Métrica" />,
+      { payload: { ...POINT, value } }
+    )
+
+    expect(screen.getByText(expected)).toBeInTheDocument()
+  })
 })
 
 describe('ScatterTooltip', () => {
@@ -97,7 +111,7 @@ describe('ScatterTooltip', () => {
     key: SESSION_ID,
     fullLabel: '21/07/2026 às 12:42:05',
     speed: 245.4000244140625,
-    accuracy: 97.5,
+    accuracy: 0.975,
   }
 
   it('não exibe o sessionId', () => {
