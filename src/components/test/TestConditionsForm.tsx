@@ -98,11 +98,11 @@ export function TestConditionsForm({
   }
 
   return (
-    <div className={compact ? 'w-full' : 'p-8 max-w-2xl mx-auto w-full'}>
-      <h1 className={compact ? 'text-lg font-semibold mb-2' : 'text-2xl font-semibold mb-2'}>
-        {title}
-      </h1>
-      <p className="text-lab-muted text-sm mb-6">{description}</p>
+    <div className={compact ? 'w-full' : 'px-6 py-10 sm:px-10 max-w-2xl mx-auto w-full'}>
+      <h1 className={compact ? 'card-title' : 'page-title'}>{title}</h1>
+      <p className={compact ? 'help-text mb-5 max-w-prose' : 'page-subtitle mb-8 max-w-prose'}>
+        {description}
+      </p>
 
       {showLoadPrevious && hasPrevious && (
         <button
@@ -118,37 +118,37 @@ export function TestConditionsForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         
         {/* Sono */}
-        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group">
+          <summary>
             Sono
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-0 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
             <label className="block">
-              <span className="text-sm text-lab-muted">Horas dormidas</span>
+              <span className="label-text">Horas dormidas</span>
               <input type="number" step="0.5" min="0" max="24"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.sleep?.hours ?? ''}
                 onChange={(e) => setNested('sleep', 'hours', e.target.value ? parseFloat(e.target.value) : undefined)} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Qualidade (1 a 5)</span>
+              <span className="label-text">Qualidade (1 a 5)</span>
               <input type="range" min="1" max="5" step="1"
-                className="w-full mt-3"
+                className="mt-2"
                 value={form.sleep?.quality ?? 3}
                 onChange={(e) => setNested('sleep', 'quality', parseInt(e.target.value))} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Horário deitou</span>
+              <span className="label-text">Horário deitou</span>
               <input type="time"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.sleep?.bedTime ?? ''}
                 onChange={(e) => setNested('sleep', 'bedTime', e.target.value)} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Horário acordou</span>
+              <span className="label-text">Horário acordou</span>
               <input type="time"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.sleep?.wakeTime ?? ''}
                 onChange={(e) => setNested('sleep', 'wakeTime', e.target.value)} />
             </label>
@@ -156,17 +156,17 @@ export function TestConditionsForm({
         </details>
 
         {/* Estado Atual */}
-        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group">
+          <summary>
             Estado Atual
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-0 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
             {(['energy', 'focus', 'mood', 'stress', 'motivation', 'sleepiness'] as const).map((field) => (
               <label key={field} className="block">
-                <span className="text-sm text-lab-muted capitalize">{field.replace(/([A-Z])/g, ' $1')} (1–5)</span>
+                <span className="label-text capitalize">{field.replace(/([A-Z])/g, ' $1')} (1–5)</span>
                 <input type="range" min="1" max="5" step="1"
-                  className="w-full mt-3"
+                  className="mt-2"
                   value={form.currentState?.[field] ?? 3}
                   onChange={(e) => setNested('currentState', field, parseInt(e.target.value))} />
               </label>
@@ -175,12 +175,12 @@ export function TestConditionsForm({
         </details>
 
         {/* Substâncias */}
-        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group">
+          <summary>
             Substâncias e Medicamentos
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-0 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
             <label className="block flex items-center gap-2 mt-4 md:col-span-2">
               <input type="checkbox"
                 checked={form.substances?.caffeine ?? false}
@@ -190,16 +190,16 @@ export function TestConditionsForm({
             {form.substances?.caffeine && (
               <>
                 <label className="block">
-                  <span className="text-sm text-lab-muted">Cafeína (mg aprox.)</span>
+                  <span className="label-text">Cafeína (mg aprox.)</span>
                   <input type="number" min="0"
-                    className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                    className="mt-1.5"
                     value={form.substances?.caffeineMg ?? ''}
                     onChange={(e) => setNested('substances', 'caffeineMg', e.target.value ? parseInt(e.target.value) : undefined)} />
                 </label>
                 <label className="block">
-                  <span className="text-sm text-lab-muted">Horário da cafeína</span>
+                  <span className="label-text">Horário da cafeína</span>
                   <input type="time"
-                    className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                    className="mt-1.5"
                     value={form.substances?.caffeineTime ?? ''}
                     onChange={(e) => setNested('substances', 'caffeineTime', e.target.value)} />
                 </label>
@@ -218,30 +218,30 @@ export function TestConditionsForm({
             </div>
 
             <label className="block md:col-span-2 mt-2">
-              <span className="text-sm text-lab-muted">Medicamento / Estimulante (Nome)</span>
+              <span className="label-text">Medicamento / Estimulante (Nome)</span>
               <input type="text"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.substances?.medicationName ?? ''}
                 onChange={(e) => setNested('substances', 'medicationName', e.target.value)} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Dose</span>
+              <span className="label-text">Dose</span>
               <input type="text"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.substances?.medicationDose ?? ''}
                 onChange={(e) => setNested('substances', 'medicationDose', e.target.value)} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Horário (Medicação)</span>
+              <span className="label-text">Horário (Medicação)</span>
               <input type="time"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.substances?.medicationTime ?? ''}
                 onChange={(e) => setNested('substances', 'medicationTime', e.target.value)} />
             </label>
             <label className="block md:col-span-2">
-              <span className="text-sm text-lab-muted">Outros / Suplementos</span>
+              <span className="label-text">Outros / Suplementos</span>
               <input type="text"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.substances?.other ?? ''}
                 onChange={(e) => setNested('substances', 'other', e.target.value)} />
             </label>
@@ -249,24 +249,24 @@ export function TestConditionsForm({
         </details>
 
         {/* Alimentação */}
-        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group">
+          <summary>
             Alimentação e Hidratação
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-0 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
             <label className="block">
-              <span className="text-sm text-lab-muted">Última refeição (horas atrás)</span>
+              <span className="label-text">Última refeição (horas atrás)</span>
               <input type="text"
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 placeholder="Ex: 2 horas"
                 value={form.nutrition?.timeSinceLastMeal ?? ''}
                 onChange={(e) => setNested('nutrition', 'timeSinceLastMeal', e.target.value)} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Tipo de refeição</span>
+              <span className="label-text">Tipo de refeição</span>
               <select
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.nutrition?.mealType ?? ''}
                 onChange={(e) => setNested('nutrition', 'mealType', e.target.value as any)}
               >
@@ -278,16 +278,16 @@ export function TestConditionsForm({
               </select>
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Fome (1–5)</span>
+              <span className="label-text">Fome (1–5)</span>
               <input type="range" min="1" max="5" step="1"
-                className="w-full mt-3"
+                className="mt-2"
                 value={form.nutrition?.hunger ?? 3}
                 onChange={(e) => setNested('nutrition', 'hunger', parseInt(e.target.value))} />
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Hidratação (1–5)</span>
+              <span className="label-text">Hidratação (1–5)</span>
               <input type="range" min="1" max="5" step="1"
-                className="w-full mt-3"
+                className="mt-2"
                 value={form.nutrition?.hydration ?? 3}
                 onChange={(e) => setNested('nutrition', 'hydration', parseInt(e.target.value))} />
             </label>
@@ -295,16 +295,16 @@ export function TestConditionsForm({
         </details>
 
         {/* Ambiente */}
-        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group">
+          <summary>
             Ambiente
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-0 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
             <label className="block">
-              <span className="text-sm text-lab-muted">Nível de ruído</span>
+              <span className="label-text">Nível de ruído</span>
               <select
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.environment?.noiseLevel ?? ''}
                 onChange={(e) => setNested('environment', 'noiseLevel', e.target.value as any)}
               >
@@ -316,9 +316,9 @@ export function TestConditionsForm({
               </select>
             </label>
             <label className="block">
-              <span className="text-sm text-lab-muted">Local</span>
+              <span className="label-text">Local</span>
               <select
-                className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+                className="mt-1.5"
                 value={form.environment?.location ?? ''}
                 onChange={(e) => setNested('environment', 'location', e.target.value as any)}
               >
@@ -346,12 +346,12 @@ export function TestConditionsForm({
         </details>
 
         {/* Contexto emocional e relacional — Emotion Lab */}
-        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group">
+          <summary>
             Contexto emocional e relacional
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-4 border-t border-lab-border">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border">
             <EmotionalContextFields
               value={form.emotionalContext}
               relationshipLabel={relationshipLabel}
@@ -363,9 +363,9 @@ export function TestConditionsForm({
         </details>
 
         <label className="block">
-          <span className="text-sm text-lab-muted">Observações Gerais</span>
+          <span className="label-text">Observações Gerais</span>
           <textarea
-            className="w-full mt-1 bg-lab-surface-2 border border-lab-border rounded-lg px-3 py-2 h-20"
+            className="mt-1.5"
             value={form.notes ?? ''}
             onChange={(e) => setRoot('notes', e.target.value)} />
         </label>

@@ -4,6 +4,8 @@ import { useApp } from '../context/AppContext'
 import { getIncompleteSessions } from '../storage/repository'
 import { ALL_TESTS, DOMAIN_LABELS } from '../tests/registry'
 import { computeBaselineStats } from '../statistics/baseline'
+import { Badge, DemoBadge } from '../components/common/Badge'
+import { Page, PageHeader, Section } from '../components/common/Page'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
@@ -23,77 +25,87 @@ export function Dashboard() {
     return stats.phase === 'monitoring'
   }).length
 
+  const lastTest = lastSession
+    ? ALL_TESTS.find((t) => t.id === lastSession.testId)?.shortName
+    : null
+
   return (
-    <div className="p-8 max-w-5xl">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-lab-muted mt-1">
-          {settings.demoDataActive && (
-            <span className="text-lab-warning mr-2">[Demonstração]</span>
-          )}
-          Comparado ao seu próprio baseline e histórico.
-        </p>
-      </header>
+    <Page width="wide">
+      <PageHeader
+        title="Dashboard"
+        subtitle="Comparado ao seu próprio baseline e histórico."
+        eyebrow={settings.demoDataActive ? <DemoBadge /> : undefined}
+      />
 
       {incompleteCount > 0 && (
-        <div className="card p-4 mb-6 border-lab-warning/40">
-          <p className="text-sm">
-            {incompleteCount} sessão(ões) incompleta(s).{' '}
-            <Link to="/settings" className="text-lab-accent hover:underline">
-              Ver em Configurações
-            </Link>
+        <div className="card p-4 mb-6 flex items-center justify-between gap-4 border-lab-warning/40">
+          <p className="text-sm text-lab-text">
+            {incompleteCount} {incompleteCount === 1 ? 'sessão incompleta' : 'sessões incompletas'}.
           </p>
+          <Link to="/settings" className="btn-secondary shrink-0">
+            Revisar
+          </Link>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="card p-5">
-          <div className="text-xs text-lab-muted uppercase tracking-wide">Baseline</div>
-          <div className="text-3xl font-mono mt-1">{testsWithBaseline}/{ALL_TESTS.length}</div>
-          <p className="text-xs text-lab-muted mt-2">testes com baseline suficiente</p>
+      {/*
+        Resumo em três medidas. Uma régua entre elas em vez de três cartões
+        separados: é um bloco só de estado, não três coisas distintas.
+      */}
+      <div className="card grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-lab-border mb-10">
+        <div className="p-5">
+          <div className="section-title">Baseline</div>
+          <div className="metric-value text-3xl mt-2">
+            {testsWithBaseline}
+            <span className="text-lab-muted text-xl">/{ALL_TESTS.length}</span>
+          </div>
+          <p className="help-text mt-1.5">testes com baseline suficiente</p>
         </div>
-        <div className="card p-5">
-          <div className="text-xs text-lab-muted uppercase tracking-wide">Sessões</div>
-          <div className="text-3xl font-mono mt-1">{realSessions.length}</div>
-          <p className="text-xs text-lab-muted mt-2">avaliações registradas</p>
+        <div className="p-5">
+          <div className="section-title">Sessões</div>
+          <div className="metric-value text-3xl mt-2">{realSessions.length}</div>
+          <p className="help-text mt-1.5">avaliações registradas</p>
         </div>
-        <div className="card p-5">
-          <div className="text-xs text-lab-muted uppercase tracking-wide">Última sessão</div>
-          <div className="text-lg font-medium mt-1">
+        <div className="p-5">
+          <div className="section-title">Última sessão</div>
+          <div className="metric-value text-xl mt-2">
             {lastSession
               ? format(new Date(lastSession.startedAt), "d MMM, HH:mm", { locale: ptBR })
               : '—'}
           </div>
-          <p className="text-xs text-lab-muted mt-2">
-            {lastSession ? ALL_TESTS.find((t) => t.id === lastSession.testId)?.shortName : 'Nenhuma sessão ainda'}
-          </p>
+          <p className="help-text mt-1.5">{lastTest ?? 'Nenhuma sessão ainda'}</p>
         </div>
       </div>
 
-      <section className="mb-8">
-        <h2 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">Início rápido</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link to="/batteries" className="card p-5 hover:border-lab-accent/50 transition-colors block">
-            <h3 className="font-medium">Iniciar bateria</h3>
+      <Section title="Início rápido">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Link
+            to="/batteries"
+            className="card p-5 hover:border-lab-border-strong hover:bg-lab-surface-2 transition-colors block"
+          >
+            <h3 className="card-title">Iniciar bateria</h3>
             <p className="text-sm text-lab-muted mt-1">Check-in rápido, diária ou padrão</p>
           </Link>
-          <Link to="/catalog" className="card p-5 hover:border-lab-accent/50 transition-colors block">
-            <h3 className="font-medium">Teste individual</h3>
+          <Link
+            to="/catalog"
+            className="card p-5 hover:border-lab-border-strong hover:bg-lab-surface-2 transition-colors block"
+          >
+            <h3 className="card-title">Teste individual</h3>
             <p className="text-sm text-lab-muted mt-1">Escolha um teste do catálogo</p>
           </Link>
         </div>
-      </section>
+      </Section>
 
-      <section>
-        <h2 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">Domínios</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <Section
+        title="Domínios"
+        description="Áreas cognitivas cobertas pelos testes deste instrumento."
+      >
+        <div className="flex flex-wrap gap-1.5">
           {Object.entries(DOMAIN_LABELS).slice(0, 8).map(([key, label]) => (
-            <div key={key} className="card p-3">
-              <div className="text-xs text-lab-muted">{label}</div>
-            </div>
+            <Badge key={key}>{label}</Badge>
           ))}
         </div>
-      </section>
-    </div>
+      </Section>
+    </Page>
   )
 }

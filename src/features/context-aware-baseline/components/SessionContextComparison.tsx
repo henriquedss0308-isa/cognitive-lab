@@ -18,10 +18,10 @@ const DASH = '—'
 
 function Row({ label, current, reference }: { label: string; current: string; reference: string }) {
   return (
-    <div className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5 py-1.5 border-b border-lab-border last:border-b-0">
+    <div className="grid grid-cols-[1fr_auto] gap-x-4 py-2 border-b border-lab-border last:border-b-0">
       <span className="text-lab-muted">{label}</span>
-      <span className="text-lab-fg text-right">{current}</span>
-      <span className="col-span-2 text-xs text-lab-muted">{reference}</span>
+      <span className="text-lab-fg text-right font-medium">{current}</span>
+      <span className="col-span-2 help-text mt-0.5">{reference}</span>
     </div>
   )
 }
@@ -94,14 +94,14 @@ export function SessionContextComparison({ comparison, referenceKind, referenceC
 
   return (
     <div className="text-sm">
-      <p className="text-xs text-lab-muted mb-4">
+      <p className="help-text mb-5 max-w-prose">
         As condições abaixo são apresentadas apenas como contexto, comparadas às{' '}
         {referenceCount} sessões da {REFERENCE_LABELS[referenceKind]}. Elas não entram em
         nenhuma métrica e não explicam o resultado — esta associação não demonstra causa.
       </p>
 
-      <section className="mb-5">
-        <h4 className="text-lab-fg font-medium mb-2">Sono</h4>
+      <section className="mb-6">
+        <h4 className="section-title mb-2">Sono</h4>
         <NumericRow
           comparison={comparison.sleepHours}
           format={(v) => formatSleepHours(v) ?? String(v)}
@@ -109,8 +109,8 @@ export function SessionContextComparison({ comparison, referenceKind, referenceC
         <NumericRow comparison={comparison.sleepQuality} suffix="/5" />
       </section>
 
-      <section className="mb-5">
-        <h4 className="text-lab-fg font-medium mb-2">Substâncias</h4>
+      <section className="mb-6">
+        <h4 className="section-title mb-2">Substâncias</h4>
         <Row
           label="Cafeína"
           current={
@@ -129,8 +129,8 @@ export function SessionContextComparison({ comparison, referenceKind, referenceC
         />
       </section>
 
-      <section className="mb-5">
-        <h4 className="text-lab-fg font-medium mb-2">Horário</h4>
+      <section className="mb-6">
+        <h4 className="section-title mb-2">Horário</h4>
         <Row
           label="Horário desta sessão"
           current={formatMinutesOfDay(comparison.timeOfDay.currentMinutes) ?? DASH}
@@ -141,21 +141,21 @@ export function SessionContextComparison({ comparison, referenceKind, referenceC
         />
       </section>
 
-      <section className="mb-5">
-        <h4 className="text-lab-fg font-medium mb-2">Estado atual</h4>
+      <section className="mb-6">
+        <h4 className="section-title mb-2">Estado atual</h4>
         {comparison.currentState.map((row) => (
           <NumericRow key={row.label} comparison={row} suffix="/5" />
         ))}
       </section>
 
-      <section className="mb-5">
-        <h4 className="text-lab-fg font-medium mb-2">Alimentação e hidratação</h4>
+      <section className="mb-6">
+        <h4 className="section-title mb-2">Alimentação e hidratação</h4>
         <NumericRow comparison={comparison.hunger} suffix="/5" />
         <NumericRow comparison={comparison.hydration} suffix="/5" />
       </section>
 
       <section>
-        <h4 className="text-lab-fg font-medium mb-2">Contexto emocional</h4>
+        <h4 className="section-title mb-2">Contexto emocional</h4>
         <Row
           label="Emoção registrada"
           current={currentEmotion ? currentEmotion.label : 'Não informado'}

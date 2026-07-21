@@ -9,6 +9,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <title>COGNITIVE LAB</title>
+    <script>
+      // Aparência antes de qualquer pintura. Os módulos são deferidos, então sem
+      // isto o fundo escuro apareceria por um frame para quem escolheu o claro.
+      // Fonte da verdade continua no IndexedDB (ver src/theme/theme.ts).
+      try {
+        var t = localStorage.getItem('cognitive-lab:theme')
+        var s = parseFloat(localStorage.getItem('cognitive-lab:font-scale'))
+        document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark')
+        if (s >= 0.8 && s <= 1.4) {
+          document.documentElement.style.setProperty('--lab-font-scale', String(s))
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

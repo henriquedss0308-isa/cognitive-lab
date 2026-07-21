@@ -38,8 +38,8 @@ export function LisdexamfetamineField({ value, onChange }: Props) {
 
   return (
     <fieldset className="border-0 p-0 m-0">
-      <legend className="font-medium mb-1">Tomou lisdexanfetamina antes desta sessão?</legend>
-      <p className="text-xs text-lab-muted mb-3">
+      <legend className="card-title mb-1">Tomou lisdexanfetamina antes desta sessão?</legend>
+      <p className="help-text mb-4 max-w-prose">
         Opcional. Este registro serve para comparar sessões com o mesmo contexto — não
         recomenda, avalia nem interpreta o uso do medicamento.
       </p>
@@ -59,7 +59,7 @@ export function LisdexamfetamineField({ value, onChange }: Props) {
         ))}
       </div>
 
-      <p className="text-xs text-lab-muted mt-2">
+      <p className="help-text mt-2">
         Estado registrado: <span className="text-lab-fg">{lisdexamfetamineStatusLabel(effective)}</span>
         {effective === 'unknown' && ' — a sessão será comparada apenas à referência geral.'}
         {OPTIONS.find((o) => o.value === selected)?.hint ? ` ${OPTIONS.find((o) => o.value === selected)!.hint}` : ''}
@@ -69,19 +69,19 @@ export function LisdexamfetamineField({ value, onChange }: Props) {
       {selected === 'taken' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <label className="block">
-            <span className="text-sm text-lab-muted">Dose (opcional)</span>
+            <span className="label-text">Dose (opcional)</span>
             <input
               type="text"
-              className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+              className="mt-1.5"
               value={record?.dose ?? ''}
               onChange={(e) => update({ dose: e.target.value })}
             />
           </label>
           <label className="block">
-            <span className="text-sm text-lab-muted">Horário (opcional)</span>
+            <span className="label-text">Horário (opcional)</span>
             <input
               type="time"
-              className="w-full mt-1 bg-lab-surface-1 border border-lab-border rounded-lg px-3 py-2"
+              className="mt-1.5"
               value={record?.time ?? ''}
               onChange={(e) => update({ time: e.target.value })}
             />

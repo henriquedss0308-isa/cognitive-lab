@@ -21,16 +21,18 @@ export function Intro() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <div className="max-w-xl text-center">
-        <div className="text-4xl mb-6 opacity-80">◈</div>
-        <h1 className="text-3xl font-semibold mb-3">COGNITIVE LAB</h1>
-        <p className="text-lab-muted text-lg mb-2">Seu laboratório cognitivo pessoal</p>
-        <p className="text-lab-muted leading-relaxed mb-8">
+    <div className="min-h-screen flex items-center justify-center p-6 sm:p-8">
+      <div className="max-w-md w-full">
+        <div className="text-2xl text-lab-accent mb-5" aria-hidden="true">◈</div>
+        <h1 className="text-xl font-semibold tracking-[0.14em] text-lab-fg">COGNITIVE LAB</h1>
+        <p className="text-sm text-lab-muted mt-1">Seu laboratório cognitivo pessoal</p>
+
+        <p className="text-sm text-lab-muted leading-relaxed mt-6 pt-6 hairline">
           Execute testes cognitivos padronizados, acompanhe seu desempenho ao longo do tempo
           e compare com seu próprio baseline. Todos os dados permanecem no seu dispositivo.
         </p>
-        <div className="space-y-3">
+
+        <div className="flex flex-col gap-2 mt-8">
           <button className="btn-primary w-full" onClick={handleStart}>
             Começar com dados vazios
           </button>
@@ -38,7 +40,8 @@ export function Intro() {
             Explorar com dados de demonstração
           </button>
         </div>
-        <p className="text-xs text-lab-muted mt-6">
+
+        <p className="help-text mt-6">
           Dados de demonstração são fictícios e claramente identificados.
           Não diagnostica TDAH, transtornos cognitivos ou QI.
         </p>

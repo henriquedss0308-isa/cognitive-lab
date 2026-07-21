@@ -721,7 +721,7 @@ export function TestRunner({
 
   if (fatalError) {
     return (
-      <div className="fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50 p-8">
+      <div className="stimulus-surface fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50 p-8">
         <h2 className="text-xl font-medium mb-2 text-lab-danger">Sessão interrompida</h2>
         <p className="text-lab-muted mb-6 max-w-md text-center">{fatalError}</p>
         <button className="btn-primary" onClick={abortRun}>Sair do teste</button>
@@ -731,7 +731,7 @@ export function TestRunner({
 
   if (phase === 'block_break') {
     return (
-      <div className="fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50">
+      <div className="stimulus-surface fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50">
         <h2 className="text-xl font-medium mb-2">Pausa entre blocos</h2>
         <p className="text-lab-muted mb-6">Bloco {(trial?.blockIndex ?? 0) + 1} concluído</p>
         <button className="btn-primary" onClick={() => setPhase('fixation')}>Continuar</button>
@@ -741,7 +741,7 @@ export function TestRunner({
 
   if (phase === 'ready') {
     return (
-      <div className="fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50">
+      <div className="stimulus-surface fixed inset-0 bg-lab-bg flex flex-col items-center justify-center z-50">
         <p className="text-lab-muted mb-2">{mode === 'training' ? 'Treino' : 'Avaliação'}</p>
         <h2 className="text-2xl font-medium mb-4">Prepare-se</h2>
         <p className="text-lab-muted">O teste começará em instantes...</p>
@@ -750,7 +750,13 @@ export function TestRunner({
   }
 
   return (
-    <div className="fixed inset-0 bg-lab-bg flex flex-col z-50">
+    /*
+      `stimulus-surface` congela a paleta desta tela: a apresentação do estímulo
+      é variável experimental e não pode mudar com o tema da interface, senão
+      sessões feitas no claro deixariam de ser comparáveis às feitas no escuro
+      e ao histórico já gravado.
+    */
+    <div className="stimulus-surface fixed inset-0 bg-lab-bg flex flex-col z-50">
       <div className="flex items-center justify-between px-6 py-3 border-b border-lab-border">
         <span className="text-sm text-lab-muted">{test.shortName}</span>
         <span className="text-sm text-lab-muted">{progress}</span>

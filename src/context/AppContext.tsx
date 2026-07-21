@@ -19,6 +19,12 @@ import {
   saveSettings,
   updateSessionConditions,
 } from '../storage/repository'
+import {
+  applyAppearance,
+  cacheAppearance,
+  normalizeFontScale,
+  normalizeTheme,
+} from '../theme/theme'
 
 interface AppContextValue {
   sessions: SessionRecord[]
@@ -58,6 +64,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       .then(() => refresh())
       .finally(() => setLoading(false))
   }, [refresh])
+
+  // Aparência segue as preferências salvas. O espelho em localStorage é o que
+  // permite o próximo boot pintar certo antes de o IndexedDB responder.
+  useEffect(() => {
+    const theme = normalizeTheme(settings.theme)
+    const fontScale = normalizeFontScale(settings.fontScale)
+    applyAppearance(document, theme, fontScale)
+    cacheAppearance(window.localStorage, theme, fontScale)
+  }, [settings.theme, settings.fontScale])
 
   const addSession = useCallback(
     async (session: SessionRecord) => {

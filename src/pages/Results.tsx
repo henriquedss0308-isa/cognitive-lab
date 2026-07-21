@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getTest } from '../tests/registry'
 import { MetricCard } from '../components/common/MetricTooltip'
+import { DemoBadge, QualityBadge } from '../components/common/Badge'
+import { Page, PageHeader, Section } from '../components/common/Page'
 import { BlockChart, RTDistribution } from '../components/charts/SessionCharts'
 import { TestConditionsForm } from '../components/test/TestConditionsForm'
 import { EmotionalContextSummary } from '../features/emotion-lab/components/EmotionalContextSummary'
@@ -31,12 +33,6 @@ const PHASE_LABELS: Record<string, string> = {
   baseline_building: 'Construindo baseline pessoal',
   monitoring: 'Monitoramento longitudinal',
   insufficient_data: 'Dados insuficientes',
-}
-
-const QUALITY_LABELS: Record<string, string> = {
-  valid: 'Válida',
-  valid_with_warnings: 'Válida com avisos',
-  invalid: 'Inválida',
 }
 
 function formatConditionValue(key: string, value: any): string {
@@ -192,43 +188,52 @@ export function Results() {
   }
 
   return (
-    <div className="p-8 max-w-4xl">
-      <header className="mb-8">
-        <Link to="/history" className="text-sm text-lab-muted hover:text-lab-accent">← Histórico</Link>
-        <h1 className="text-2xl font-semibold mt-2">{test.name}</h1>
-        <p className="text-lab-muted">
-          {session.mode === 'assessment' ? 'Avaliação' : 'Treino'} ·{' '}
-          {new Date(session.startedAt).toLocaleString('pt-BR')}
-          {session.isDemo && <span className="text-lab-warning ml-2">[Demonstração]</span>}
-        </p>
-      </header>
-
-      <div className="card p-4 mb-6 flex items-center gap-4">
-        <div className={`w-3 h-3 rounded-full ${
-          result.quality === 'valid' ? 'bg-lab-success' :
-          result.quality === 'valid_with_warnings' ? 'bg-lab-warning' : 'bg-lab-danger'
-        }`} />
-        <div>
-          <span className="font-medium">{QUALITY_LABELS[result.quality]}</span>
-          {result.baselinePhase && (
-            <span className="text-sm text-lab-muted ml-3">
-              {PHASE_LABELS[result.baselinePhase]}
+    <Page>
+      <PageHeader
+        title={test.name}
+        eyebrow={
+          <Link to="/history" className="text-xs text-lab-muted hover:text-lab-accent">
+            ← Histórico
+          </Link>
+        }
+        subtitle={
+          <span className="flex items-center gap-2 flex-wrap">
+            <span>
+              {session.mode === 'assessment' ? 'Avaliação' : 'Treino'} ·{' '}
+              {new Date(session.startedAt).toLocaleString('pt-BR')}
             </span>
-          )}
-        </div>
+            {session.isDemo && <DemoBadge />}
+          </span>
+        }
+      />
+
+      {/* Estado da sessão: qualidade e fase juntas, uma linha só. */}
+      <div className="card px-4 py-3 mb-6 flex items-center gap-3 flex-wrap">
+        <QualityBadge quality={result.quality} />
+        {result.baselinePhase && (
+          <>
+            <span aria-hidden="true" className="text-lab-faint">·</span>
+            <span className="text-sm text-lab-muted">{PHASE_LABELS[result.baselinePhase]}</span>
+          </>
+        )}
       </div>
 
       {result.flagMessages.length > 0 && (
-        <div className="card p-4 mb-6 border-lab-warning/50">
-          <h3 className="text-sm font-medium mb-2">Avisos de qualidade</h3>
-          <ul className="text-sm text-lab-muted space-y-1">
-            {result.flagMessages.map((m, i) => <li key={i}>· {m}</li>)}
+        <div className="card p-4 mb-6 border-lab-warning/40">
+          <h3 className="card-title mb-2">Avisos de qualidade</h3>
+          <ul className="text-sm text-lab-muted space-y-1.5">
+            {result.flagMessages.map((m, i) => (
+              <li key={i} className="flex gap-2">
+                <span aria-hidden="true" className="text-lab-warning shrink-0">·</span>
+                <span>{m}</span>
+              </li>
+            ))}
           </ul>
         </div>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <MetricCard metric={test.primaryMetricKey} label="Métrica principal"
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
+        <MetricCard emphasis metric={test.primaryMetricKey} label="Métrica principal"
           value={primaryValue} unit={test.primaryMetricKey.includes('accuracy') || test.primaryMetricKey.includes('span') ? '' : ' ms'} />
         <MetricCard metric="accuracy" label="Precisão" value={result.accuracyMetrics.accuracy * 100} unit="%" />
         <MetricCard metric="medianCorrectRT" label="RT mediano" value={result.rtMetrics.medianCorrectRT} unit=" ms" />
@@ -236,12 +241,12 @@ export function Results() {
       </div>
 
       {zOutcome.kind !== 'not_monitoring' && zOutcome.kind !== 'no_baseline_metric' && (
-        <div className="card p-4 mb-6">
-          <h3 className="text-sm font-medium">Comparado ao seu próprio baseline</h3>
+        <div className="card p-5 mb-6">
+          <h3 className="section-title">Comparado ao seu próprio baseline</h3>
           {zOutcome.kind === 'ok' && (
             <>
-              <p className="text-2xl font-mono mt-1">z = {zOutcome.z.toFixed(2)}</p>
-              <p className="text-xs text-lab-muted mt-1">
+              <p className="metric-value text-3xl mt-3">z = {zOutcome.z.toFixed(2)}</p>
+              <p className="help-text mt-2 max-w-prose">
                 z positivo = melhor que o seu habitual nesta métrica.
                 Baseado em {zOutcome.n} de {baseline.baselineCount} sessões de baseline
                 {baseline.warningCount > 0 && ` (${baseline.warningCount} com avisos)`}.
@@ -250,18 +255,18 @@ export function Results() {
             </>
           )}
           {zOutcome.kind === 'value_missing' && (
-            <p className="text-sm text-lab-muted mt-1">
+            <p className="text-sm text-lab-muted mt-2 max-w-prose">
               A métrica principal não pôde ser calculada nesta sessão — comparação indisponível.
             </p>
           )}
           {zOutcome.kind === 'insufficient_n' && (
-            <p className="text-sm text-lab-muted mt-1">
+            <p className="text-sm text-lab-muted mt-2 max-w-prose">
               Baseline com poucos valores nesta métrica ({zOutcome.n} de {baseline.baselineCount})
               — comparação por desvio suprimida para evitar conclusões instáveis.
             </p>
           )}
           {zOutcome.kind === 'zero_mad' && (
-            <p className="text-sm text-lab-muted mt-1">
+            <p className="text-sm text-lab-muted mt-2 max-w-prose">
               A variabilidade do seu baseline nesta métrica é ≈ 0 (valores quase idênticos), então o
               desvio padronizado não é informativo. Mediana do baseline: {zOutcome.median?.toFixed(2)}
               {zOutcome.delta !== null &&
@@ -270,7 +275,11 @@ export function Results() {
             </p>
           )}
           {/* Qual referência serviu de comparação, e por quê. */}
-          {!session.isDemo && <ReferenceBadge selection={selection} />}
+          {!session.isDemo && (
+            <div className="mt-4 pt-4 hairline">
+              <ReferenceBadge selection={selection} />
+            </div>
+          )}
         </div>
       )}
 
@@ -281,26 +290,61 @@ export function Results() {
         seleção de referência — só o estado medicamentoso seleciona referência,
         e isso já aconteceu acima.
       */}
+      {Object.keys(result.customMetrics).length > 0 && (
+        <Section title="Métricas específicas">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {Object.entries(result.customMetrics).map(([key, val]) => (
+              <MetricCard key={key} metric={key} label={test.metricLabels[key] ?? key} value={val}
+                unit={key.includes('Rate') || key.includes('accuracy') ? '' : key.includes('Cost') || key.includes('RT') ? ' ms' : ''} />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {Object.keys(result.conditionMetrics).length > 0 && (
+        <Section title="Condições">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {Object.entries(result.conditionMetrics).map(([cond, metrics]) => (
+              <div key={cond} className="card p-4">
+                <h4 className="card-title capitalize mb-2">{cond.replace(/_/g, ' ')}</h4>
+                <dl>
+                  {Object.entries(metrics).map(([k, v]) => (
+                    <div
+                      key={k}
+                      className="flex justify-between gap-3 text-sm py-1.5 border-b border-lab-border last:border-b-0"
+                    >
+                      <dt className="text-lab-muted">{k}</dt>
+                      <dd className="metric-value text-sm">
+                        {v !== null ? (typeof v === 'number' ? v.toFixed(1) : v) : '—'}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
       {!session.isDemo && reference.metadata.sessionCount > 0 && contextComparison.hasAnyData && (
-        <section className="card p-5 mb-8">
-          <h3 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">
-            Contexto da sessão comparado à referência utilizada
-          </h3>
-          <SessionContextComparison
-            comparison={contextComparison}
-            referenceKind={reference.metadata.kind}
-            referenceCount={reference.metadata.sessionCount}
-          />
-        </section>
+        <Section title="Contexto da sessão comparado à referência utilizada">
+          <div className="card p-5">
+            <SessionContextComparison
+              comparison={contextComparison}
+              referenceKind={reference.metadata.kind}
+              referenceCount={reference.metadata.sessionCount}
+            />
+          </div>
+        </Section>
       )}
 
       {!session.isDemo && (
-        <details className="mb-8 bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+        <details className="section-toggle group mb-10">
+          <summary>
             Composição das referências deste teste
-            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+            <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
           </summary>
-          <div className="p-4 pt-4 border-t border-lab-border">
+          <div className="px-4 pb-5 pt-4 border-t border-lab-border">
             <ReferenceComposition
               selection={selection}
               general={buildGeneralReference(...referenceArgs)}
@@ -311,62 +355,28 @@ export function Results() {
         </details>
       )}
 
-      {Object.keys(result.customMetrics).length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">Métricas específicas</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {Object.entries(result.customMetrics).map(([key, val]) => (
-              <MetricCard key={key} metric={key} label={test.metricLabels[key] ?? key} value={val}
-                unit={key.includes('Rate') || key.includes('accuracy') ? '' : key.includes('Cost') || key.includes('RT') ? ' ms' : ''} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {Object.keys(result.conditionMetrics).length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">Condições</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {Object.entries(result.conditionMetrics).map(([cond, metrics]) => (
-              <div key={cond} className="card p-4">
-                <h4 className="text-sm font-medium capitalize mb-2">{cond.replace(/_/g, ' ')}</h4>
-                {Object.entries(metrics).map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-sm py-1">
-                    <span className="text-lab-muted">{k}</span>
-                    <span className="font-mono">{v !== null ? (typeof v === 'number' ? v.toFixed(1) : v) : '—'}</span>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/*
         Contexto emocional — seção própria e sempre visível quando existe.
         Puramente descritiva: não entra em nenhuma métrica acima nem é
         relacionada ao desempenho da sessão.
       */}
       {hasEmotionalContent(session.checkIn?.emotionalContext) && (
-        <section className="card p-5 mb-8">
-          <h3 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">
-            Contexto emocional
-          </h3>
-          <div className="text-sm text-lab-muted">
+        <Section title="Contexto emocional">
+          <div className="card p-5 text-sm text-lab-muted">
             <EmotionalContextSummary
               context={session.checkIn?.emotionalContext}
               relationshipLabel={settings.relationshipLabel}
             />
           </div>
-        </section>
+        </Section>
       )}
 
-      <details className="mb-8 bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-        <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+      <details className="section-toggle group mb-10">
+        <summary>
           Condições da Sessão
-          <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+          <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
         </summary>
-        <div className="p-4 pt-0 border-t border-lab-border text-sm text-lab-muted mt-4">
+        <div className="px-4 pb-5 pt-4 border-t border-lab-border text-sm text-lab-muted">
           <div className="flex justify-end mb-4">
             <button
               type="button"
@@ -434,15 +444,17 @@ export function Results() {
         </div>
       </details>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <BlockChart session={session} />
-        <RTDistribution session={session} />
-      </div>
+      <Section title="Distribuições desta sessão">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <BlockChart session={session} />
+          <RTDistribution session={session} />
+        </div>
+      </Section>
 
-      <div className="flex gap-3">
+      <div className="flex gap-2 pt-2">
         <Link to={`/test/${session.testId}`} className="btn-primary">Repetir teste</Link>
         <Link to="/history" className="btn-secondary">Ver histórico</Link>
       </div>
-    </div>
+    </Page>
   )
 }
