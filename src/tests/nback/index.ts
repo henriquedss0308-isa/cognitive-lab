@@ -1,5 +1,9 @@
 import type { DeviceInfo, TestMode, TrialRecord } from '../../types'
 import { buildBaseResult, conditionRTAndAccuracy } from '../../scoring/common'
+import {
+  isEligibleForStimulusContingentScoring,
+  PREONSET_EXCLUSION_SCORING_VERSION,
+} from '../../scoring/stimulusEligibility'
 import { computeSDT } from '../../statistics'
 import { randomInt, seededRandom } from '../../utils/random'
 import type { CognitiveTestDefinition, GeneratedTrial, ProtocolConfig } from '../types'
@@ -147,12 +151,11 @@ function scoreNBackByLevel(
   cleaning: typeof CLEANING
 ) {
   const levelTrials = trials.filter((t) => t.metadata?.nBack === n)
-  const targetTrials = levelTrials.filter((t) => t.metadata?.isTarget === true)
-  const nonTargetTrials = levelTrials.filter((t) => t.metadata?.isTarget === false)
+  const eligibleLevelTrials = levelTrials.filter(isEligibleForStimulusContingentScoring)
+  const targetTrials = eligibleLevelTrials.filter((t) => t.metadata?.isTarget === true)
+  const nonTargetTrials = eligibleLevelTrials.filter((t) => t.metadata?.isTarget === false)
 
-  const hits = targetTrials.filter(
-    (t) => t.correct && t.actualResponse === 'space'
-  ).length
+  const hits = targetTrials.filter((t) => t.actualResponse !== '' && t.actualResponse !== 'none').length
   const misses = targetTrials.filter(
     (t) => t.actualResponse === '' || t.actualResponse === 'none'
   ).length
@@ -194,11 +197,12 @@ function scoreNBackSession(
   const twoBack =
     mode === 'assessment' ? scoreNBackByLevel(trials, 2, config.cleaningRules) : null
 
-  const overallTargets = trials.filter((t) => t.metadata?.isTarget === true)
-  const overallNonTargets = trials.filter((t) => t.metadata?.isTarget === false)
+  const eligibleTrials = trials.filter(isEligibleForStimulusContingentScoring)
+  const overallTargets = eligibleTrials.filter((t) => t.metadata?.isTarget === true)
+  const overallNonTargets = eligibleTrials.filter((t) => t.metadata?.isTarget === false)
 
   const sdtMetrics = computeSDT({
-    hits: overallTargets.filter((t) => t.correct && t.actualResponse === 'space').length,
+    hits: overallTargets.filter((t) => t.actualResponse !== '' && t.actualResponse !== 'none').length,
     misses: overallTargets.filter(
       (t) => t.actualResponse === '' || t.actualResponse === 'none'
     ).length,
@@ -246,6 +250,7 @@ function scoreNBackSession(
 
   return {
     ...base,
+    scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
     sdtMetrics,
     conditionMetrics,
     customMetrics,
@@ -262,7 +267,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de memória de trabalho espacial. Indique quando a posição atual coincide com a de N ensaios atrás.',
   duration: '~8 min',
   protocolVersion: PROTOCOL_VERSION,
-  scoringVersion: 'sdt-hautus-1',
+  scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

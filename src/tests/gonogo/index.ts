@@ -1,5 +1,9 @@
 import type { DeviceInfo, TestMode, TrialRecord } from '../../types'
 import { buildBaseResult, conditionRTAndAccuracy } from '../../scoring/common'
+import {
+  isEligibleForStimulusContingentScoring,
+  PREONSET_EXCLUSION_SCORING_VERSION,
+} from '../../scoring/stimulusEligibility'
 import { computeSDT } from '../../statistics/signalDetection'
 import { seededRandom, randomInt } from '../../utils/random'
 import type { CognitiveTestDefinition, GeneratedTrial, ProtocolConfig } from '../types'
@@ -228,16 +232,16 @@ function scoreSession(
 
   const goTrials = trials.filter((t) => t.condition === 'go')
   const nogoTrials = trials.filter((t) => t.condition === 'nogo')
+  const eligibleGoTrials = goTrials.filter(isEligibleForStimulusContingentScoring)
+  const eligibleNogoTrials = nogoTrials.filter(isEligibleForStimulusContingentScoring)
 
-  const go = conditionRTAndAccuracy(goTrials, 'go', CLEANING)
-  const nogo = conditionRTAndAccuracy(nogoTrials, 'nogo', CLEANING)
+  const go = conditionRTAndAccuracy(eligibleGoTrials, 'go', CLEANING)
+  const nogo = conditionRTAndAccuracy(eligibleNogoTrials, 'nogo', CLEANING)
 
-  const hits = goTrials.filter((t) => t.correct && !isNoResponse(t.actualResponse)).length
-  const misses = goTrials.filter((t) => isNoResponse(t.actualResponse)).length
-  const falseAlarms = nogoTrials.filter((t) => !isNoResponse(t.actualResponse)).length
-  const correctRejections = nogoTrials.filter(
-    (t) => isNoResponse(t.actualResponse) && t.correct
-  ).length
+  const hits = eligibleGoTrials.filter((t) => !isNoResponse(t.actualResponse)).length
+  const misses = eligibleGoTrials.filter((t) => isNoResponse(t.actualResponse)).length
+  const falseAlarms = eligibleNogoTrials.filter((t) => !isNoResponse(t.actualResponse)).length
+  const correctRejections = eligibleNogoTrials.filter((t) => isNoResponse(t.actualResponse)).length
 
   const sdt = computeSDT({ hits, misses, falseAlarms, correctRejections })
 
@@ -259,7 +263,8 @@ function scoreSession(
   }
 
   const commissionErrors = falseAlarms
-  const commissionErrorRate = nogoTrials.length > 0 ? commissionErrors / nogoTrials.length : null
+  const commissionErrorRate =
+    eligibleNogoTrials.length > 0 ? commissionErrors / eligibleNogoTrials.length : null
 
   base.customMetrics = {
     ...base.customMetrics,
@@ -273,6 +278,7 @@ function scoreSession(
 
   return {
     ...base,
+    scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
     sdtMetrics: sdt,
   }
 }
@@ -287,7 +293,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Avalia a capacidade de inibir respostas prepotentes diante de estímulos que exigem não responder.',
   duration: '~10 min',
   protocolVersion: PROTOCOL_VERSION,
-  scoringVersion: 'sdt-hautus-1',
+  scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

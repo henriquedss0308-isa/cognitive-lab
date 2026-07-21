@@ -171,8 +171,8 @@ export interface SDTMetrics {
   misses: number
   falseAlarms: number
   correctRejections: number
-  hitRate: number
-  falseAlarmRate: number
+  hitRate: number | null
+  falseAlarmRate: number | null
   dPrime: number | null
   criterion: number | null
 }

@@ -1,5 +1,9 @@
 import type { DeviceInfo, TestMode, TrialRecord } from '../../types'
 import { buildBaseResult, conditionRTAndAccuracy, postErrorSlowing } from '../../scoring/common'
+import {
+  isEligibleForStimulusContingentScoring,
+  PREONSET_EXCLUSION_SCORING_VERSION,
+} from '../../scoring/stimulusEligibility'
 import { computeSDT } from '../../statistics'
 import { pseudoRandomSequence, randomInt, seededRandom } from '../../utils/random'
 import type { CognitiveTestDefinition, GeneratedTrial, ProtocolConfig } from '../types'
@@ -106,30 +110,33 @@ function scoreSartSession(
 
   const goTrials = trials.filter((t) => t.condition === 'go')
   const noGoTrials = trials.filter((t) => t.condition === 'no-go')
+  const eligibleGoTrials = goTrials.filter(isEligibleForStimulusContingentScoring)
+  const eligibleNoGoTrials = noGoTrials.filter(isEligibleForStimulusContingentScoring)
 
-  const hits = goTrials.filter(
-    (t) => t.correct && t.actualResponse === 'space'
-  ).length
-  const misses = goTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
-  const falseAlarms = noGoTrials.filter(
+  const hits = eligibleGoTrials.filter(
     (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
   ).length
-  const correctRejections = noGoTrials.filter(
+  const misses = eligibleGoTrials.filter(
+    (t) => t.actualResponse === '' || t.actualResponse === 'none'
+  ).length
+  const falseAlarms = eligibleNoGoTrials.filter(
+    (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
+  ).length
+  const correctRejections = eligibleNoGoTrials.filter(
     (t) => t.actualResponse === '' || t.actualResponse === 'none'
   ).length
 
   const sdtMetrics = computeSDT({ hits, misses, falseAlarms, correctRejections })
 
-  const goMetrics = conditionRTAndAccuracy(goTrials, 'go', config.cleaningRules)
-  const noGoMetrics = conditionRTAndAccuracy(noGoTrials, 'no-go', config.cleaningRules)
+  const goMetrics = conditionRTAndAccuracy(eligibleGoTrials, 'go', config.cleaningRules)
+  const noGoMetrics = conditionRTAndAccuracy(eligibleNoGoTrials, 'no-go', config.cleaningRules)
 
   const commissionErrorRate =
-    noGoTrials.length > 0 ? falseAlarms / noGoTrials.length : null
+    eligibleNoGoTrials.length > 0 ? falseAlarms / eligibleNoGoTrials.length : null
 
   return {
     ...base,
+    scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
     sdtMetrics,
     conditionMetrics: {
       go: {
@@ -164,7 +171,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de atenção sustentada com ritmo acelerado. Responda aos dígitos exceto ao alvo de inibição (3).',
   duration: '~5 min',
   protocolVersion: PROTOCOL_VERSION,
-  scoringVersion: 'sdt-hautus-1',
+  scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

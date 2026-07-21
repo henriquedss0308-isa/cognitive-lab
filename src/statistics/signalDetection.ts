@@ -48,8 +48,8 @@ export interface SDTResult {
   misses: number
   falseAlarms: number
   correctRejections: number
-  hitRate: number
-  falseAlarmRate: number
+  hitRate: number | null
+  falseAlarmRate: number | null
   dPrime: number | null
   criterion: number | null
 }
@@ -59,8 +59,8 @@ export function computeSDT(input: SDTInput): SDTResult {
   const signalTrials = hits + misses
   const noiseTrials = falseAlarms + correctRejections
 
-  const rawHitRate = signalTrials > 0 ? hits / signalTrials : 0
-  const rawFARate = noiseTrials > 0 ? falseAlarms / noiseTrials : 0
+  const rawHitRate = signalTrials > 0 ? hits / signalTrials : null
+  const rawFARate = noiseTrials > 0 ? falseAlarms / noiseTrials : null
 
   if (signalTrials === 0 || noiseTrials === 0) {
     return {
