@@ -1,0 +1,3502 @@
+{
+ "building": [
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-01T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 424.629
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 424.629,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s00",
+   "startedAt": "2026-02-01T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-02T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 401.754
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 401.754,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s01",
+   "startedAt": "2026-02-02T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-03T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 466.645
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 466.645,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s02",
+   "startedAt": "2026-02-03T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-04T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 410.985
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 410.985,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s03",
+   "startedAt": "2026-02-04T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-05T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 478.636
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 478.636,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s04",
+   "startedAt": "2026-02-05T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-06T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 428.418
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 428.418,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s05",
+   "startedAt": "2026-02-06T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-07T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 399.515
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 399.515,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s06",
+   "startedAt": "2026-02-07T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  }
+ ],
+ "contextual": [
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-01T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 424.629
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 424.629,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s00",
+   "startedAt": "2026-02-01T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-02T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 401.754
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 401.754,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s01",
+   "startedAt": "2026-02-02T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-03T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 466.645
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 466.645,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s02",
+   "startedAt": "2026-02-03T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-04T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 410.985
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 410.985,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s03",
+   "startedAt": "2026-02-04T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "not_taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-05T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 478.636
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 478.636,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s04",
+   "startedAt": "2026-02-05T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-06T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 428.418
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 428.418,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s05",
+   "startedAt": "2026-02-06T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-07T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 399.515
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 399.515,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s06",
+   "startedAt": "2026-02-07T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "not_taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-08T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 426.098
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 426.098,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s07",
+   "startedAt": "2026-02-08T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-09T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 416.296
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 416.296,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s08",
+   "startedAt": "2026-02-09T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-10T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 486.066
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 486.066,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s09",
+   "startedAt": "2026-02-10T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "not_taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-11T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 374.022
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 374.022,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s10",
+   "startedAt": "2026-02-11T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-12T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 419.045
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 419.045,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s11",
+   "startedAt": "2026-02-12T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-13T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 439.08
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 439.08,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s12",
+   "startedAt": "2026-02-13T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": {
+    "medications": {
+     "lisdexamfetamine": {
+      "status": "not_taken"
+     }
+    }
+   },
+   "completedAt": "2026-02-14T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 406.513
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 406.513,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s13",
+   "startedAt": "2026-02-14T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  }
+ ],
+ "mixed_protocol": [
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-01T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v0",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s00",
+   "startedAt": "2026-02-01T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-02T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v0",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s01",
+   "startedAt": "2026-02-02T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-03T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v0",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s02",
+   "startedAt": "2026-02-03T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-04T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v0",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s03",
+   "startedAt": "2026-02-04T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-05T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v0",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s04",
+   "startedAt": "2026-02-05T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-06T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v0",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s05",
+   "startedAt": "2026-02-06T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-07T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 424.629
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 424.629,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s06",
+   "startedAt": "2026-02-07T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-08T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 401.754
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 401.754,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s07",
+   "startedAt": "2026-02-08T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-09T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 466.645
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 466.645,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s08",
+   "startedAt": "2026-02-09T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-10T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 410.985
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 410.985,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s09",
+   "startedAt": "2026-02-10T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-11T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 478.636
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 478.636,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s10",
+   "startedAt": "2026-02-11T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-12T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 428.418
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 428.418,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s11",
+   "startedAt": "2026-02-12T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-13T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 399.515
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 399.515,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s12",
+   "startedAt": "2026-02-13T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-14T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 426.098
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 426.098,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s13",
+   "startedAt": "2026-02-14T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-15T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 416.296
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 416.296,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s14",
+   "startedAt": "2026-02-15T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-16T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 486.066
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 486.066,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s15",
+   "startedAt": "2026-02-16T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-17T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 374.022
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 374.022,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s16",
+   "startedAt": "2026-02-17T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-18T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 419.045
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 419.045,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s17",
+   "startedAt": "2026-02-18T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  }
+ ],
+ "monitoring": [
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-01T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 424.629
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 424.629,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s00",
+   "startedAt": "2026-02-01T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-02T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 401.754
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 401.754,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s01",
+   "startedAt": "2026-02-02T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-03T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 466.645
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 466.645,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s02",
+   "startedAt": "2026-02-03T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-04T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 410.985
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 410.985,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s03",
+   "startedAt": "2026-02-04T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-05T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 478.636
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 478.636,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s04",
+   "startedAt": "2026-02-05T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-06T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 428.418
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 428.418,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s05",
+   "startedAt": "2026-02-06T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-07T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 399.515
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 399.515,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s06",
+   "startedAt": "2026-02-07T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-08T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 426.098
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 426.098,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s07",
+   "startedAt": "2026-02-08T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-09T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 416.296
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 416.296,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s08",
+   "startedAt": "2026-02-09T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-10T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 486.066
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 486.066,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s09",
+   "startedAt": "2026-02-10T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-11T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 374.022
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 374.022,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s10",
+   "startedAt": "2026-02-11T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-12T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 419.045
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 419.045,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s11",
+   "startedAt": "2026-02-12T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  }
+ ],
+ "with_ineligible": [
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-01T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 424.629
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 424.629,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s00",
+   "startedAt": "2026-02-01T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-02T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 401.754
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 401.754,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s01",
+   "startedAt": "2026-02-02T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-03T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 466.645
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 466.645,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s02",
+   "startedAt": "2026-02-03T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-04T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 410.985
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 410.985,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s03",
+   "startedAt": "2026-02-04T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-05T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 478.636
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 478.636,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s04",
+   "startedAt": "2026-02-05T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-06T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 428.418
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 428.418,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s05",
+   "startedAt": "2026-02-06T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-07T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 399.515
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 399.515,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s06",
+   "startedAt": "2026-02-07T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-08T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 426.098
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 426.098,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s07",
+   "startedAt": "2026-02-08T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-09T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 416.296
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 416.296,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s08",
+   "startedAt": "2026-02-09T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-10T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 486.066
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 486.066,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s09",
+   "startedAt": "2026-02-10T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-11T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 374.022
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 374.022,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s10",
+   "startedAt": "2026-02-11T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-12T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 419.045
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 419.045,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s11",
+   "startedAt": "2026-02-12T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-21T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "invalid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s20",
+   "startedAt": "2026-02-21T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-22T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": true,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s21",
+   "startedAt": "2026-02-22T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-23T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "training",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s22",
+   "startedAt": "2026-02-23T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-24T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": true
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s23",
+   "startedAt": "2026-02-24T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-25T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 999.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 999.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s24",
+   "startedAt": "2026-02-25T12:00:00.000Z",
+   "status": "interrupted",
+   "testId": "fx",
+   "trials": []
+  }
+ ],
+ "zero_mad": [
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-01T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s00",
+   "startedAt": "2026-02-01T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-02T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s01",
+   "startedAt": "2026-02-02T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-03T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s02",
+   "startedAt": "2026-02-03T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-04T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s03",
+   "startedAt": "2026-02-04T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-05T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s04",
+   "startedAt": "2026-02-05T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-06T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s05",
+   "startedAt": "2026-02-06T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-07T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s06",
+   "startedAt": "2026-02-07T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-08T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s07",
+   "startedAt": "2026-02-08T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-09T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s08",
+   "startedAt": "2026-02-09T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-10T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s09",
+   "startedAt": "2026-02-10T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-11T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s10",
+   "startedAt": "2026-02-11T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  },
+  {
+   "checkIn": null,
+   "completedAt": "2026-02-12T12:10:00.000Z",
+   "deviceInfo": {
+    "browser": "Chrome",
+    "deviceType": "desktop",
+    "inputMethod": "keyboard",
+    "screenHeight": 1080,
+    "screenWidth": 1920,
+    "userAgent": "fx"
+   },
+   "flagMessages": [],
+   "flags": {
+    "insufficientPractice": false
+   },
+   "isDemo": false,
+   "isDemoData": false,
+   "mode": "assessment",
+   "practiceCompleted": true,
+   "protocolVersion": "fx.v1",
+   "quality": "valid",
+   "randomizationSeed": 1,
+   "result": {
+    "accuracyMetrics": {
+     "accuracy": 0.9
+    },
+    "conditionMetrics": {},
+    "customMetrics": {
+     "m": 400.0
+    },
+    "rtMetrics": {
+     "anticipationRate": 0,
+     "lapseRate": 0,
+     "medianCorrectRT": 400.0,
+     "rtCoefficientOfVariation": null
+    }
+   },
+   "sessionId": "s11",
+   "startedAt": "2026-02-12T12:00:00.000Z",
+   "status": "completed",
+   "testId": "fx",
+   "trials": []
+  }
+ ]
+}

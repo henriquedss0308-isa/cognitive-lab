@@ -1,0 +1,22 @@
+{
+ "accuracy": 0.8448275862068966,
+ "commissionErrorRate": 0.25,
+ "commissionErrors": 3,
+ "counts": {
+  "correctRejections": 9,
+  "falseAlarms": 3,
+  "hits": 40,
+  "misses": 4
+ },
+ "medianCorrectRT": 376.7445,
+ "sdt": {
+  "correctRejections": 9,
+  "criterion": -0.3332052304743136,
+  "dPrime": 1.8966926701405744,
+  "falseAlarmRate": 0.25,
+  "falseAlarms": 3,
+  "hitRate": 0.9090909090909091,
+  "hits": 40,
+  "misses": 4
+ }
+}

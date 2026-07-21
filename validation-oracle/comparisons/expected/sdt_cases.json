@@ -1,0 +1,82 @@
+[
+ {
+  "correctRejections": 23,
+  "criterion": 0.2513440714107683,
+  "dPrime": 2.1048772013854364,
+  "falseAlarmRate": 0.08,
+  "falseAlarms": 2,
+  "hitRate": 0.8,
+  "hits": 20,
+  "misses": 5
+ },
+ {
+  "correctRejections": 5,
+  "criterion": -0.0,
+  "dPrime": 0.0,
+  "falseAlarmRate": 0.5,
+  "falseAlarms": 5,
+  "hitRate": 0.5,
+  "hits": 10,
+  "misses": 10
+ },
+ {
+  "correctRejections": 25,
+  "criterion": 2.220446049250313e-16,
+  "dPrime": 4.139803661790102,
+  "falseAlarmRate": 0.0,
+  "falseAlarms": 0,
+  "hitRate": 1.0,
+  "hits": 25,
+  "misses": 0
+ },
+ {
+  "correctRejections": 0,
+  "criterion": 2.220446049250313e-16,
+  "dPrime": -4.139803661790102,
+  "falseAlarmRate": 1.0,
+  "falseAlarms": 25,
+  "hitRate": 0.0,
+  "hits": 0,
+  "misses": 25
+ },
+ {
+  "correctRejections": 7,
+  "criterion": null,
+  "dPrime": null,
+  "falseAlarmRate": 0.3,
+  "falseAlarms": 3,
+  "hitRate": 0.0,
+  "hits": 0,
+  "misses": 0
+ },
+ {
+  "correctRejections": 0,
+  "criterion": null,
+  "dPrime": null,
+  "falseAlarmRate": 0.0,
+  "falseAlarms": 0,
+  "hitRate": 0.3,
+  "hits": 3,
+  "misses": 7
+ },
+ {
+  "correctRejections": 24,
+  "criterion": -0.20032516225473007,
+  "dPrime": 2.4296478160776616,
+  "falseAlarmRate": 0.14285714285714285,
+  "falseAlarms": 4,
+  "hitRate": 0.925,
+  "hits": 111,
+  "misses": 9
+ },
+ {
+  "correctRejections": 1,
+  "criterion": -0.0,
+  "dPrime": 1.3489795003921634,
+  "falseAlarmRate": 0.0,
+  "falseAlarms": 0,
+  "hitRate": 1.0,
+  "hits": 1,
+  "misses": 0
+ }
+]

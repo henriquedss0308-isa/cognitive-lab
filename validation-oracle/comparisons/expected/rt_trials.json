@@ -1,0 +1,68 @@
+{
+ "all_invalid": {
+  "accuracy": {
+   "accuracy": 0.5,
+   "correctCount": 1,
+   "errorCount": 0,
+   "omissionCount": 1,
+   "totalTrials": 2
+  },
+  "postErrorSlowing": null,
+  "rt": {
+   "anticipationRate": 0.5,
+   "lapseRate": 0.0,
+   "meanCorrectRT": null,
+   "medianCorrectRT": null,
+   "p10RT": null,
+   "p90RT": null,
+   "rtCoefficientOfVariation": null,
+   "rtIQR": null,
+   "rtStandardDeviation": null,
+   "validTrialCount": 0
+  }
+ },
+ "empty": {
+  "accuracy": {
+   "accuracy": 0.0,
+   "correctCount": 0,
+   "errorCount": 0,
+   "omissionCount": 0,
+   "totalTrials": 0
+  },
+  "postErrorSlowing": null,
+  "rt": {
+   "anticipationRate": 0.0,
+   "lapseRate": 0.0,
+   "meanCorrectRT": null,
+   "medianCorrectRT": null,
+   "p10RT": null,
+   "p90RT": null,
+   "rtCoefficientOfVariation": null,
+   "rtIQR": null,
+   "rtStandardDeviation": null,
+   "validTrialCount": 0
+  }
+ },
+ "messy": {
+  "accuracy": {
+   "accuracy": 0.918918918918919,
+   "correctCount": 34,
+   "errorCount": 2,
+   "omissionCount": 1,
+   "totalTrials": 37
+  },
+  "postErrorSlowing": 1056.348,
+  "rt": {
+   "anticipationRate": 0.05405405405405406,
+   "lapseRate": 0.02702702702702703,
+   "meanCorrectRT": 398.7300666666667,
+   "medianCorrectRT": 394.2845,
+   "p10RT": 339.0485,
+   "p90RT": 463.8285,
+   "rtCoefficientOfVariation": 0.14285813407642978,
+   "rtIQR": 79.69975,
+   "rtStandardDeviation": 56.96183332417045,
+   "validTrialCount": 30
+  }
+ }
+}

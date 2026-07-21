@@ -1,0 +1,21 @@
+{
+ "generatedAt": "2026-07-21T17:47:26.106Z",
+ "auditedCommit": "05ef727b4826ea92193ec0e2add40cd662eb1906",
+ "fixtureSeed": 2026,
+ "tolerances": {
+  "descriptive": 1e-9,
+  "sdt": 0.0005
+ },
+ "notes": [
+  {
+   "area": "random",
+   "detail": "seededRandom devolve 1.0 no estado 0xffffffff; randomInt(0,3) → 4",
+   "status": "divergence"
+  },
+  {
+   "area": "taskswitch",
+   "detail": "mixingCostAccuracy = repeat − pure (sinal oposto à convenção do switchCostAccuracy); direção -1 registrada fica invertida",
+   "status": "divergence"
+  }
+ ]
+}

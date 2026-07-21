@@ -1,0 +1,7 @@
+{
+ "mixingCostAccuracyAsProduction": -0.0871794871794872,
+ "mixingCostAccuracyConsistent": 0.0871794871794872,
+ "mixingCostRT": 108.57500000000005,
+ "switchCostAccuracy": 0.1105263157894737,
+ "switchCostRT": 160.69449999999995
+}

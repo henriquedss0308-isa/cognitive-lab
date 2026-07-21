@@ -1,0 +1,50 @@
+[
+ {
+  "correctRejections": 23,
+  "falseAlarms": 2,
+  "hits": 20,
+  "misses": 5
+ },
+ {
+  "correctRejections": 5,
+  "falseAlarms": 5,
+  "hits": 10,
+  "misses": 10
+ },
+ {
+  "correctRejections": 25,
+  "falseAlarms": 0,
+  "hits": 25,
+  "misses": 0
+ },
+ {
+  "correctRejections": 0,
+  "falseAlarms": 25,
+  "hits": 0,
+  "misses": 25
+ },
+ {
+  "correctRejections": 7,
+  "falseAlarms": 3,
+  "hits": 0,
+  "misses": 0
+ },
+ {
+  "correctRejections": 0,
+  "falseAlarms": 0,
+  "hits": 3,
+  "misses": 7
+ },
+ {
+  "correctRejections": 24,
+  "falseAlarms": 4,
+  "hits": 111,
+  "misses": 9
+ },
+ {
+  "correctRejections": 1,
+  "falseAlarms": 0,
+  "hits": 1,
+  "misses": 0
+ }
+]

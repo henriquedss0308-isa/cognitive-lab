@@ -1,0 +1,2 @@
+# Sem dependências externas de propósito: o oráculo usa apenas a stdlib do
+# Python (>= 3.8). Este arquivo existe para deixar isso explícito e auditável.

@@ -1,0 +1,5 @@
+{
+ "expectedNext": 1.0,
+ "note": "randomInt(0, 3) com este estado deve sair do intervalo se random()==1.0",
+ "seed": 653637408
+}

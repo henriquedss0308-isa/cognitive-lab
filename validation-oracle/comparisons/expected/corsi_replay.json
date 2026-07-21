@@ -1,0 +1,34 @@
+{
+ "empty": {
+  "confirmedSpan": 0,
+  "maxSpan": 2,
+  "partialScore": 0,
+  "partialScoreRate": null,
+  "totalCorrectSequences": 0,
+  "totalItems": 0
+ },
+ "hand_case": {
+  "confirmedSpan": 4,
+  "maxSpan": 4,
+  "partialScore": 17,
+  "partialScoreRate": 0.6538461538461539,
+  "totalCorrectSequences": 5,
+  "totalItems": 26
+ },
+ "immediate_fail": {
+  "confirmedSpan": 0,
+  "maxSpan": 2,
+  "partialScore": 0,
+  "partialScoreRate": 0.0,
+  "totalCorrectSequences": 0,
+  "totalItems": 4
+ },
+ "short_response_is_error": {
+  "confirmedSpan": 2,
+  "maxSpan": 2,
+  "partialScore": 4,
+  "partialScoreRate": 0.5,
+  "totalCorrectSequences": 1,
+  "totalItems": 8
+ }
+}
