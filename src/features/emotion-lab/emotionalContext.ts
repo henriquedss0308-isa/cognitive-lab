@@ -96,6 +96,39 @@ export function sanitizeEmotionalContext(value: unknown): EmotionalContext | und
   return context
 }
 
+/**
+ * Aplica o saneamento ao campo `emotionalContext` de um objeto de condições,
+ * sem tocar em nenhum outro campo. Tipagem estrutural de propósito: evita que
+ * o módulo do Emotion Lab dependa dos tipos de sessão da aplicação.
+ */
+export function withSanitizedEmotionalContext<T extends object>(conditions: T): T {
+  const source = conditions as { emotionalContext?: unknown }
+  if (source.emotionalContext === undefined) return conditions
+
+  const sanitized = sanitizeEmotionalContext(source.emotionalContext)
+  const next = { ...conditions } as T & { emotionalContext?: EmotionalContext }
+  if (sanitized) next.emotionalContext = sanitized
+  else delete next.emotionalContext
+  return next
+}
+
+/**
+ * Remove o contexto emocional de um objeto de condições.
+ *
+ * Usado ao reaproveitar as condições de uma sessão anterior: sono, ambiente e
+ * substâncias costumam se repetir, mas emoção e percepção da relação são
+ * momentâneas — copiá-las faria a tela afirmar um relato que a pessoa não deu
+ * agora.
+ */
+export function withoutEmotionalContext<T extends object>(conditions: T): T {
+  if ((conditions as { emotionalContext?: unknown }).emotionalContext === undefined) {
+    return conditions
+  }
+  const next = { ...conditions } as T & { emotionalContext?: EmotionalContext }
+  delete next.emotionalContext
+  return next
+}
+
 function contentKey(context: EmotionalContext | undefined): string {
   if (!hasEmotionalContent(context)) return ''
   const c = context as EmotionalContext
