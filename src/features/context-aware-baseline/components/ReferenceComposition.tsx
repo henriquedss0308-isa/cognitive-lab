@@ -1,3 +1,4 @@
+import { Badge, QualityBadge } from '../../../components/common/Badge'
 import type { SessionRecord } from '../../../types'
 import {
   classificationLabel,
@@ -17,20 +18,20 @@ function CompositionTable({ sessions }: { sessions: SessionRecord[] }) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse">
+    <div className="overflow-x-auto -mx-1 px-1">
+      <table className="data-table">
         <caption className="sr-only">Sessões que compõem esta referência</caption>
         <thead>
-          <tr className="text-left text-xs text-lab-muted">
-            <th scope="col" className="py-2 pr-3 font-medium">Data</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Lisdexanfetamina</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Cafeína</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Sono</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Qual. sono</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Horário</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Dispositivo</th>
-            <th scope="col" className="py-2 pr-3 font-medium">Qualidade</th>
-            <th scope="col" className="py-2 font-medium">Protocolo</th>
+          <tr>
+            <th scope="col">Data</th>
+            <th scope="col">Lisdexanfetamina</th>
+            <th scope="col">Cafeína</th>
+            <th scope="col">Sono</th>
+            <th scope="col">Qual. sono</th>
+            <th scope="col">Horário</th>
+            <th scope="col">Dispositivo</th>
+            <th scope="col">Qualidade</th>
+            <th scope="col">Protocolo</th>
           </tr>
         </thead>
         <tbody>
@@ -39,28 +40,24 @@ function CompositionTable({ sessions }: { sessions: SessionRecord[] }) {
             const caffeine = checkIn?.substances?.caffeine
             const sleep = formatSleepHours(checkIn?.sleep?.hours ?? null)
             return (
-              <tr key={session.sessionId} className="border-t border-lab-border">
-                <td className="py-2 pr-3 whitespace-nowrap">
+              <tr key={session.sessionId}>
+                <td className="whitespace-nowrap num">
                   {new Date(session.startedAt).toLocaleDateString('pt-BR')}
                 </td>
-                <td className="py-2 pr-3">
-                  {lisdexamfetamineStatusLabel(getSessionLisdexamfetamineStatus(session))}
-                </td>
-                <td className="py-2 pr-3">
-                  {caffeine === undefined ? 'Não informado' : caffeine ? 'Sim' : 'Não'}
-                </td>
-                <td className="py-2 pr-3">{sleep ?? '—'}</td>
-                <td className="py-2 pr-3">
+                <td>{lisdexamfetamineStatusLabel(getSessionLisdexamfetamineStatus(session))}</td>
+                <td>{caffeine === undefined ? 'Não informado' : caffeine ? 'Sim' : 'Não'}</td>
+                <td className="num">{sleep ?? '—'}</td>
+                <td className="num">
                   {checkIn?.sleep?.quality !== undefined ? `${checkIn.sleep.quality}/5` : '—'}
                 </td>
-                <td className="py-2 pr-3 whitespace-nowrap">
+                <td className="whitespace-nowrap num">
                   {formatMinutesOfDay(minutesSinceMidnight(session.startedAt)) ?? '—'}
                 </td>
-                <td className="py-2 pr-3">{session.deviceInfo?.deviceType ?? '—'}</td>
-                <td className="py-2 pr-3">
-                  {session.quality === 'valid_with_warnings' ? 'Com avisos' : 'Válida'}
+                <td>{session.deviceInfo?.deviceType ?? '—'}</td>
+                <td>
+                  <QualityBadge quality={session.quality} />
                 </td>
-                <td className="py-2 font-mono text-xs">{session.protocolVersion}</td>
+                <td className="num text-lab-muted">{session.protocolVersion}</td>
               </tr>
             )
           })}
@@ -75,13 +72,14 @@ function CompositionSummary({ reference }: { reference: ContextualReference }) {
   const classification = classifyComposition(composition)
 
   return (
-    <div className="text-sm text-lab-muted mt-3 space-y-1">
-      <p>
-        Com lisdexanfetamina: {composition.taken} · Sem lisdexanfetamina: {composition.notTaken} ·
-        Não informado: {composition.unknown}
-      </p>
-      <p className="text-lab-fg">{classificationLabel(classification)}</p>
-      <p className="text-xs">
+    <div className="mt-4 pt-3 hairline space-y-2">
+      <div className="flex flex-wrap gap-1.5">
+        <Badge>Com lisdexanfetamina · {composition.taken}</Badge>
+        <Badge>Sem lisdexanfetamina · {composition.notTaken}</Badge>
+        <Badge>Não informado · {composition.unknown}</Badge>
+      </div>
+      <p className="text-sm text-lab-text">{classificationLabel(classification)}</p>
+      <p className="help-text">
         Esta classificação é apenas descritiva: ela não altera nenhuma métrica, nota ou
         comparação.
       </p>
@@ -98,10 +96,22 @@ function ProgressLine({
   count: number
   required: number
 }) {
+  const complete = count >= required
   return (
-    <li>
-      {label}: <span className="text-lab-fg font-mono">{count}/{required}</span>
-      {count >= required && ' — referência completa'}
+    <li className="flex items-center justify-between gap-3 py-1.5 border-b border-lab-border last:border-b-0">
+      <span className="text-lab-text">{label}</span>
+      <span className="flex items-center gap-2.5">
+        <span className="metric-value text-sm">
+          {count}/{required}
+        </span>
+        {complete ? (
+          <Badge tone="success" dot>
+            Completa
+          </Badge>
+        ) : (
+          <Badge>Em construção</Badge>
+        )}
+      </span>
     </li>
   )
 }
@@ -142,7 +152,7 @@ export function ReferenceComposition({ selection, general, taken, notTaken }: Pr
           nenhuma das duas.
         </p>
 
-        <ul className="text-sm text-lab-muted space-y-1 mb-4">
+        <ul className="text-sm mb-5">
           <ProgressLine
             label="Com lisdexanfetamina"
             count={selection.progress.taken.count}

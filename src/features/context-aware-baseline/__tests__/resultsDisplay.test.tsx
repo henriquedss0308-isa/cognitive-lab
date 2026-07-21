@@ -91,7 +91,10 @@ describe('composição da referência', () => {
 
     expect(screen.getByText('8/8')).toBeInTheDocument()
     expect(screen.getByText('0/8')).toBeInTheDocument()
-    expect(screen.getAllByText(/Com lisdexanfetamina:/).length).toBeGreaterThan(0)
+    // A composição virou badge ("Com lisdexanfetamina · 8"). O padrão inclui o
+    // número de propósito: sem ele isto casaria também com o rótulo da linha de
+    // progresso e deixaria de verificar o resumo de composição.
+    expect(screen.getAllByText(/Com lisdexanfetamina · \d+/).length).toBeGreaterThan(0)
   })
 
   it('lista as colunas exigidas da composição', () => {

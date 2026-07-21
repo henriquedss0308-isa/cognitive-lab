@@ -5,6 +5,10 @@ import { exportFullBackup, downloadJSON, downloadCSV, trialsToCSV, resultsToCSV,
 import { getIncompleteSessions, updateSessionStatus } from '../storage/repository'
 import { canResumeSession, resumeBlockedReason } from '../storage/sessionRecovery'
 import { getTest } from '../tests/registry'
+import { ThemeToggle } from '../components/layout/ThemeToggle'
+import { Page, PageHeader } from '../components/common/Page'
+import { Badge } from '../components/common/Badge'
+import { FONT_SCALE_MAX, FONT_SCALE_MIN, normalizeFontScale } from '../theme/theme'
 import type { SessionRecord } from '../types'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -63,16 +67,16 @@ export function Settings() {
   }
 
   return (
-    <div className="p-8 max-w-2xl">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold">Dados e Configurações</h1>
-        <p className="text-lab-muted mt-1">Local-first — seus dados permanecem neste dispositivo.</p>
-      </header>
+    <Page width="narrow">
+      <PageHeader
+        title="Dados e Configurações"
+        subtitle="Local-first — seus dados permanecem neste dispositivo."
+      />
 
       {incomplete.length > 0 && (
-        <section className="card p-5 mb-6 border-lab-warning/40">
-          <h2 className="font-medium mb-2">Sessões incompletas</h2>
-          <p className="text-sm text-lab-muted mb-4">
+        <section className="card p-5 mb-6">
+          <h2 className="card-title mb-1">Sessões incompletas</h2>
+          <p className="help-text mb-4">
             Avaliações interrompidas não entram no baseline. Protocolos fixos devem ser reiniciados.
           </p>
           <ul className="space-y-3">
@@ -81,14 +85,14 @@ export function Settings() {
               const canResume = canResumeSession(s)
               const blockReason = resumeBlockedReason(s)
               return (
-                <li key={s.sessionId} className="border border-lab-border rounded-lg p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <span className="font-medium">{test.shortName}</span>
-                      <span className="text-lab-muted text-sm ml-2">
+                <li key={s.sessionId} className="border border-lab-border rounded-md p-4 bg-lab-bg">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-medium text-lab-fg">{test.shortName}</span>
+                      <span className="help-text">
                         {format(new Date(s.startedAt), "d MMM HH:mm", { locale: ptBR })}
                       </span>
-                      <span className="text-xs text-lab-warning ml-2">{s.status}</span>
+                      <Badge tone="warning" dot>{s.status}</Badge>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button
@@ -140,10 +144,10 @@ export function Settings() {
                     </div>
                   </div>
                   {!canResume && blockReason && (
-                    <p className="text-xs text-lab-muted mt-2">{blockReason}</p>
+                    <p className="help-text mt-2">{blockReason}</p>
                   )}
                   {expandedId === s.sessionId && s.trials.length > 0 && (
-                    <p className="text-xs text-lab-muted mt-3 font-mono">
+                    <p className="help-text mt-3 font-mono">
                       Últimos ensaios: {s.trials.slice(-3).map((t) => `#${t.trialIndex + 1} ${t.correct ? '✓' : '✗'}`).join(' · ')}
                     </p>
                   )}
@@ -155,13 +159,13 @@ export function Settings() {
       )}
 
       <section className="card p-5 mb-6">
-        <h2 className="font-medium mb-4">Exportar</h2>
-        <div className="flex flex-wrap gap-3">
+        <h2 className="card-title mb-4">Exportar</h2>
+        <div className="flex flex-wrap gap-2">
           <button className="btn-secondary" onClick={handleExportJSON}>Backup JSON completo</button>
           <button className="btn-secondary" onClick={handleExportTrials}>CSV ensaios</button>
           <button className="btn-secondary" onClick={handleExportResults}>CSV resultados</button>
         </div>
-        <p className="text-xs text-lab-muted mt-4">
+        <p className="help-text mt-4">
           O backup JSON inclui as condições registradas em cada sessão, e portanto pode conter
           o contexto emocional e a percepção da relação, além do rótulo configurado abaixo.
           Guarde e compartilhe o arquivo com esse cuidado.
@@ -169,7 +173,7 @@ export function Settings() {
       </section>
 
       <section className="card p-5 mb-6">
-        <h2 className="font-medium mb-4">Importar</h2>
+        <h2 className="card-title mb-4">Importar</h2>
         <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
         <button className="btn-secondary" onClick={() => fileRef.current?.click()}>
           Importar backup
@@ -177,23 +181,59 @@ export function Settings() {
       </section>
 
       <section className="card p-5 mb-6">
-        <h2 className="font-medium mb-4">Preferências</h2>
-        <label className="block text-sm mb-5">
-          <span className="text-lab-muted">Nome da pessoa ou relação acompanhada (opcional)</span>
+        <h2 className="card-title mb-1">Aparência</h2>
+        <p className="help-text mb-5">
+          A escolha fica salva neste dispositivo e é reaplicada ao recarregar a página.
+        </p>
+
+        <div className="flex items-center justify-between gap-4 py-3 border-b border-lab-border">
+          <div>
+            <div className="text-sm text-lab-text">Tema</div>
+            <p className="help-text mt-0.5">
+              A tela de execução dos testes mantém a apresentação escura nos dois temas,
+              para que sessões continuem comparáveis entre si.
+            </p>
+          </div>
+          <ThemeToggle />
+        </div>
+
+        <label className="flex items-center justify-between gap-6 py-3">
+          <span className="shrink-0">
+            <span className="text-sm text-lab-text">Escala de fonte</span>
+            <span className="help-text block mt-0.5">
+              {Math.round(normalizeFontScale(settings.fontScale) * 100)}% do tamanho padrão
+            </span>
+          </span>
+          <input
+            type="range"
+            min={FONT_SCALE_MIN}
+            max={FONT_SCALE_MAX}
+            step="0.1"
+            className="max-w-56"
+            value={normalizeFontScale(settings.fontScale)}
+            onChange={(e) => updateSettings({ fontScale: parseFloat(e.target.value) })}
+          />
+        </label>
+      </section>
+
+      <section className="card p-5 mb-6">
+        <h2 className="card-title mb-4">Preferências</h2>
+        <label className="block mb-5">
+          <span className="label-text">Nome da pessoa ou relação acompanhada (opcional)</span>
           <input
             type="text"
-            className="w-full mt-1 border border-lab-border rounded-lg px-3 py-2"
+            className="mt-1.5"
             value={settings.relationshipLabel ?? ''}
             maxLength={40}
             onChange={(e) => updateSettings({ relationshipLabel: e.target.value })}
           />
-          <span className="block text-xs text-lab-muted mt-2">
+          <span className="help-text block mt-2">
             Usado apenas para personalizar o texto do registro de percepção neste dispositivo.
             Deixe em branco para manter a linguagem genérica. Fica salvo junto das demais
             preferências e, por isso, também entra no backup JSON.
           </span>
         </label>
-        <label className="flex items-center gap-3 text-sm">
+        <label className="flex items-center gap-2.5 text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={settings.developerMode}
@@ -201,19 +241,30 @@ export function Settings() {
           />
           Modo desenvolvedor
         </label>
-        <label className="flex items-center gap-3 text-sm mt-3">
-          <span className="text-lab-muted">Escala de fonte</span>
-          <input
-            type="range" min="0.8" max="1.4" step="0.1"
-            value={settings.fontScale}
-            onChange={(e) => updateSettings({ fontScale: parseFloat(e.target.value) })}
-          />
-        </label>
       </section>
 
-      <section className="card p-5 mb-6 border-lab-danger/30">
-        <h2 className="font-medium mb-4 text-lab-danger">Zona de perigo</h2>
-        <div className="flex flex-wrap gap-3">
+      <section className="card p-5 mb-6">
+        <h2 className="card-title mb-1">Estatísticas</h2>
+        <div className="flex gap-8 mt-3">
+          <div>
+            <div className="metric-value text-xl">{sessions.length}</div>
+            <div className="help-text mt-0.5">sessões</div>
+          </div>
+          <div>
+            <div className="metric-value text-xl">
+              {sessions.reduce((a, s) => a + s.trials.length, 0)}
+            </div>
+            <div className="help-text mt-0.5">ensaios</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Borda avermelhada além do texto: a seção precisa se distinguir mesmo
+          para quem não percebe a diferença de cor. */}
+      <section className="card p-5 border-lab-danger/40">
+        <h2 className="card-title mb-1 text-lab-danger">Zona de perigo</h2>
+        <p className="help-text mb-4">Estas ações não podem ser desfeitas.</p>
+        <div className="flex flex-wrap gap-2">
           {settings.demoDataActive && (
             <button className="btn-secondary" onClick={clearDemo}>Limpar dados de demonstração</button>
           )}
@@ -227,13 +278,6 @@ export function Settings() {
           </button>
         </div>
       </section>
-
-      <section className="card p-5">
-        <h2 className="font-medium mb-2">Estatísticas</h2>
-        <p className="text-sm text-lab-muted">
-          {sessions.length} sessões · {sessions.reduce((a, s) => a + s.trials.length, 0)} ensaios
-        </p>
-      </section>
-    </div>
+    </Page>
   )
 }
