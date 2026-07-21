@@ -128,4 +128,13 @@ describe('ScatterTooltip', () => {
     expect(screen.getByText('245,4 ms')).toBeInTheDocument()
     expect(screen.getByText('97,5%')).toBeInTheDocument()
   })
+
+  it('identifica o tempo de reprodução do Corsi pelo metadado explícito', () => {
+    renderAsRecharts(<ScatterTooltip medianMetricKey="corsiReproductionTime" />, {
+      payload: SCATTER_POINT,
+    })
+
+    expect(screen.getByText(/Tempo mediano de reprodução/)).toBeInTheDocument()
+    expect(screen.getByText('245,4 ms')).toBeInTheDocument()
+  })
 })
