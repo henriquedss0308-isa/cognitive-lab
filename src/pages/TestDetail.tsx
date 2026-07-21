@@ -10,6 +10,7 @@ import {
 } from '../features/context-aware-baseline/contextualReference'
 import { selectReference } from '../features/context-aware-baseline/referenceSelection'
 import { ReferenceComposition } from '../features/context-aware-baseline/components/ReferenceComposition'
+import { Page, PageHeader } from '../components/common/Page'
 import type { TestId } from '../types'
 
 export function TestDetail() {
@@ -34,40 +35,48 @@ export function TestDetail() {
   })
 
   return (
-    <div className="p-8 max-w-3xl">
-      <Link to="/catalog" className="text-sm text-lab-muted hover:text-lab-accent">← Catálogo</Link>
-      <h1 className="text-2xl font-semibold mt-2">{test.name}</h1>
-      <p className="text-lab-accent text-sm">{DOMAIN_LABELS[test.domain]}</p>
+    <Page>
+      <PageHeader
+        title={test.name}
+        subtitle={DOMAIN_LABELS[test.domain]}
+        eyebrow={
+          <Link to="/catalog" className="text-xs text-lab-muted hover:text-lab-accent">
+            ← Catálogo
+          </Link>
+        }
+      />
 
-      <div className="card p-5 mt-6 mb-6">
-        <h3 className="font-medium mb-2">O que mede</h3>
-        <p className="text-sm text-lab-muted">{test.description}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+        <div className="card p-5">
+          <h3 className="card-title mb-2">O que mede</h3>
+          <p className="text-sm text-lab-muted leading-relaxed">{test.description}</p>
+        </div>
+        <div className="card p-5">
+          <h3 className="card-title mb-2">O que NÃO mede</h3>
+          <p className="text-sm text-lab-muted leading-relaxed">
+            Não diagnostica TDAH, transtornos cognitivos, doenças neurológicas, déficits clínicos ou QI.
+            Não fornece percentis populacionais.
+          </p>
+        </div>
       </div>
 
-      <div className="card p-5 mb-6">
-        <h3 className="font-medium mb-2">O que NÃO mede</h3>
-        <p className="text-sm text-lab-muted">
-          Não diagnostica TDAH, transtornos cognitivos, doenças neurológicas, déficits clínicos ou QI.
-          Não fornece percentis populacionais.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="card p-4">
-          <div className="text-xs text-lab-muted">Protocolo</div>
-          <div className="font-mono text-sm mt-1">{test.protocolVersion}</div>
+      <div className="card grid grid-cols-2 md:grid-cols-4 divide-x divide-lab-border mb-8">
+        <div className="p-4">
+          <div className="section-title">Protocolo</div>
+          <div className="metric-value text-sm mt-1.5">{test.protocolVersion}</div>
         </div>
-        <div className="card p-4">
-          <div className="text-xs text-lab-muted">Ensaios (avaliação)</div>
-          <div className="font-mono text-sm mt-1">{test.assessmentConfig.trialCount}</div>
+        <div className="p-4">
+          <div className="section-title">Ensaios</div>
+          <div className="metric-value text-sm mt-1.5">{test.assessmentConfig.trialCount}</div>
         </div>
-        <div className="card p-4">
-          <div className="text-xs text-lab-muted">Baseline</div>
-          <div className="text-sm mt-1">{baseline.sessionCount} sessões · fase {baseline.phase}</div>
+        <div className="p-4">
+          <div className="section-title">Baseline</div>
+          <div className="text-sm mt-1.5">{baseline.sessionCount} sessões</div>
+          <div className="help-text">fase {baseline.phase}</div>
         </div>
-        <div className="card p-4">
-          <div className="text-xs text-lab-muted">Duração</div>
-          <div className="text-sm mt-1">{test.duration}</div>
+        <div className="p-4">
+          <div className="section-title">Duração</div>
+          <div className="text-sm mt-1.5">{test.duration}</div>
         </div>
       </div>
 
@@ -79,12 +88,12 @@ export function TestDetail() {
         />
       )}
 
-      <details className="mt-6 bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
-        <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+      <details className="section-toggle group mt-6">
+        <summary>
           Composição das referências
-          <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+          <span aria-hidden="true" className="text-lab-faint text-[0.625rem] group-open:rotate-180 transition-transform">▼</span>
         </summary>
-        <div className="p-4 pt-4 border-t border-lab-border">
+        <div className="px-4 pb-5 pt-4 border-t border-lab-border">
           <ReferenceComposition
             selection={selection}
             general={buildGeneralReference(...referenceArgs)}
@@ -97,6 +106,6 @@ export function TestDetail() {
       <div className="mt-6">
         <Link to={`/test/${test.id}`} className="btn-primary">Iniciar teste</Link>
       </div>
-    </div>
+    </Page>
   )
 }

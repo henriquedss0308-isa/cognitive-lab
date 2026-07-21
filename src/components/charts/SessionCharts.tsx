@@ -4,33 +4,71 @@ import {
 } from 'recharts'
 import type { SessionRecord } from '../../types'
 import { selectTrendSessions } from './chartSelectors'
+import { useChartTheme, tooltipStyle, type ChartTheme } from './useChartTheme'
+
+/**
+ * Gráficos das sessões.
+ *
+ * O redesign mexe só na apresentação: grade mais discreta, eixos sem linha
+ * dupla, tipografia menor e cores vindas do tema. Nenhuma seleção, agregação ou
+ * escala foi alterada.
+ */
 
 interface Props {
   session: SessionRecord
 }
 
-export function BlockChart({ session }: Props) {
-  const blocks = session.result?.blockMetrics ?? []
-  if (blocks.length === 0) return null
+/** Eixos com a mesma aparência em todos os gráficos. */
+function axisProps(theme: ChartTheme, size = 11) {
+  return {
+    tick: { fill: theme.axis, fontSize: size },
+    tickLine: false,
+    axisLine: { stroke: theme.grid },
+    stroke: theme.grid,
+  }
+}
 
+function ChartFrame({
+  title,
+  note,
+  children,
+}: {
+  title: string
+  note?: string
+  children: React.ReactNode
+}) {
   return (
     <div className="card p-4">
-      <h3 className="text-sm font-medium mb-4">Desempenho por bloco</h3>
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={blocks}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a3548" />
-          <XAxis dataKey="blockIndex" tick={{ fill: '#8b9bb4', fontSize: 12 }} />
-          <YAxis tick={{ fill: '#8b9bb4', fontSize: 12 }} />
-          <Tooltip contentStyle={{ background: '#111820', border: '1px solid #2a3548' }} />
-          <Bar dataKey="medianRT" name="RT mediano (ms)" fill="#4a9eff" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="accuracy" name="Precisão" fill="#3dd68c" radius={[4, 4, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+      <h3 className="card-title">{title}</h3>
+      {note && <p className="help-text mt-1">{note}</p>}
+      <div className="mt-4">{children}</div>
     </div>
   )
 }
 
+export function BlockChart({ session }: Props) {
+  const theme = useChartTheme()
+  const blocks = session.result?.blockMetrics ?? []
+  if (blocks.length === 0) return null
+
+  return (
+    <ChartFrame title="Desempenho por bloco">
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={blocks} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
+          <CartesianGrid stroke={theme.grid} vertical={false} />
+          <XAxis dataKey="blockIndex" {...axisProps(theme)} />
+          <YAxis {...axisProps(theme)} />
+          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ fill: theme.grid, opacity: 0.4 }} />
+          <Bar dataKey="medianRT" name="RT mediano (ms)" fill={theme.series} radius={[2, 2, 0, 0]} />
+          <Bar dataKey="accuracy" name="Precisão" fill={theme.seriesAlt} radius={[2, 2, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartFrame>
+  )
+}
+
 export function RTDistribution({ session }: Props) {
+  const theme = useChartTheme()
   const rts = session.trials
     .filter((t) => t.correct && t.reactionTimeMs !== null && t.reactionTimeMs >= 150)
     .map((t) => t.reactionTimeMs!)
@@ -51,18 +89,17 @@ export function RTDistribution({ session }: Props) {
   })
 
   return (
-    <div className="card p-4">
-      <h3 className="text-sm font-medium mb-4">Distribuição de RT</h3>
+    <ChartFrame title="Distribuição de RT" note="Ensaios corretos, em milissegundos.">
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={histogram}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a3548" />
-          <XAxis dataKey="range" tick={{ fill: '#8b9bb4', fontSize: 10 }} />
-          <YAxis tick={{ fill: '#8b9bb4', fontSize: 12 }} />
-          <Tooltip contentStyle={{ background: '#111820', border: '1px solid #2a3548' }} />
-          <Bar dataKey="count" fill="#a78bfa" radius={[4, 4, 0, 0]} />
+        <BarChart data={histogram} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
+          <CartesianGrid stroke={theme.grid} vertical={false} />
+          <XAxis dataKey="range" {...axisProps(theme, 10)} />
+          <YAxis {...axisProps(theme)} />
+          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ fill: theme.grid, opacity: 0.4 }} />
+          <Bar dataKey="count" fill={theme.seriesThird} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </ChartFrame>
   )
 }
 
@@ -73,6 +110,7 @@ interface LongitudinalProps {
 }
 
 export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalProps) {
+  const theme = useChartTheme()
   const selection = selectTrendSessions(sessions)
   const data = selection.sessions
     .map((s, i) => {
@@ -100,30 +138,38 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
 
   if (data.length < 2) {
     return (
-      <div className="card p-4 text-lab-muted text-sm">
-        Dados insuficientes para tendência ({data.length} sessão{data.length !== 1 ? 'ões' : ''}).
-        {hiddenNote && <span className="block mt-1">{hiddenNote}.</span>}
+      <div className="card p-4">
+        <h3 className="card-title">{label}</h3>
+        <p className="help-text mt-1">
+          Dados insuficientes para tendência ({data.length} sessão{data.length !== 1 ? 'ões' : ''}).
+          {hiddenNote && <span className="block mt-1">{hiddenNote}.</span>}
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="card p-4">
-      <h3 className="text-sm font-medium mb-4">{label} — tendência longitudinal</h3>
-      <p className="text-xs text-lab-muted mb-2">
-        Comparado às suas sessões anteriores. {data.length} sessões.
-        {hiddenNote && ` ${hiddenNote}.`}
-      </p>
+    <ChartFrame
+      title={`${label} — tendência longitudinal`}
+      note={`Comparado às suas sessões anteriores. ${data.length} sessões.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
+    >
       <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a3548" />
-          <XAxis dataKey="date" tick={{ fill: '#8b9bb4', fontSize: 11 }} />
-          <YAxis tick={{ fill: '#8b9bb4', fontSize: 12 }} />
-          <Tooltip contentStyle={{ background: '#111820', border: '1px solid #2a3548' }} />
-          <Line type="monotone" dataKey="value" stroke="#4a9eff" strokeWidth={2} dot={{ fill: '#4a9eff' }} />
+        <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+          <CartesianGrid stroke={theme.grid} vertical={false} />
+          <XAxis dataKey="date" {...axisProps(theme)} />
+          <YAxis {...axisProps(theme)} />
+          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ stroke: theme.grid }} />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={theme.series}
+            strokeWidth={1.75}
+            dot={{ fill: theme.series, r: 2.5, strokeWidth: 0 }}
+            activeDot={{ r: 4, strokeWidth: 0 }}
+          />
         </LineChart>
       </ResponsiveContainer>
-    </div>
+    </ChartFrame>
   )
 }
 
@@ -132,6 +178,7 @@ interface SpeedAccuracyProps {
 }
 
 export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
+  const theme = useChartTheme()
   const data = selectTrendSessions(sessions)
     .sessions
     .map((s) => ({
@@ -145,18 +192,17 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
   if (data.length === 0) return null
 
   return (
-    <div className="card p-4">
-      <h3 className="text-sm font-medium mb-4">Velocidade vs Precisão</h3>
+    <ChartFrame title="Velocidade vs Precisão">
       <ResponsiveContainer width="100%" height={240}>
-        <ScatterChart>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a3548" />
-          <XAxis dataKey="speed" name="RT mediano" unit="ms" tick={{ fill: '#8b9bb4' }} />
-          <YAxis dataKey="accuracy" name="Precisão" unit="%" tick={{ fill: '#8b9bb4' }} domain={[0, 100]} />
-          <Tooltip contentStyle={{ background: '#111820', border: '1px solid #2a3548' }} />
-          <Legend />
-          <Scatter name="Sessões" data={data} fill="#4a9eff" />
+        <ScatterChart margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
+          <CartesianGrid stroke={theme.grid} />
+          <XAxis dataKey="speed" name="RT mediano" unit="ms" {...axisProps(theme)} />
+          <YAxis dataKey="accuracy" name="Precisão" unit="%" domain={[0, 100]} {...axisProps(theme)} />
+          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ stroke: theme.grid }} />
+          <Legend wrapperStyle={{ fontSize: 12, color: theme.axis }} />
+          <Scatter name="Sessões" data={data} fill={theme.series} />
         </ScatterChart>
       </ResponsiveContainer>
-    </div>
+    </ChartFrame>
   )
 }

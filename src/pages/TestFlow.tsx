@@ -282,27 +282,27 @@ export function TestFlow() {
   if (step === 'instructions') {
     const instr = test.instructions
     return (
-      <div className="p-8 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-2">{instr.title}</h1>
-        <p className="text-lab-muted mb-6">{instr.summary}</p>
-        <div className="card p-5 mb-6">
-          <h3 className="text-sm font-medium mb-3">Instruções</h3>
-          <ol className="list-decimal list-inside space-y-2 text-sm">
+      <div className="px-6 py-10 sm:px-10 max-w-2xl mx-auto">
+        <h1 className="page-title">{instr.title}</h1>
+        <p className="page-subtitle mb-8">{instr.summary}</p>
+        <div className="card p-5 mb-3">
+          <h3 className="section-title mb-3">Instruções</h3>
+          <ol className="list-decimal list-inside space-y-2 text-sm text-lab-text marker:text-lab-faint">
             {instr.steps.map((s, i) => <li key={i}>{s}</li>)}
           </ol>
         </div>
         <div className="card p-5 mb-6">
-          <h3 className="text-sm font-medium mb-3">Teclas</h3>
-          <div className="flex flex-wrap gap-3">
+          <h3 className="section-title mb-3">Teclas</h3>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
             {instr.keys.map((k) => (
-              <span key={k.key} className="text-sm">
+              <span key={k.key} className="text-sm text-lab-muted">
                 <kbd className="kbd">{k.key.toUpperCase()}</kbd> {k.action}
               </span>
             ))}
           </div>
         </div>
-        <p className="text-xs text-lab-muted mb-6">{instr.tips.join(' ')}</p>
-        <div className="flex flex-wrap gap-3">
+        <p className="help-text mb-8 max-w-prose">{instr.tips.join(' ')}</p>
+        <div className="flex flex-wrap gap-2">
           <button className="btn-primary" onClick={() => setStep('practice')}>
             Iniciar treino (obrigatório)
           </button>
@@ -324,14 +324,14 @@ export function TestFlow() {
 
   if (step === 'practice_failed' && practiceEval) {
     return (
-      <div className="p-8 max-w-lg mx-auto">
-        <h2 className="text-xl font-medium mb-2">Treino não atingiu o critério</h2>
-        <p className="text-lab-muted mb-4">
+      <div className="px-6 py-10 sm:px-10 max-w-lg mx-auto">
+        <h2 className="page-title mb-2">Treino não atingiu o critério</h2>
+        <p className="text-sm text-lab-muted mb-4">
           Precisão: {(practiceEval.accuracy * 100).toFixed(0)}% (mínimo{' '}
           {(practiceCriteria.minAccuracy * 100).toFixed(0)}%)
         </p>
         {practiceEval.errors.length > 0 && (
-          <ul className="text-sm text-lab-muted mb-6 space-y-1">
+          <ul className="text-sm text-lab-muted mb-6 space-y-1.5">
             {practiceEval.errors.map((e) => (
               <li key={e.kind}>· {e.label}: {e.count}</li>
             ))}
@@ -346,9 +346,9 @@ export function TestFlow() {
 
   if (step === 'practice_done') {
     return (
-      <div className="p-8 max-w-lg mx-auto text-center">
-        <h2 className="text-xl font-medium mb-4">Treino concluído</h2>
-        <p className="text-lab-muted mb-6">
+      <div className="px-6 py-10 sm:px-10 max-w-lg mx-auto text-center">
+        <h2 className="page-title mb-3">Treino concluído</h2>
+        <p className="text-sm text-lab-muted mb-6">
           Critério atingido. Os dados do treino não entram nas estatísticas longitudinais.
         </p>
         <button className="btn-primary" onClick={startAssessment}>
@@ -362,9 +362,9 @@ export function TestFlow() {
 
   if (persistError) {
     return (
-      <div className="p-8 max-w-lg mx-auto">
-        <h2 className="text-xl font-medium mb-2">Erro ao salvar resultados</h2>
-        <p className="text-lab-muted mb-4">{persistError}</p>
+      <div className="px-6 py-10 sm:px-10 max-w-lg mx-auto">
+        <h2 className="page-title mb-2 text-lab-danger">Erro ao salvar resultados</h2>
+        <p className="text-sm text-lab-muted mb-4">{persistError}</p>
         <button className="btn-secondary" onClick={() => navigate('/catalog')}>
           Voltar ao catálogo
         </button>

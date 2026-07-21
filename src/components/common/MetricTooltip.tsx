@@ -15,21 +15,30 @@ interface Props {
   label: string
   value: string | number | null
   unit?: string
+  /** Métrica principal da sessão — recebe mais peso visual que as demais. */
+  emphasis?: boolean
 }
 
-export function MetricCard({ metric, label, value, unit }: Props) {
+export function MetricCard({ metric, label, value, unit, emphasis = false }: Props) {
   const explanation = EXPLANATIONS[metric]
   const display = value === null || value === undefined ? '—' : typeof value === 'number' ? value.toFixed(metric.includes('Rate') || metric === 'accuracy' ? 2 : 0) : value
 
   return (
-    <div className="card p-4" title={explanation}>
-      <div className="text-xs text-lab-muted uppercase tracking-wide mb-1">{label}</div>
-      <div className="text-2xl font-mono font-medium">
-        {display}{unit && value !== null ? unit : ''}
+    <div className="card p-4 flex flex-col" title={explanation}>
+      <div className="section-title">{label}</div>
+      {/*
+        Número e unidade separados: a unidade em peso menor deixa a magnitude
+        legível de relance, que é o que se procura numa grade de métricas.
+      */}
+      <div className="mt-2 flex items-baseline gap-1">
+        <span className={emphasis ? 'metric-value text-3xl' : 'metric-value text-2xl'}>
+          {display}
+        </span>
+        {unit && value !== null && value !== undefined && (
+          <span className="text-xs text-lab-muted">{unit.trim()}</span>
+        )}
       </div>
-      {explanation && (
-        <p className="text-xs text-lab-muted mt-2 leading-relaxed">{explanation}</p>
-      )}
+      {explanation && <p className="help-text mt-2 flex-1">{explanation}</p>}
     </div>
   )
 }
