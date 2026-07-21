@@ -141,11 +141,11 @@ function scoreSartSession(
     conditionMetrics: {
       go: {
         medianRT: goMetrics.medianRT,
-        accuracy: goMetrics.accuracy,
+        accuracy: eligibleGoTrials.length > 0 ? goMetrics.accuracy : null,
         omissionCount: goMetrics.omissionCount,
       },
       'no-go': {
-        accuracy: noGoMetrics.accuracy,
+        accuracy: eligibleNoGoTrials.length > 0 ? noGoMetrics.accuracy : null,
         commissionErrors: falseAlarms,
       },
     },

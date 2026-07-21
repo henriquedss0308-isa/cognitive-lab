@@ -248,14 +248,14 @@ function scoreSession(
   base.conditionMetrics = {
     go: {
       medianRT: go.medianRT,
-      accuracy: go.accuracy,
+      accuracy: eligibleGoTrials.length > 0 ? go.accuracy : null,
       errorCount: go.errorCount,
       omissionCount: go.omissionCount,
       hitRate: sdt.hitRate,
     },
     nogo: {
       medianRT: nogo.medianRT,
-      accuracy: nogo.accuracy,
+      accuracy: eligibleNogoTrials.length > 0 ? nogo.accuracy : null,
       errorCount: nogo.errorCount,
       omissionCount: nogo.omissionCount,
       falseAlarmRate: sdt.falseAlarmRate,

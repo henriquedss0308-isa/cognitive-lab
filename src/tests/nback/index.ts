@@ -168,8 +168,9 @@ function scoreNBackByLevel(
 
   const sdt = computeSDT({ hits, misses, falseAlarms, correctRejections })
   const targetMetrics = conditionRTAndAccuracy(targetTrials, `${n}back`, cleaning)
+  const targetAccuracy = targetTrials.length > 0 ? targetMetrics.accuracy : null
 
-  return { sdt, targetMetrics, levelTrials, targetTrials, nonTargetTrials }
+  return { sdt, targetMetrics, targetAccuracy, levelTrials, targetTrials, nonTargetTrials }
 }
 
 function scoreNBackSession(
@@ -217,7 +218,7 @@ function scoreNBackSession(
   const conditionMetrics: Record<string, Record<string, number | null>> = {
     '1back': {
       medianRT: oneBack.targetMetrics.medianRT,
-      accuracy: oneBack.targetMetrics.accuracy,
+      accuracy: oneBack.targetAccuracy,
       dPrime: oneBack.sdt.dPrime,
       hitRate: oneBack.sdt.hitRate,
       falseAlarmRate: oneBack.sdt.falseAlarmRate,
@@ -234,14 +235,14 @@ function scoreNBackSession(
     dPrime2Back: twoBack?.sdt.dPrime ?? null,
     medianRT1Back: oneBack.targetMetrics.medianRT,
     medianRT2Back: twoBack?.targetMetrics.medianRT ?? null,
-    accuracy1Back: oneBack.targetMetrics.accuracy,
-    accuracy2Back: twoBack?.targetMetrics.accuracy ?? null,
+    accuracy1Back: oneBack.targetAccuracy,
+    accuracy2Back: twoBack?.targetAccuracy ?? null,
   }
 
   if (twoBack) {
     conditionMetrics['2back'] = {
       medianRT: twoBack.targetMetrics.medianRT,
-      accuracy: twoBack.targetMetrics.accuracy,
+      accuracy: twoBack.targetAccuracy,
       dPrime: twoBack.sdt.dPrime,
       hitRate: twoBack.sdt.hitRate,
       falseAlarmRate: twoBack.sdt.falseAlarmRate,
