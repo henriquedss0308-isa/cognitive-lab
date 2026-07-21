@@ -98,11 +98,11 @@ export function TestConditionsForm({
   }
 
   return (
-    <div className={compact ? 'w-full' : 'p-8 max-w-2xl mx-auto w-full'}>
-      <h1 className={compact ? 'text-lg font-semibold mb-2' : 'text-2xl font-semibold mb-2'}>
-        {title}
-      </h1>
-      <p className="text-lab-muted text-sm mb-6">{description}</p>
+    <div className={compact ? 'w-full' : 'px-6 py-10 sm:px-10 max-w-2xl mx-auto w-full'}>
+      <h1 className={compact ? 'card-title' : 'page-title'}>{title}</h1>
+      <p className={compact ? 'help-text mb-5 max-w-prose' : 'page-subtitle mb-8 max-w-prose'}>
+        {description}
+      </p>
 
       {showLoadPrevious && hasPrevious && (
         <button

@@ -182,8 +182,8 @@ export function EmotionalContextFields({ value, onChange, relationshipLabel }: P
     <div className="space-y-6">
       {/* ---------------- Registro emocional ---------------- */}
       <section>
-        <h3 className="font-medium mb-1">Como estou me sentindo agora</h3>
-        <p className="text-xs text-lab-muted mb-4">
+        <h3 className="card-title mb-1">Como estou me sentindo agora</h3>
+        <p className="help-text mb-4 max-w-prose">
           Opcional. Serve para dar contexto à sessão — não altera seus resultados nem a
           análise do seu desempenho.
         </p>
@@ -251,8 +251,8 @@ export function EmotionalContextFields({ value, onChange, relationshipLabel }: P
 
       {/* ---------------- Percepção da relação ---------------- */}
       <section className="pt-5 border-t border-lab-border">
-        <h3 className="font-medium mb-1">{relationshipQuestion(relationshipLabel)}</h3>
-        <p className="text-xs text-lab-muted mb-4">
+        <h3 className="card-title mb-1">{relationshipQuestion(relationshipLabel)}</h3>
+        <p className="help-text mb-4 max-w-prose">
           Este registro representa sua percepção neste momento. Ela pode ser influenciada pelo
           contexto, acontecimentos recentes, ansiedade, cansaço ou outras emoções.
         </p>
@@ -314,7 +314,7 @@ export function EmotionalContextFields({ value, onChange, relationshipLabel }: P
             <legend className="label-text mb-1">
               Quanto confio nessa percepção neste momento?
             </legend>
-            <p className="text-xs text-lab-muted mb-2">
+            <p className="help-text mb-2 max-w-prose">
               Este campo descreve sua confiança na própria leitura agora. Ele não corrige nem
               invalida o que você registrou acima.
             </p>

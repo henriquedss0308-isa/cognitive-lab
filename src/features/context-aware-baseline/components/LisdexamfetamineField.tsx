@@ -38,8 +38,8 @@ export function LisdexamfetamineField({ value, onChange }: Props) {
 
   return (
     <fieldset className="border-0 p-0 m-0">
-      <legend className="font-medium mb-1">Tomou lisdexanfetamina antes desta sessão?</legend>
-      <p className="text-xs text-lab-muted mb-3">
+      <legend className="card-title mb-1">Tomou lisdexanfetamina antes desta sessão?</legend>
+      <p className="help-text mb-4 max-w-prose">
         Opcional. Este registro serve para comparar sessões com o mesmo contexto — não
         recomenda, avalia nem interpreta o uso do medicamento.
       </p>
@@ -59,7 +59,7 @@ export function LisdexamfetamineField({ value, onChange }: Props) {
         ))}
       </div>
 
-      <p className="text-xs text-lab-muted mt-2">
+      <p className="help-text mt-2">
         Estado registrado: <span className="text-lab-fg">{lisdexamfetamineStatusLabel(effective)}</span>
         {effective === 'unknown' && ' — a sessão será comparada apenas à referência geral.'}
         {OPTIONS.find((o) => o.value === selected)?.hint ? ` ${OPTIONS.find((o) => o.value === selected)!.hint}` : ''}
