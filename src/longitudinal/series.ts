@@ -34,6 +34,12 @@ export function normalizeScoringVersion(value: unknown): NormalizedScoringVersio
   return normalized || LEGACY_UNVERSIONED_SCORING_VERSION
 }
 
+export function formatScoringVersionLabel(scoringVersion: NormalizedScoringVersion): string {
+  return scoringVersion === LEGACY_UNVERSIONED_SCORING_VERSION
+    ? 'Legado sem versão registrada'
+    : scoringVersion
+}
+
 export function getLongitudinalSeriesIdentity(
   session: LongitudinalSeriesSource
 ): LongitudinalSeriesIdentity {

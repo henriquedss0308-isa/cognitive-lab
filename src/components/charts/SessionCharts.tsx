@@ -17,6 +17,11 @@ import {
   sessionMedianPresentationKey,
   type KnownMetricKey,
 } from '../../metrics/presentation'
+import {
+  formatScoringVersionLabel,
+  normalizeScoringVersion,
+  type LongitudinalSeriesSource,
+} from '../../longitudinal/series'
 
 /**
  * Gráficos das sessões.
@@ -73,6 +78,9 @@ export function SessionTooltip({
       <div className="mt-1 text-lab-fg">
         {metricLabel}:{' '}
         <span className="metric-value">{formatTrendValue(metricKey, point.value)}</span>
+      </div>
+      <div className="mt-1 text-lab-muted">
+        Scoring: {formatScoringVersionLabel(point.scoringVersion)}
       </div>
     </div>
   )
@@ -199,11 +207,18 @@ interface LongitudinalProps {
   sessions: SessionRecord[]
   metricKey: string
   label: string
+  /** Quando informado, somente esta identidade longitudinal pode formar a linha. */
+  targetSeries?: LongitudinalSeriesSource
 }
 
-export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalProps) {
+export function LongitudinalChart({
+  sessions,
+  metricKey,
+  label,
+  targetSeries,
+}: LongitudinalProps) {
   const theme = useChartTheme()
-  const selection = selectTrendSessions(sessions)
+  const selection = selectTrendSessions(sessions, targetSeries)
   const data = buildTrendPoints(selection.sessions, metricKey)
   // O eixo recebe o id da sessão e precisa devolver a data curta.
   const axisLabels = new Map(data.map((p) => [p.key, p.shortLabel]))
@@ -212,6 +227,9 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
     selection.hiddenInvalid > 0 ? `${selection.hiddenInvalid} inválida(s) não plotada(s)` : null,
     selection.hiddenOtherVersions > 0
       ? `${selection.hiddenOtherVersions} de versão anterior do protocolo oculta(s)`
+      : null,
+    selection.hiddenOtherScoringVersions > 0
+      ? `${selection.hiddenOtherScoringVersions} histórica(s) com scoring diferente preservada(s), fora desta série`
       : null,
   ]
     .filter(Boolean)
@@ -237,9 +255,9 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
         anteriores", o que sugeria que a mais recente ficava de fora — este
         gráfico não exclui sessão nenhuma por ser a atual (ele nem é exibido na
         página de uma sessão). Fora da série ficam apenas os casos listados em
-        `hiddenNote`: inválidas e de outra versão de protocolo.
+        `hiddenNote`: inválidas e de outra identidade longitudinal.
       */
-      note={`${data.length} sessões, da mais antiga à mais recente — todas as elegíveis entram, inclusive a última.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
+      note={`${data.length} sessões comparáveis, da mais antiga à mais recente. Scoring: ${formatScoringVersionLabel(selection.scoringVersion!)}.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
     >
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
@@ -279,6 +297,7 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
 
 interface SpeedAccuracyProps {
   sessions: SessionRecord[]
+  targetSeries?: LongitudinalSeriesSource
 }
 
 /**
@@ -294,7 +313,9 @@ export function ScatterTooltip({
   medianMetricKey = 'medianCorrectRT',
 }: {
   active?: boolean
-  payload?: { payload?: { fullLabel: string; speed: number; accuracy: number } }[]
+  payload?: {
+    payload?: { fullLabel: string; speed: number; accuracy: number; scoringVersion: string }
+  }[]
   medianMetricKey?: KnownMetricKey
 }) {
   const point = active ? payload?.[0]?.payload : undefined
@@ -310,13 +331,16 @@ export function ScatterTooltip({
       <div className="text-lab-fg">
         Precisão: <span className="metric-value">{formatTrendValue('accuracy', point.accuracy)}</span>
       </div>
+      <div className="mt-1 text-lab-muted">
+        Scoring: {formatScoringVersionLabel(point.scoringVersion)}
+      </div>
     </div>
   )
 }
 
-export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
+export function SpeedAccuracyChart({ sessions, targetSeries }: SpeedAccuracyProps) {
   const theme = useChartTheme()
-  const selectedSessions = selectTrendSessions(sessions).sessions
+  const selectedSessions = selectTrendSessions(sessions, targetSeries).sessions
   const medianMetricKey = selectedSessions[0]
     ? sessionMedianPresentationKey(selectedSessions[0].testId)
     : 'medianCorrectRT'
@@ -332,6 +356,7 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
       fullLabel: formatFullDate(s.startedAt),
       speed: s.result!.rtMetrics.medianCorrectRT as number,
       accuracy: s.result!.accuracyMetrics.accuracy,
+      scoringVersion: normalizeScoringVersion(s.result!.scoringVersion),
     }))
 
   if (data.length === 0) return null

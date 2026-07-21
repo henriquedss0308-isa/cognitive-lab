@@ -23,6 +23,7 @@ const POINT: TrendPoint = {
   shortLabel: '21/07/2026',
   fullLabel: '21/07/2026 às 12:42:05',
   value: 245.4000244140625,
+  scoringVersion: 'sdt-hautus-1',
 }
 
 /**
@@ -112,6 +113,7 @@ describe('ScatterTooltip', () => {
     fullLabel: '21/07/2026 às 12:42:05',
     speed: 245.4000244140625,
     accuracy: 0.975,
+    scoringVersion: 'sdt-hautus-1',
   }
 
   it('não exibe o sessionId', () => {

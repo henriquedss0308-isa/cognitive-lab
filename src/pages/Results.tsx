@@ -256,6 +256,18 @@ export function Results() {
         <MetricCard metric="rtCV" label="Variabilidade (CV)" value={result.rtMetrics.rtCoefficientOfVariation} />
       </div>
 
+      {!session.isDemo && baseline.incompatibleScoringCount > 0 && (
+        <div className="card p-4 mb-6 border-lab-warning/40" role="note">
+          <p className="text-sm text-lab-muted">
+            Existem {baseline.incompatibleScoringCount} sessão
+            {baseline.incompatibleScoringCount === 1 ? '' : 's'} histórica
+            {baseline.incompatibleScoringCount === 1 ? '' : 's'} deste protocolo com outra regra
+            de scoring. Os registros continuam preservados no histórico, mas não completam nem
+            entram nesta referência.
+          </p>
+        </div>
+      )}
+
       {zOutcome.kind !== 'not_monitoring' && zOutcome.kind !== 'no_baseline_metric' && (
         <div className="card p-5 mb-6">
           <h3 className="section-title">Comparado ao seu próprio baseline</h3>
@@ -291,6 +303,12 @@ export function Results() {
               {zOutcome.delta !== null &&
                 ` · diferença desta sessão: ${formatMetricDelta(test.primaryMetricKey, zOutcome.delta)}`}
               .
+            </p>
+          )}
+          {zOutcome.kind === 'incompatible_series' && (
+            <p className="text-sm text-lab-muted mt-2 max-w-prose">
+              Comparação indisponível: a sessão e a referência usam regras de scoring
+              diferentes.
             </p>
           )}
           {/* Qual referência serviu de comparação, e por quê. */}

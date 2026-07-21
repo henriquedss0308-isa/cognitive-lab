@@ -11,6 +11,10 @@ import {
 import { getSessionLisdexamfetamineStatus, lisdexamfetamineStatusLabel } from '../medicationContext'
 import { REFERENCE_LABELS } from '../contextualReference'
 import type { ContextualReference, ReferenceSelection } from '../types'
+import {
+  formatScoringVersionLabel,
+  getLongitudinalSeriesIdentity,
+} from '../../../longitudinal/series'
 
 function CompositionTable({ sessions }: { sessions: SessionRecord[] }) {
   if (sessions.length === 0) {
@@ -32,6 +36,7 @@ function CompositionTable({ sessions }: { sessions: SessionRecord[] }) {
             <th scope="col">Dispositivo</th>
             <th scope="col">Qualidade</th>
             <th scope="col">Protocolo</th>
+            <th scope="col">Scoring</th>
           </tr>
         </thead>
         <tbody>
@@ -58,6 +63,11 @@ function CompositionTable({ sessions }: { sessions: SessionRecord[] }) {
                   <QualityBadge quality={session.quality} />
                 </td>
                 <td className="num text-lab-muted">{session.protocolVersion}</td>
+                <td className="num text-lab-muted">
+                  {formatScoringVersionLabel(
+                    getLongitudinalSeriesIdentity(session).scoringVersion
+                  )}
+                </td>
               </tr>
             )
           })}
@@ -137,8 +147,8 @@ export function ReferenceComposition({ selection, general, taken, notTaken }: Pr
       <section>
         <h4 className="font-medium mb-1">Referência geral</h4>
         <p className="text-xs text-lab-muted mb-3">
-          As sessões elegíveis nº 4–11 do teste, como sempre foi. As três primeiras são
-          familiarização e não entram.
+          As sessões elegíveis nº 4–11 desta série de scoring. As três primeiras da mesma
+          série são familiarização e não entram.
         </p>
         <CompositionTable sessions={general.sessions} />
         <CompositionSummary reference={general} />
