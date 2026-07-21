@@ -282,6 +282,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de flexibilidade cognitiva com blocos puros e mistos. A regra muda conforme a indicação visual.',
   duration: '~6 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

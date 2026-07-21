@@ -262,6 +262,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de memória de trabalho espacial. Indique quando a posição atual coincide com a de N ensaios atrás.',
   duration: '~8 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

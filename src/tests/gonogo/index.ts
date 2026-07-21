@@ -287,6 +287,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Avalia a capacidade de inibir respostas prepotentes diante de estímulos que exigem não responder.',
   duration: '~10 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

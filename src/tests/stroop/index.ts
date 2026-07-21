@@ -186,6 +186,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Mede o controle de interferência ao nomear a cor da tinta enquanto palavras de cores competem pela atenção.',
   duration: '~8 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

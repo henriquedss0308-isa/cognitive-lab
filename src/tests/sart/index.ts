@@ -164,6 +164,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de atenção sustentada com ritmo acelerado. Responda aos dígitos exceto ao alvo de inibição (3).',
   duration: '~5 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

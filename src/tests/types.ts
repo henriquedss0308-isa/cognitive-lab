@@ -60,6 +60,8 @@ export interface CognitiveTestDefinition {
   description: string
   duration: string
   protocolVersion: string
+  /** Versão de scoring produzida por novas sessões desta definição. */
+  scoringVersion: string
   practiceConfig: ProtocolConfig
   assessmentConfig: ProtocolConfig
   instructions: TestInstructions

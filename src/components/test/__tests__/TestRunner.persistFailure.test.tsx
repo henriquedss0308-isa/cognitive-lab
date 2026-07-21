@@ -62,6 +62,7 @@ function makeSimpleTest(trials: GeneratedTrial[]): CognitiveTestDefinition {
     description: '',
     duration: '',
     protocolVersion: config.version,
+    scoringVersion: 'sdt-hautus-1',
     practiceConfig: config,
     assessmentConfig: config,
     instructions: { title: '', summary: '', steps: [], keys: [], tips: [] },
