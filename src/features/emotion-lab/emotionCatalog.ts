@@ -12,9 +12,17 @@ import type {
 } from './types'
 
 /**
- * Os quatro quadrantes. As cores reutilizam tokens já existentes no tema —
- * a cor é uma classificação visual/analítica e nunca o único portador de
- * significado: nome e descrição acompanham sempre.
+ * Os quatro quadrantes.
+ *
+ * Cada um tem token próprio (`--color-lab-emotion-*`) em vez de emprestar as
+ * cores semânticas da interface. A interface chama estes quadrantes pelo nome da
+ * cor — "Amarelo", "Verde", "Azul", "Vermelho" — então eles precisam continuar
+ * sendo de fato aquela cor, mesmo quando a paleta da interface muda de tema ou
+ * fica mais sóbria. Vermelho aqui significa "energia alta e desagradável", não
+ * "erro".
+ *
+ * A cor nunca é o único portador de significado: nome e descrição acompanham
+ * sempre.
  */
 export const QUADRANTS: Record<EmotionQuadrant, QuadrantDefinition> = {
   yellow: {
@@ -23,7 +31,7 @@ export const QUADRANTS: Record<EmotionQuadrant, QuadrantDefinition> = {
     description: 'Energia alta e agradável',
     pleasantness: 'pleasant',
     energy: 'high',
-    cssVar: 'var(--color-lab-warning)',
+    cssVar: 'var(--color-lab-emotion-yellow)',
   },
   green: {
     id: 'green',
@@ -31,7 +39,7 @@ export const QUADRANTS: Record<EmotionQuadrant, QuadrantDefinition> = {
     description: 'Energia baixa e agradável',
     pleasantness: 'pleasant',
     energy: 'low',
-    cssVar: 'var(--color-lab-success)',
+    cssVar: 'var(--color-lab-emotion-green)',
   },
   blue: {
     id: 'blue',
@@ -39,7 +47,7 @@ export const QUADRANTS: Record<EmotionQuadrant, QuadrantDefinition> = {
     description: 'Energia baixa e desagradável',
     pleasantness: 'unpleasant',
     energy: 'low',
-    cssVar: 'var(--color-lab-accent)',
+    cssVar: 'var(--color-lab-emotion-blue)',
   },
   red: {
     id: 'red',
@@ -47,7 +55,7 @@ export const QUADRANTS: Record<EmotionQuadrant, QuadrantDefinition> = {
     description: 'Energia alta e desagradável',
     pleasantness: 'unpleasant',
     energy: 'high',
-    cssVar: 'var(--color-lab-danger)',
+    cssVar: 'var(--color-lab-emotion-red)',
   },
 }
 
