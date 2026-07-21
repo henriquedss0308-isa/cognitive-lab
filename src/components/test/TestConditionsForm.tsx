@@ -3,6 +3,8 @@ import type { TestConditions } from '../../types'
 import { getLatestConditions } from '../../storage/repository'
 import { EmotionalContextFields } from '../../features/emotion-lab/components/EmotionalContextFields'
 import { touchEmotionalContext } from '../../features/emotion-lab/emotionalContext'
+import { LisdexamfetamineField } from '../../features/context-aware-baseline/components/LisdexamfetamineField'
+import { touchMedicationContext } from '../../features/context-aware-baseline/medicationContext'
 
 interface Props {
   onConfirm: (conditions: TestConditions) => void
@@ -78,14 +80,20 @@ export function TestConditionsForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Sanea e carimba `updatedAt` só se o conteúdo emocional mudou de fato.
+    // Sanea e carimba `updatedAt` só se o conteúdo mudou de fato — reabrir a
+    // edição e salvar sem mexer nestes campos preserva os carimbos anteriores.
     const emotionalContext = touchEmotionalContext(
       initialConditions?.emotionalContext,
       form.emotionalContext
     )
+    const medications = touchMedicationContext(initialConditions?.medications, form.medications)
+
     const conditions: TestConditions = { ...form, recordedAt: new Date().toISOString() }
     if (emotionalContext) conditions.emotionalContext = emotionalContext
     else delete conditions.emotionalContext
+    if (medications) conditions.medications = medications
+    else delete conditions.medications
+
     onConfirm(conditions)
   }
 
@@ -197,6 +205,18 @@ export function TestConditionsForm({
                 </label>
               </>
             )}
+            {/*
+              Registro estruturado — o único que classifica a sessão para as
+              referências contextuais. Fica ANTES dos campos livres abaixo, que
+              seguem existindo para compatibilidade e nunca são interpretados.
+            */}
+            <div className="md:col-span-2 mt-2 pb-4 border-b border-lab-border">
+              <LisdexamfetamineField
+                value={form.medications}
+                onChange={(medications) => setForm((prev) => ({ ...prev, medications }))}
+              />
+            </div>
+
             <label className="block md:col-span-2 mt-2">
               <span className="text-sm text-lab-muted">Medicamento / Estimulante (Nome)</span>
               <input type="text"

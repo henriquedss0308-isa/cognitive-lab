@@ -36,6 +36,13 @@ export function referenceKindForStatus(
   return KIND_BY_STATUS[status]
 }
 
+/** Nome de cada referência na interface. */
+export const REFERENCE_LABELS: Record<ReferenceKind, string> = {
+  general: 'referência geral',
+  lisdexamfetamine_taken: 'referência com lisdexanfetamina',
+  lisdexamfetamine_not_taken: 'referência sem lisdexanfetamina',
+}
+
 function dateRangeOf(sessions: SessionRecord[]): { first: string; last: string } | null {
   if (sessions.length === 0) return null
   return {
