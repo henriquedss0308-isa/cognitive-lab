@@ -1,5 +1,9 @@
 import type { BaselineStats } from '../types'
 import type { CognitiveTestDefinition } from '../tests/types'
+import {
+  getLongitudinalSeriesKey,
+  type LongitudinalSeriesSource,
+} from '../longitudinal/series'
 import { robustZScore } from './basic'
 
 /** Mínimo de valores no baseline para z interpretável (spec §3.2). */
@@ -10,6 +14,7 @@ export type PrimaryZOutcome =
   | { kind: 'not_monitoring' }
   | { kind: 'value_missing' }
   | { kind: 'no_baseline_metric' }
+  | { kind: 'incompatible_series' }
   | { kind: 'no_direction' }
   | { kind: 'insufficient_n'; n: number }
   | { kind: 'zero_mad'; median: number | null; delta: number | null; n: number }
@@ -21,8 +26,16 @@ export type PrimaryZOutcome =
 export function evaluatePrimaryZ(
   primaryValue: number | null | undefined,
   baseline: BaselineStats,
-  test: CognitiveTestDefinition
+  test: CognitiveTestDefinition,
+  session: LongitudinalSeriesSource = {
+    testId: baseline.testId,
+    protocolVersion: baseline.protocolVersion,
+    result: { scoringVersion: baseline.scoringVersion },
+  }
 ): PrimaryZOutcome {
+  if (baseline.seriesKey !== getLongitudinalSeriesKey(session)) {
+    return { kind: 'incompatible_series' }
+  }
   if (baseline.phase !== 'monitoring') return { kind: 'not_monitoring' }
 
   const stats = baseline.metrics[test.primaryMetricKey]

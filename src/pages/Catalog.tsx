@@ -29,7 +29,13 @@ export function Catalog() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {ALL_TESTS.map((test) => {
-          const stats = computeBaselineStats(sessions, test.id, test.protocolVersion, test.baselineMetricKeys)
+          const stats = computeBaselineStats(
+            sessions,
+            test.id,
+            test.protocolVersion,
+            test.baselineMetricKeys,
+            test.scoringVersion
+          )
           const last = sessions.find((s) => s.testId === test.id && s.mode === 'assessment')
           const phaseLabel = PHASE_LABELS[stats.phase] ?? stats.phase
           const medianMetricKey = sessionMedianPresentationKey(test.id)

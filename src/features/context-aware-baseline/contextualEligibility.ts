@@ -46,10 +46,11 @@ export function orderSessionsDeterministically(sessions: SessionRecord[]): Sessi
 export function getEligibleSessions(
   sessions: SessionRecord[],
   testId: TestId,
-  protocolVersion: string
+  protocolVersion: string,
+  scoringVersion?: unknown
 ): SessionRecord[] {
   return orderSessionsDeterministically(
-    getValidAssessmentSessions(sessions, testId, protocolVersion)
+    getValidAssessmentSessions(sessions, testId, protocolVersion, scoringVersion)
   )
 }
 

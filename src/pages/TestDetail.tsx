@@ -20,7 +20,13 @@ export function TestDetail() {
 
   if (!test) return <div className="p-8">Teste não encontrado.</div>
 
-  const baseline = computeBaselineStats(sessions, test.id, test.protocolVersion, test.baselineMetricKeys)
+  const baseline = computeBaselineStats(
+    sessions,
+    test.id,
+    test.protocolVersion,
+    test.baselineMetricKeys,
+    test.scoringVersion
+  )
   const testSessions = sessions.filter((s) => s.testId === test.id && s.mode === 'assessment')
 
   const referenceArgs = [sessions, test.id, test.protocolVersion, test.baselineMetricKeys] as const
@@ -28,7 +34,12 @@ export function TestDetail() {
   // então basta um contexto neutro para obter o progresso das duas janelas.
   const selection = selectReference({
     sessions,
-    session: { checkIn: undefined, testId: test.id, protocolVersion: test.protocolVersion },
+    session: {
+      checkIn: undefined,
+      testId: test.id,
+      protocolVersion: test.protocolVersion,
+      result: { scoringVersion: test.scoringVersion },
+    },
     testId: test.id,
     protocolVersion: test.protocolVersion,
     metricKeys: test.baselineMetricKeys,
@@ -96,9 +107,9 @@ export function TestDetail() {
         <div className="px-4 pb-5 pt-4 border-t border-lab-border">
           <ReferenceComposition
             selection={selection}
-            general={buildGeneralReference(...referenceArgs)}
-            taken={buildContextualReference(...referenceArgs, 'taken')}
-            notTaken={buildContextualReference(...referenceArgs, 'not_taken')}
+            general={buildGeneralReference(...referenceArgs, test.scoringVersion)}
+            taken={buildContextualReference(...referenceArgs, 'taken', test.scoringVersion)}
+            notTaken={buildContextualReference(...referenceArgs, 'not_taken', test.scoringVersion)}
           />
         </div>
       </details>

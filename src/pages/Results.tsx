@@ -142,6 +142,7 @@ export function Results() {
     session.protocolVersion,
     test.baselineMetricKeys,
   ] as const
+  const scoringVersion = result.scoringVersion
 
   const selection = selectReference({
     sessions: pool,
@@ -163,7 +164,7 @@ export function Results() {
   // Sessão demo nunca é comparada ao baseline real do usuário.
   const zOutcome = session.isDemo
     ? ({ kind: 'not_monitoring' } as const)
-    : evaluatePrimaryZ(primaryValue, baseline, test)
+    : evaluatePrimaryZ(primaryValue, baseline, test, session)
 
   const contextComparison = buildContextComparison(session, reference.sessions)
   const medicationRecord = getSessionMedicationRecord(session)
@@ -221,10 +222,10 @@ export function Results() {
       {/* Estado da sessão: qualidade e fase juntas, uma linha só. */}
       <div className="card px-4 py-3 mb-6 flex items-center gap-3 flex-wrap">
         <QualityBadge quality={result.quality} />
-        {result.baselinePhase && (
+        {baseline.phase && (
           <>
             <span aria-hidden="true" className="text-lab-faint">·</span>
-            <span className="text-sm text-lab-muted">{PHASE_LABELS[result.baselinePhase]}</span>
+            <span className="text-sm text-lab-muted">{PHASE_LABELS[baseline.phase]}</span>
           </>
         )}
       </div>
@@ -369,9 +370,9 @@ export function Results() {
           <div className="px-4 pb-5 pt-4 border-t border-lab-border">
             <ReferenceComposition
               selection={selection}
-              general={buildGeneralReference(...referenceArgs)}
-              taken={buildContextualReference(...referenceArgs, 'taken')}
-              notTaken={buildContextualReference(...referenceArgs, 'not_taken')}
+              general={buildGeneralReference(...referenceArgs, scoringVersion)}
+              taken={buildContextualReference(...referenceArgs, 'taken', scoringVersion)}
+              notTaken={buildContextualReference(...referenceArgs, 'not_taken', scoringVersion)}
             />
           </div>
         </details>

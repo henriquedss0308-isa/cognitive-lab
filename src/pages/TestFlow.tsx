@@ -166,7 +166,12 @@ export function TestFlow() {
     const scored = test.scoreSession(trials, mode, deviceInfo, flags as Record<string, boolean>)
     // Fase da sessão corrente = contagem de sessões elegíveis ANTERIORES
     // (mesma régua do baseline; a própria sessão nunca conta — spec §1.1).
-    const priorEligible = getValidAssessmentSessions(sessions, test.id, test.protocolVersion)
+    const priorEligible = getValidAssessmentSessions(
+      sessions,
+      test.id,
+      test.protocolVersion,
+      scored.scoringVersion
+    )
     const phase = getBaselinePhase(priorEligible.length)
 
     const deviceCmp = compareDeviceToHistory(deviceInfo, priorEligible)

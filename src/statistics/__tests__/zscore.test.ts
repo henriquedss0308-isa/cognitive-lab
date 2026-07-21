@@ -3,20 +3,29 @@ import { evaluatePrimaryZ } from '../zscore'
 import { ALL_TESTS, TEST_MAP } from '../../tests/registry'
 import type { BaselineStats } from '../../types'
 import type { CognitiveTestDefinition } from '../../tests/types'
+import { getLongitudinalSeriesKey } from '../../longitudinal/series'
 
 function baselineFor(
   test: CognitiveTestDefinition,
   metric: { median: number | null; mad: number | null; n: number },
   phase: BaselineStats['phase'] = 'monitoring'
 ): BaselineStats {
+  const series = {
+    testId: test.id,
+    protocolVersion: test.protocolVersion,
+    result: { scoringVersion: test.scoringVersion },
+  }
   return {
     testId: test.id,
     protocolVersion: test.protocolVersion,
+    scoringVersion: test.scoringVersion,
+    seriesKey: getLongitudinalSeriesKey(series),
     phase,
     sessionCount: 12,
     familiarizationCount: 3,
     baselineCount: 8,
     warningCount: 0,
+    incompatibleScoringCount: 0,
     metrics: { [test.primaryMetricKey]: metric },
   }
 }
