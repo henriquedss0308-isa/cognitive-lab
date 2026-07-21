@@ -2,6 +2,11 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
+// Lido do disco de propósito: sob vitest o plugin do Tailwind não roda e um
+// `import '…css?raw'` chega vazio. O CSS é a única fonte da paleta — este teste
+// verifica o arquivo que o navegador realmente usa, não uma cópia.
+const CSS = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8')
+
 /**
  * Contraste dos tokens, lido do próprio CSS.
  *
@@ -9,9 +14,6 @@ import { describe, expect, it } from 'vitest'
  * ficar mais elegante pode deixar texto ilegível no outro tema sem ninguém
  * perceber. O amarelo do Emotion Lab no tema claro já falhou aqui uma vez.
  */
-
-// Sob jsdom, `import.meta.url` é uma URL http — daí o caminho pela raiz do projeto.
-const CSS = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8')
 
 function parseBlock(header: string): Record<string, string> {
   const start = CSS.indexOf(header)

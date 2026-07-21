@@ -4,7 +4,10 @@
     "target": "es2023",
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
-    "types": ["vite/client"],
+    // "node" porque os testes moram em src/ e portanto caem neste tsconfig; o
+    // teste de contraste lê o próprio index.css (sob vitest o Tailwind não roda
+    // e imports de .css chegam vazios, então `?raw` não serve).
+    "types": ["vite/client", "node"],
     "skipLibCheck": true,
 
     /* Bundler mode */
