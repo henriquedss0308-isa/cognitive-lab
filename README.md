@@ -47,6 +47,7 @@ src/
 └── types/          # Tipos centrais
 
 docs/               # AUDITORIA.md · ESPECIFICACAO.md (normativa) · PLANO.md · EMOTION_LAB.md
+                    # CONTEXT_AWARE_BASELINE.md
 ```
 
 ## Baseline pessoal
@@ -59,6 +60,32 @@ Contagem por teste **e por versão de protocolo** (regra normativa em `docs/ESPE
 - Z-score robusto: `direction × (value − median) / (1.4826 × MAD)`, com **direção explícita por métrica** (`metricDirections`; z positivo = melhor que o habitual)
 - O z só é exibido com fase de monitoramento, valor presente, **MAD > 0** e **n ≥ 6** valores no baseline; MAD = 0 mostra mediana e delta bruto com explicação
 - Importar sessões anteriores às locais pode recompor a janela — o import avisa quando isso é possível
+
+## Referências sensíveis ao contexto
+
+O baseline geral usa sessões válidas sem olhar as condições registradas nelas,
+o que pode produzir uma referência que **mistura contextos muito diferentes**.
+
+Opcionalmente, cada sessão registra se houve uso de lisdexanfetamina (**Sim /
+Não / Não informado** — nunca um checkbox, porque desmarcado seria
+indistinguível de não respondido). Com isso existem, por teste e versão de
+protocolo, até três referências:
+
+- **geral** — inalterada, exatamente como sempre foi;
+- **com lisdexanfetamina** — as 8 primeiras sessões `taken` após a familiarização global;
+- **sem lisdexanfetamina** — as 8 primeiras sessões `not_taken` após a familiarização global.
+
+A familiarização (sessões 1–3) permanece **global**: a prática aprendida no
+teste não reinicia por causa do estado medicamentoso. Sem referência contextual
+completa, a comparação cai na geral e a tela **diz que caiu e por quê**.
+
+Campo ausente significa `unknown`, nunca "não tomou", e **nada é inferido de
+texto livre** ("Venvanse", "30 mg", "estimulante" seguem sendo apenas texto).
+Sono, cafeína, horário, sliders e contexto emocional são exibidos como contexto
+descritivo ao lado da referência — **não** selecionam referência, não alteram o
+z-score e não explicam o resultado.
+
+Regra completa, limitações e itens fora de escopo em `docs/CONTEXT_AWARE_BASELINE.md`.
 
 ## Qualidade das sessões
 

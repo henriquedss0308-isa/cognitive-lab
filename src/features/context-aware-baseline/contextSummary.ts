@@ -112,8 +112,11 @@ export function classifyComposition(composition: StatusComposition): ContextClas
   const { taken, notTaken, total } = composition
   const documented = taken + notTaken
 
-  // Metade ou mais sem registro: descrever "predominância" seria enganoso.
-  if (total === 0 || documented * 2 < total) return 'insufficiently_documented'
+  // Exige MAIORIA das sessões documentada para falar em predominância. Com
+  // metade da janela sem registro, chamá-la de "predominantemente com
+  // lisdexanfetamina" afirmaria mais do que se sabe: o rótulo descreve a
+  // janela inteira, não apenas o subconjunto classificado.
+  if (total === 0 || documented * 2 <= total) return 'insufficiently_documented'
   if (taken / documented >= PREDOMINANCE_THRESHOLD) return 'predominantly_taken'
   if (notTaken / documented >= PREDOMINANCE_THRESHOLD) return 'predominantly_not_taken'
   return 'mixed'
