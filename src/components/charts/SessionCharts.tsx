@@ -40,17 +40,23 @@ function axisProps(theme: ChartTheme, size = 11) {
  * Mostra data COM horário porque várias sessões podem cair no mesmo dia — sem o
  * horário elas ficariam indistinguíveis. O valor é formatado pela métrica, em
  * vez do número cru do ponto flutuante.
+ *
+ * O nome da métrica vem em `metricLabel`, e NÃO em `label`: o Recharts clona o
+ * elemento passado em `content` injetando os próprios props, e entre eles vai um
+ * `label` com o valor da categoria do eixo X — que aqui é o sessionId. Um prop
+ * chamado `label` seria sobrescrito por esse id, e o UUID apareceria na tela.
+ * O id é identidade interna e nunca deve ser exibido.
  */
-function SessionTooltip({
+export function SessionTooltip({
   active,
   payload,
   metricKey,
-  label,
+  metricLabel,
 }: {
   active?: boolean
   payload?: { payload?: TrendPoint }[]
   metricKey: string
-  label: string
+  metricLabel: string
 }) {
   const point = active ? payload?.[0]?.payload : undefined
   if (!point) return null
@@ -59,7 +65,8 @@ function SessionTooltip({
     <div className="card px-3 py-2 text-xs shadow-none">
       <div className="text-lab-muted">{point.fullLabel}</div>
       <div className="mt-1 text-lab-fg">
-        {label}: <span className="metric-value">{formatTrendValue(metricKey, point.value)}</span>
+        {metricLabel}:{' '}
+        <span className="metric-value">{formatTrendValue(metricKey, point.value)}</span>
       </div>
     </div>
   )
@@ -203,7 +210,7 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
           <Tooltip
             cursor={{ stroke: theme.grid }}
             wrapperStyle={{ outline: 'none' }}
-            content={<SessionTooltip metricKey={metricKey} label={label} />}
+            content={<SessionTooltip metricKey={metricKey} metricLabel={label} />}
           />
           <Line
             type="monotone"
@@ -223,8 +230,14 @@ interface SpeedAccuracyProps {
   sessions: SessionRecord[]
 }
 
-/** Tooltip do dispersão: identifica a sessão por data e horário. */
-function ScatterTooltip({
+/**
+ * Tooltip do dispersão: identifica a sessão por data e horário.
+ *
+ * Como no longitudinal, a sessão é identificada por data e horário — nunca pelo
+ * sessionId, que existe só como identidade interna. Nenhum prop aqui se chama
+ * `label`, justamente para não colidir com o que o Recharts injeta.
+ */
+export function ScatterTooltip({
   active,
   payload,
 }: {
