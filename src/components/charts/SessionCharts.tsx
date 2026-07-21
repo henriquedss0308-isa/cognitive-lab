@@ -3,7 +3,13 @@ import {
   BarChart, Bar, ScatterChart, Scatter, CartesianGrid, Legend,
 } from 'recharts'
 import type { SessionRecord } from '../../types'
-import { selectTrendSessions } from './chartSelectors'
+import {
+  buildTrendPoints,
+  formatFullDate,
+  formatTrendValue,
+  selectTrendSessions,
+  type TrendPoint,
+} from './chartSelectors'
 import { useChartTheme, tooltipStyle, type ChartTheme } from './useChartTheme'
 
 /**
@@ -26,6 +32,37 @@ function axisProps(theme: ChartTheme, size = 11) {
     axisLine: { stroke: theme.grid },
     stroke: theme.grid,
   }
+}
+
+/**
+ * Tooltip de uma sessão.
+ *
+ * Mostra data COM horário porque várias sessões podem cair no mesmo dia — sem o
+ * horário elas ficariam indistinguíveis. O valor é formatado pela métrica, em
+ * vez do número cru do ponto flutuante.
+ */
+function SessionTooltip({
+  active,
+  payload,
+  metricKey,
+  label,
+}: {
+  active?: boolean
+  payload?: { payload?: TrendPoint }[]
+  metricKey: string
+  label: string
+}) {
+  const point = active ? payload?.[0]?.payload : undefined
+  if (!point) return null
+
+  return (
+    <div className="card px-3 py-2 text-xs shadow-none">
+      <div className="text-lab-muted">{point.fullLabel}</div>
+      <div className="mt-1 text-lab-fg">
+        {label}: <span className="metric-value">{formatTrendValue(metricKey, point.value)}</span>
+      </div>
+    </div>
+  )
 }
 
 function ChartFrame({
@@ -112,20 +149,9 @@ interface LongitudinalProps {
 export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalProps) {
   const theme = useChartTheme()
   const selection = selectTrendSessions(sessions)
-  const data = selection.sessions
-    .map((s, i) => {
-      let value: number | null = null
-      if (metricKey === 'medianCorrectRT') value = s.result!.rtMetrics.medianCorrectRT
-      else if (metricKey === 'accuracy') value = s.result!.accuracyMetrics.accuracy
-      else value = s.result!.customMetrics[metricKey] ?? null
-
-      return {
-        index: i + 1,
-        date: new Date(s.startedAt).toLocaleDateString('pt-BR'),
-        value,
-      }
-    })
-    .filter((d) => d.value !== null)
+  const data = buildTrendPoints(selection.sessions, metricKey)
+  // O eixo recebe o id da sessão e precisa devolver a data curta.
+  const axisLabels = new Map(data.map((p) => [p.key, p.shortLabel]))
 
   const hiddenNote = [
     selection.hiddenInvalid > 0 ? `${selection.hiddenInvalid} inválida(s) não plotada(s)` : null,
@@ -151,14 +177,34 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
   return (
     <ChartFrame
       title={`${label} — tendência longitudinal`}
-      note={`Comparado às suas sessões anteriores. ${data.length} sessões.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
+      /*
+        O texto diz o que a série de fato contém. Antes falava em "sessões
+        anteriores", o que sugeria que a mais recente ficava de fora — este
+        gráfico não exclui sessão nenhuma por ser a atual (ele nem é exibido na
+        página de uma sessão). Fora da série ficam apenas os casos listados em
+        `hiddenNote`: inválidas e de outra versão de protocolo.
+      */
+      note={`${data.length} sessões, da mais antiga à mais recente — todas as elegíveis entram, inclusive a última.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
     >
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} vertical={false} />
-          <XAxis dataKey="date" {...axisProps(theme)} />
+          {/*
+            A categoria é o id da sessão (único); o eixo exibe a data curta pelo
+            tickFormatter. Chavear pela data faria sessões do mesmo dia
+            colidirem numa só categoria.
+          */}
+          <XAxis
+            dataKey="key"
+            tickFormatter={(key: string) => axisLabels.get(key) ?? ''}
+            {...axisProps(theme)}
+          />
           <YAxis {...axisProps(theme)} />
-          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ stroke: theme.grid }} />
+          <Tooltip
+            cursor={{ stroke: theme.grid }}
+            wrapperStyle={{ outline: 'none' }}
+            content={<SessionTooltip metricKey={metricKey} label={label} />}
+          />
           <Line
             type="monotone"
             dataKey="value"
@@ -177,17 +223,44 @@ interface SpeedAccuracyProps {
   sessions: SessionRecord[]
 }
 
+/** Tooltip do dispersão: identifica a sessão por data e horário. */
+function ScatterTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean
+  payload?: { payload?: { fullLabel: string; speed: number; accuracy: number } }[]
+}) {
+  const point = active ? payload?.[0]?.payload : undefined
+  if (!point) return null
+
+  return (
+    <div className="card px-3 py-2 text-xs shadow-none">
+      <div className="text-lab-muted">{point.fullLabel}</div>
+      <div className="mt-1 text-lab-fg">
+        RT mediano: <span className="metric-value">{formatTrendValue('medianCorrectRT', point.speed)}</span>
+      </div>
+      <div className="text-lab-fg">
+        Precisão: <span className="metric-value">{formatTrendValue('accuracy', point.accuracy / 100)}</span>
+      </div>
+    </div>
+  )
+}
+
 export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
   const theme = useChartTheme()
   const data = selectTrendSessions(sessions)
     .sessions
+    .filter((s) => s.result!.rtMetrics.medianCorrectRT !== null)
     .map((s) => ({
-      id: s.sessionId.slice(0, 8),
-      speed: s.result!.rtMetrics.medianCorrectRT,
+      // Mesma correção do longitudinal: identidade pelo id da sessão, e o
+      // timestamp completo viaja junto para o tooltip poder distinguir duas
+      // sessões que caiam no mesmo ponto da nuvem.
+      key: s.sessionId,
+      fullLabel: formatFullDate(s.startedAt),
+      speed: s.result!.rtMetrics.medianCorrectRT as number,
       accuracy: s.result!.accuracyMetrics.accuracy * 100,
-      date: new Date(s.startedAt).toLocaleDateString('pt-BR'),
     }))
-    .filter((d) => d.speed !== null)
 
   if (data.length === 0) return null
 
@@ -196,9 +269,32 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
       <ResponsiveContainer width="100%" height={240}>
         <ScatterChart margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} />
-          <XAxis dataKey="speed" name="RT mediano" unit="ms" {...axisProps(theme)} />
-          <YAxis dataKey="accuracy" name="Precisão" unit="%" domain={[0, 100]} {...axisProps(theme)} />
-          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ stroke: theme.grid }} />
+          {/*
+            Eixos numéricos: num gráfico de dispersão as duas grandezas são
+            contínuas. Como categoria, sessões com o mesmo RT cairiam na mesma
+            posição — a mesma classe de erro do eixo por data.
+          */}
+          <XAxis
+            type="number"
+            dataKey="speed"
+            name="RT mediano"
+            unit=" ms"
+            domain={['dataMin - 20', 'dataMax + 20']}
+            {...axisProps(theme)}
+          />
+          <YAxis
+            type="number"
+            dataKey="accuracy"
+            name="Precisão"
+            unit="%"
+            domain={[0, 100]}
+            {...axisProps(theme)}
+          />
+          <Tooltip
+            cursor={{ stroke: theme.grid }}
+            wrapperStyle={{ outline: 'none' }}
+            content={<ScatterTooltip />}
+          />
           <Legend wrapperStyle={{ fontSize: 12, color: theme.axis }} />
           <Scatter name="Sessões" data={data} fill={theme.series} />
         </ScatterChart>
