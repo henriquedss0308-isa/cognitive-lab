@@ -1,5 +1,6 @@
 import type { AppBackup, SessionRecord, TestConditions } from '../types'
 import { withSanitizedEmotionalContext } from '../features/emotion-lab/emotionalContext'
+import { withSanitizedMedicationContext } from '../features/context-aware-baseline/medicationContext'
 import {
   getAllSessions,
   getSettings,
@@ -177,13 +178,17 @@ export function validateImportedSession(value: unknown): string | null {
 }
 
 /**
- * Contexto emocional de backup passa por saneamento em vez de rejeitar a
+ * Campos contextuais de backup passam por saneamento em vez de rejeitar a
  * sessão: descartar trials por causa de um campo contextual malformado seria
  * destrutivo. O que não sobrevive à validação simplesmente some (spec §10a).
+ *
+ * No registro medicamentoso, um `status` desconhecido não apaga o registro:
+ * cai para `unknown`, que é exatamente o significado de "não sabemos" e mantém
+ * a sessão fora das referências contextuais até classificação explícita.
  */
 function sanitizeImportedCheckIn(checkIn: TestConditions | undefined): TestConditions | undefined {
   if (!checkIn || typeof checkIn !== 'object' || Array.isArray(checkIn)) return undefined
-  return withSanitizedEmotionalContext(checkIn)
+  return withSanitizedMedicationContext(withSanitizedEmotionalContext(checkIn))
 }
 
 function normalizeImportedSession(s: SessionRecord): SessionRecord {

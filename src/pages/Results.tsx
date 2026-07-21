@@ -7,8 +7,21 @@ import { BlockChart, RTDistribution } from '../components/charts/SessionCharts'
 import { TestConditionsForm } from '../components/test/TestConditionsForm'
 import { EmotionalContextSummary } from '../features/emotion-lab/components/EmotionalContextSummary'
 import { hasEmotionalContent } from '../features/emotion-lab/emotionalContext'
-import { computeBaselineStats } from '../statistics'
 import { evaluatePrimaryZ } from '../statistics/zscore'
+import { selectReference } from '../features/context-aware-baseline/referenceSelection'
+import {
+  buildContextualReference,
+  buildGeneralReference,
+} from '../features/context-aware-baseline/contextualReference'
+import { buildContextComparison } from '../features/context-aware-baseline/contextSummary'
+import {
+  getSessionLisdexamfetamineStatus,
+  getSessionMedicationRecord,
+  lisdexamfetamineStatusLabel,
+} from '../features/context-aware-baseline/medicationContext'
+import { ReferenceBadge } from '../features/context-aware-baseline/components/ReferenceBadge'
+import { ReferenceComposition } from '../features/context-aware-baseline/components/ReferenceComposition'
+import { SessionContextComparison } from '../features/context-aware-baseline/components/SessionContextComparison'
 import { getSession } from '../storage/repository'
 import { loadResultsSession, type ResultsLoadState } from '../storage/resultsLoader'
 import type { SessionRecord, TestConditions } from '../types'
@@ -115,12 +128,27 @@ export function Results() {
 
   const test = getTest(session.testId)
   const result = session.result
-  const baseline = computeBaselineStats(
-    sessions.filter((s) => s.sessionId !== sessionId),
+
+  // A própria sessão nunca entra na referência com que é comparada — é isso
+  // que faz a nona sessão de um contexto ser a primeira comparável à janela
+  // já completa daquele contexto.
+  const pool = sessions.filter((s) => s.sessionId !== sessionId)
+  const referenceArgs = [
+    pool,
     session.testId,
     session.protocolVersion,
-    test.baselineMetricKeys
-  )
+    test.baselineMetricKeys,
+  ] as const
+
+  const selection = selectReference({
+    sessions: pool,
+    session,
+    testId: session.testId,
+    protocolVersion: session.protocolVersion,
+    metricKeys: test.baselineMetricKeys,
+  })
+  const reference = selection.reference
+  const baseline = reference.stats
 
   const primaryValue = result.customMetrics[test.primaryMetricKey] ??
     result.rtMetrics.medianCorrectRT
@@ -129,6 +157,9 @@ export function Results() {
   const zOutcome = session.isDemo
     ? ({ kind: 'not_monitoring' } as const)
     : evaluatePrimaryZ(primaryValue, baseline, test)
+
+  const contextComparison = buildContextComparison(session, reference.sessions)
+  const medicationRecord = getSessionMedicationRecord(session)
 
   const handleConditionsSave = async (conditions: TestConditions) => {
     if (!session) return
@@ -238,7 +269,46 @@ export function Results() {
               .
             </p>
           )}
+          {/* Qual referência serviu de comparação, e por quê. */}
+          {!session.isDemo && <ReferenceBadge selection={selection} />}
         </div>
+      )}
+
+      {/*
+        Contexto da sessão comparado à referência utilizada.
+
+        Puramente descritivo: nenhum destes campos entra em métrica, z-score ou
+        seleção de referência — só o estado medicamentoso seleciona referência,
+        e isso já aconteceu acima.
+      */}
+      {!session.isDemo && reference.metadata.sessionCount > 0 && contextComparison.hasAnyData && (
+        <section className="card p-5 mb-8">
+          <h3 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">
+            Contexto da sessão comparado à referência utilizada
+          </h3>
+          <SessionContextComparison
+            comparison={contextComparison}
+            referenceKind={reference.metadata.kind}
+            referenceCount={reference.metadata.sessionCount}
+          />
+        </section>
+      )}
+
+      {!session.isDemo && (
+        <details className="mb-8 bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
+          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+            Composição das referências deste teste
+            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div className="p-4 pt-4 border-t border-lab-border">
+            <ReferenceComposition
+              selection={selection}
+              general={buildGeneralReference(...referenceArgs)}
+              taken={buildContextualReference(...referenceArgs, 'taken')}
+              notTaken={buildContextualReference(...referenceArgs, 'not_taken')}
+            />
+          </div>
+        </details>
       )}
 
       {Object.keys(result.customMetrics).length > 0 && (
@@ -339,6 +409,18 @@ export function Results() {
               {renderConditionSection('Sono', session.checkIn.sleep)}
               {renderConditionSection('Estado Atual', session.checkIn.currentState)}
               {renderConditionSection('Substancias', session.checkIn.substances)}
+              {/* Registro estruturado: vive fora de `substances` e tem rótulos próprios. */}
+              <div className="mb-4">
+                <h4 className="text-lab-fg font-medium mb-1">Lisdexanfetamina</h4>
+                <ul className="space-y-1">
+                  <li>
+                    Registro:{' '}
+                    {lisdexamfetamineStatusLabel(getSessionLisdexamfetamineStatus(session))}
+                  </li>
+                  {medicationRecord?.dose && <li>Dose: {medicationRecord.dose}</li>}
+                  {medicationRecord?.time && <li>Horario: {medicationRecord.time}</li>}
+                </ul>
+              </div>
               {renderConditionSection('Alimentacao', session.checkIn.nutrition)}
               {renderConditionSection('Ambiente', session.checkIn.environment)}
               {session.checkIn.notes && (

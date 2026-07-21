@@ -1,5 +1,6 @@
 import type { AppSettings, SessionRecord, SessionStatus, TestId, TestMode, TestConditions } from '../types'
 import { withoutEmotionalContext } from '../features/emotion-lab/emotionalContext'
+import { withoutMedicationContext } from '../features/context-aware-baseline/medicationContext'
 import { DEFAULT_SETTINGS, getDB } from './db'
 import { prepareSessionForStorage } from './sanitize'
 
@@ -277,6 +278,8 @@ export async function getLatestConditions(): Promise<TestConditions | undefined>
 
   const latest = withConditions[0]?.checkIn
   // Emoção e percepção da relação são momentâneas: reaproveitá-las registraria
-  // como "de agora" um relato dado em outro dia.
-  return latest ? withoutEmotionalContext(latest) : undefined
+  // como "de agora" um relato dado em outro dia. O estado medicamentoso é um
+  // fato do DIA e sai pelo mesmo motivo, agravado: copiá-lo colocaria a sessão
+  // numa referência contextual sem que a pessoa tenha confirmado nada hoje.
+  return latest ? withoutMedicationContext(withoutEmotionalContext(latest)) : undefined
 }

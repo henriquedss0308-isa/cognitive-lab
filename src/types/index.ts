@@ -1,6 +1,7 @@
 import type { EmotionalContext } from '../features/emotion-lab/types'
+import type { MedicationContext } from '../features/context-aware-baseline/types'
 
-export type { EmotionalContext }
+export type { EmotionalContext, MedicationContext }
 
 export type TestMode = 'assessment' | 'training'
 export type SessionStatus = 'in_progress' | 'completed' | 'abandoned' | 'interrupted'
@@ -46,11 +47,23 @@ export interface TestConditions {
     caffeine?: boolean
     caffeineMg?: number
     caffeineTime?: string
+    /**
+     * Campos livres herdados. Preservados para compatibilidade e NUNCA lidos
+     * para classificar medicação — o registro estruturado vive em `medications`.
+     */
     medicationName?: string
     medicationDose?: string
     medicationTime?: string
     other?: string
   }
+  /**
+   * Registro estruturado de medicamento (baseline sensível ao contexto).
+   *
+   * Separado dos campos livres acima de propósito: só um registro explícito
+   * seleciona uma referência contextual. Ausência do campo significa
+   * `unknown` — nunca "não tomou".
+   */
+  medications?: MedicationContext
   nutrition?: {
     timeSinceLastMeal?: string
     mealType?: 'fasting' | 'light' | 'normal' | 'heavy'
