@@ -266,6 +266,7 @@ export function TestFlow() {
   if (step === 'conditions') {
     return (
       <TestConditionsForm
+        relationshipLabel={settings.relationshipLabel}
         onConfirm={(cond) => {
           setPendingConditions(cond)
           setStep('instructions')

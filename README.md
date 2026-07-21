@@ -40,12 +40,13 @@ src/
 ├── storage/        # IndexedDB, migrações, export/import, conclusão/recuperação de sessão
 ├── batteries/      # Baterias pré-definidas
 ├── demo/           # Dados de demonstração
+├── features/       # Funcionalidades por domínio (emotion-lab: contexto emocional)
 ├── components/     # UI (layout, test runner, gráficos, métricas)
 ├── pages/          # Dashboard, catálogo, histórico, etc.
 ├── context/        # Estado global (sessões + configurações)
 └── types/          # Tipos centrais
 
-docs/               # AUDITORIA.md · ESPECIFICACAO.md (normativa) · PLANO.md
+docs/               # AUDITORIA.md · ESPECIFICACAO.md (normativa) · PLANO.md · EMOTION_LAB.md
 ```
 
 ## Baseline pessoal
@@ -66,6 +67,20 @@ Sessões marcadas como `valid`, `valid_with_warnings` ou `invalid`.
 - `valid_with_warnings` (perda de foco, troca de aba, dispositivo/entrada divergente do habitual, excesso de antecipações/omissões): **entra no baseline**, e a interface mostra a composição ("N sessões, K com avisos").
 - Sessões demo e sem treino válido nunca entram no baseline.
 
+## Contexto emocional (Emotion Lab)
+
+Opcionalmente, cada sessão registra **como a pessoa relata estar se sentindo** e
+**como percebe sua relação naquele momento** — emoção principal e secundária
+(catálogo de 4 quadrantes, com intensidade 1–5) e uma percepção relacional de
+0 a 100 exibida por rótulo qualitativo ("Ok–Boa"), com confiança opcional.
+
+São dados **estritamente contextuais**: nenhum caminho de scoring, métrica,
+qualidade ou elegibilidade de baseline lê `checkIn` — a separação é estrutural.
+O registro é opcional, editável depois sem recalcular nada, e nunca produz
+diagnóstico, score ou afirmação sobre o estado de uma relação.
+
+Detalhes, invariantes e limites em `docs/EMOTION_LAB.md`.
+
 ## Como executar
 
 ```bash
@@ -83,6 +98,11 @@ Em **Dados e Configurações**:
 - CSV de ensaios individuais
 - CSV de resultados por sessão
 - Importação de backup — **validada por sessão** (estrutura e enums), **idempotente** (sessão já existente é mantida, nunca sobrescrita) e com relatório de importadas/mantidas/rejeitadas; settings do backup só são aplicados em banco vazio
+
+O backup JSON inclui as condições de cada sessão e, portanto, pode conter
+**contexto emocional e relacional** (e o rótulo da relação, guardado nas
+preferências). Contexto emocional malformado em um backup é saneado na
+importação, sem rejeitar a sessão nem seus ensaios.
 
 ## Limitações de timing (navegador)
 

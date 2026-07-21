@@ -1,4 +1,5 @@
-import type { AppBackup, SessionRecord } from '../types'
+import type { AppBackup, SessionRecord, TestConditions } from '../types'
+import { withSanitizedEmotionalContext } from '../features/emotion-lab/emotionalContext'
 import {
   getAllSessions,
   getSettings,
@@ -175,8 +176,18 @@ export function validateImportedSession(value: unknown): string | null {
   return null
 }
 
+/**
+ * Contexto emocional de backup passa por saneamento em vez de rejeitar a
+ * sessão: descartar trials por causa de um campo contextual malformado seria
+ * destrutivo. O que não sobrevive à validação simplesmente some (spec §10a).
+ */
+function sanitizeImportedCheckIn(checkIn: TestConditions | undefined): TestConditions | undefined {
+  if (!checkIn || typeof checkIn !== 'object' || Array.isArray(checkIn)) return undefined
+  return withSanitizedEmotionalContext(checkIn)
+}
+
 function normalizeImportedSession(s: SessionRecord): SessionRecord {
-  return {
+  const normalized: SessionRecord = {
     ...s,
     flags: s.flags && typeof s.flags === 'object' ? s.flags : {},
     flagMessages: Array.isArray(s.flagMessages) ? s.flagMessages : [],
@@ -184,6 +195,19 @@ function normalizeImportedSession(s: SessionRecord): SessionRecord {
     practiceCompleted: s.practiceCompleted === true,
     randomizationSeed: typeof s.randomizationSeed === 'number' ? s.randomizationSeed : 0,
   }
+
+  const checkIn = sanitizeImportedCheckIn(s.checkIn)
+  if (checkIn) normalized.checkIn = checkIn
+  else delete normalized.checkIn
+
+  if (normalized.result) {
+    const resultCheckIn = sanitizeImportedCheckIn(normalized.result.checkIn)
+    normalized.result = { ...normalized.result }
+    if (resultCheckIn) normalized.result.checkIn = resultCheckIn
+    else delete normalized.result.checkIn
+  }
+
+  return normalized
 }
 
 /**

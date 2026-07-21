@@ -1,4 +1,5 @@
 import type { AppSettings, SessionRecord, SessionStatus, TestId, TestMode, TestConditions } from '../types'
+import { withoutEmotionalContext } from '../features/emotion-lab/emotionalContext'
 import { DEFAULT_SETTINGS, getDB } from './db'
 import { prepareSessionForStorage } from './sanitize'
 
@@ -274,5 +275,8 @@ export async function getLatestConditions(): Promise<TestConditions | undefined>
     .filter((s) => !s.isDemo && s.checkIn && Object.keys(s.checkIn).length > 0)
     .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
 
-  return withConditions[0]?.checkIn
+  const latest = withConditions[0]?.checkIn
+  // Emoção e percepção da relação são momentâneas: reaproveitá-las registraria
+  // como "de agora" um relato dado em outro dia.
+  return latest ? withoutEmotionalContext(latest) : undefined
 }

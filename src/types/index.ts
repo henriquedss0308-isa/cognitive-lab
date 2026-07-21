@@ -1,3 +1,7 @@
+import type { EmotionalContext } from '../features/emotion-lab/types'
+
+export type { EmotionalContext }
+
 export type TestMode = 'assessment' | 'training'
 export type SessionStatus = 'in_progress' | 'completed' | 'abandoned' | 'interrupted'
 export type SessionQuality = 'valid' | 'valid_with_warnings' | 'invalid'
@@ -61,6 +65,14 @@ export interface TestConditions {
     inputDevice?: string
   }
   notes?: string
+  /**
+   * Contexto emocional e de percepção relacional (Emotion Lab).
+   *
+   * Estritamente contextual: nenhum caminho de scoring, métrica, qualidade ou
+   * elegibilidade de baseline lê `checkIn`. Ausente em sessões anteriores à
+   * funcionalidade — e a ausência é um estado válido, não um dado faltando.
+   */
+  emotionalContext?: EmotionalContext
   recordedAt?: string
 }
 
@@ -219,6 +231,12 @@ export interface AppSettings {
   developerMode: boolean
   hasSeenIntro: boolean
   demoDataActive: boolean
+  /**
+   * Rótulo local e opcional da relação acompanhada (Emotion Lab). Personaliza
+   * o texto da interface; vazio ⇒ linguagem genérica. Fica em `settings`, logo
+   * FAZ PARTE do backup JSON. Nunca é escrito em log.
+   */
+  relationshipLabel?: string
 }
 
 export interface AppBackup {

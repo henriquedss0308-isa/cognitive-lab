@@ -161,6 +161,11 @@ export function Settings() {
           <button className="btn-secondary" onClick={handleExportTrials}>CSV ensaios</button>
           <button className="btn-secondary" onClick={handleExportResults}>CSV resultados</button>
         </div>
+        <p className="text-xs text-lab-muted mt-4">
+          O backup JSON inclui as condições registradas em cada sessão, e portanto pode conter
+          o contexto emocional e a percepção da relação, além do rótulo configurado abaixo.
+          Guarde e compartilhe o arquivo com esse cuidado.
+        </p>
       </section>
 
       <section className="card p-5 mb-6">
@@ -173,6 +178,21 @@ export function Settings() {
 
       <section className="card p-5 mb-6">
         <h2 className="font-medium mb-4">Preferências</h2>
+        <label className="block text-sm mb-5">
+          <span className="text-lab-muted">Nome da pessoa ou relação acompanhada (opcional)</span>
+          <input
+            type="text"
+            className="w-full mt-1 border border-lab-border rounded-lg px-3 py-2"
+            value={settings.relationshipLabel ?? ''}
+            maxLength={40}
+            onChange={(e) => updateSettings({ relationshipLabel: e.target.value })}
+          />
+          <span className="block text-xs text-lab-muted mt-2">
+            Usado apenas para personalizar o texto do registro de percepção neste dispositivo.
+            Deixe em branco para manter a linguagem genérica. Fica salvo junto das demais
+            preferências e, por isso, também entra no backup JSON.
+          </span>
+        </label>
         <label className="flex items-center gap-3 text-sm">
           <input
             type="checkbox"
