@@ -44,7 +44,7 @@
   --color-lab-text: #dde3ec;
   --color-lab-fg: #f2f5fa;
   --color-lab-muted: #868f9f;
-  --color-lab-faint: #5c6472;
+  --color-lab-faint: #6b7484;
 
   /* Azul-marinho como cor principal: preenchimento sóbrio + um azul de leitura
      mais claro para texto e ícones, que precisa passar contraste sobre o fundo. */
@@ -111,15 +111,18 @@
   --color-lab-accent-dim: #1d3a67;
   --color-lab-accent-soft: #dde3ee;
 
-  --color-lab-success: #2f7d5c;
-  --color-lab-warning: #8a6520;
+  /* Amarelo e verde precisam ser bem mais escuros no claro que no escuro: sobre
+     superfície clara eles perdem contraste rápido. Os valores abaixo passam 4.5:1
+     em bg, surface e surface-2 — conferido, não estimado. */
+  --color-lab-success: #2c7656;
+  --color-lab-warning: #7d5c15;
   --color-lab-danger: #a63f45;
   --color-lab-info: #2b528d;
 
-  --color-lab-emotion-yellow: #9a7222;
-  --color-lab-emotion-green: #2f7d5c;
+  --color-lab-emotion-yellow: #856118;
+  --color-lab-emotion-green: #2c7656;
   --color-lab-emotion-blue: #2b6098;
-  --color-lab-emotion-red: #b04a50;
+  --color-lab-emotion-red: #a8464c;
 
   --color-lab-purple: #6a5cae;
 }
