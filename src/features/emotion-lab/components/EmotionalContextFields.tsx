@@ -270,6 +270,14 @@ export function EmotionalContextFields({ value, onChange, relationshipLabel }: P
           value={sliderValue}
           aria-valuetext={ratingRegistered ? (ratingLabel ?? undefined) : 'Não registrado'}
           onChange={(e) => setRating(Number(e.target.value))}
+          onPointerUp={(e) => {
+            // Clicar exatamente sobre a posição de repouso não muda o valor do
+            // input e portanto não dispara `change` — sem isto, seria impossível
+            // registrar justamente o valor do meio da escala com um clique.
+            // Pelo teclado não é preciso: a partir do repouso toda tecla de
+            // operação altera o valor e já dispara `change`.
+            if (!ratingRegistered) setRating(Number(e.currentTarget.value))
+          }}
         />
 
         <div className="flex justify-between text-[11px] text-lab-muted mt-1" aria-hidden="true">
