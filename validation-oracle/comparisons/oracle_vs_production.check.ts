@@ -21,7 +21,7 @@ import {
 import { computeSDT } from '../../src/statistics/signalDetection'
 import { computeRTMetrics, computeAccuracyMetrics } from '../../src/statistics/rtProcessing'
 import { postErrorSlowing } from '../../src/scoring/common'
-import { stroopCostRT, stroopCostAccuracy, switchCost, mixingCost } from '../../src/statistics/costs'
+import { stroopCostRT, switchCost, mixingCost } from '../../src/statistics/costs'
 import { replayCorsiTrials } from '../../src/tests/corsi/adaptive'
 import { computeBaselineStats, getValidAssessmentSessions, getBaselinePhase } from '../../src/statistics/baseline'
 import { evaluatePrimaryZ } from '../../src/statistics/zscore'
