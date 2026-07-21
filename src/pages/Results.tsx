@@ -32,6 +32,7 @@ import {
   getMetricLabel,
   sessionMedianPresentationKey,
 } from '../metrics/presentation'
+import { resolvePrimaryMetricValue } from '../metrics/primaryMetric'
 import type { SessionRecord, TestConditions } from '../types'
 
 const PHASE_LABELS: Record<string, string> = {
@@ -152,8 +153,7 @@ export function Results() {
   const reference = selection.reference
   const baseline = reference.stats
 
-  const primaryValue = result.customMetrics[test.primaryMetricKey] ??
-    result.rtMetrics.medianCorrectRT
+  const primaryValue = resolvePrimaryMetricValue(test, result)
   const primaryLabel = getMetricLabel(
     test.primaryMetricKey,
     test.metricLabels[test.primaryMetricKey]

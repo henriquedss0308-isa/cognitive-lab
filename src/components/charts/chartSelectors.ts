@@ -1,5 +1,7 @@
 import type { SessionRecord } from '../../types'
 import { formatMetricValue } from '../../metrics/presentation'
+import { resolvePrimaryMetricValue } from '../../metrics/primaryMetric'
+import { getTest } from '../../tests/registry'
 
 export interface TrendSelection {
   /** Sessões plotáveis, ordenadas por startedAt crescente. */
@@ -67,6 +69,8 @@ export interface TrendPoint {
 function metricValue(session: SessionRecord, metricKey: string): number | null {
   const result = session.result
   if (!result) return null
+  const test = getTest(session.testId)
+  if (metricKey === test.primaryMetricKey) return resolvePrimaryMetricValue(test, result)
   if (metricKey === 'medianCorrectRT') return result.rtMetrics.medianCorrectRT
   if (metricKey === 'accuracy') return result.accuracyMetrics.accuracy
   return result.customMetrics[metricKey] ?? null
