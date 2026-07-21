@@ -48,20 +48,7 @@ export function computeBaselineStats(
       ? valid.slice(FAMILIARIZATION_SESSIONS, FAMILIARIZATION_SESSIONS + BASELINE_SESSIONS)
       : valid.slice(FAMILIARIZATION_SESSIONS)
 
-  const metrics: BaselineStats['metrics'] = {}
-
-  for (const key of metricKeys) {
-    const values: number[] = []
-    for (const session of baselineSessions) {
-      const val = getMetricValue(session, key)
-      if (val !== null && !isNaN(val)) values.push(val)
-    }
-    metrics[key] = {
-      median: median(values),
-      mad: mad(values),
-      n: values.length,
-    }
-  }
+  const metrics = computeMetricStats(baselineSessions, metricKeys)
 
   return {
     testId,
@@ -75,7 +62,35 @@ export function computeBaselineStats(
   }
 }
 
-function getMetricValue(session: SessionRecord, key: string): number | null {
+/**
+ * Mediana/MAD/n por métrica sobre um conjunto arbitrário de sessões.
+ *
+ * Extraído de `computeBaselineStats` para que a referência GERAL e as
+ * referências CONTEXTUAIS usem exatamente o mesmo código numérico — a única
+ * diferença entre elas é quais sessões entram, nunca como a conta é feita.
+ * `n` é sempre a contagem de valores não nulos de fato usados.
+ */
+export function computeMetricStats(
+  sessions: SessionRecord[],
+  metricKeys: string[]
+): BaselineStats['metrics'] {
+  const metrics: BaselineStats['metrics'] = {}
+  for (const key of metricKeys) {
+    const values: number[] = []
+    for (const session of sessions) {
+      const val = getMetricValue(session, key)
+      if (val !== null && !isNaN(val)) values.push(val)
+    }
+    metrics[key] = {
+      median: median(values),
+      mad: mad(values),
+      n: values.length,
+    }
+  }
+  return metrics
+}
+
+export function getMetricValue(session: SessionRecord, key: string): number | null {
   const result = session.result
   if (!result) return null
 

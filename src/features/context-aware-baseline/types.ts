@@ -85,6 +85,7 @@ export interface ReferenceMetadata {
   requiredCount: number | null
   /** Data da primeira e da última sessão da janela (ISO), quando há sessões. */
   dateRange: { first: string; last: string } | null
+  /** `true` quando a referência GERAL foi usada no lugar de uma contextual. */
   fallback: boolean
   fallbackReason?: FallbackReason
 }
@@ -105,8 +106,13 @@ export interface ContextualReference {
 
 /** Resultado da seleção de referência para uma sessão. */
 export interface ReferenceSelection {
-  /** `null` quando não há referência suficiente — a UI mantém "baseline em construção". */
-  reference: ContextualReference | null
+  /**
+   * Referência escolhida. Quando nem a geral está consolidada, vem a geral
+   * ainda em construção (`stats.phase !== 'monitoring'`): `evaluatePrimaryZ`
+   * já se recusa a comparar nesse estado, então nada é fabricado e a tela
+   * mantém o comportamento atual de "baseline em construção".
+   */
+  reference: ContextualReference
   /** Estado medicamentoso da sessão avaliada. */
   sessionStatus: LisdexamfetamineStatus
   /** Progresso das duas janelas contextuais, para exibição (X/8). */
