@@ -5,6 +5,8 @@ import { getTest } from '../tests/registry'
 import { MetricCard } from '../components/common/MetricTooltip'
 import { BlockChart, RTDistribution } from '../components/charts/SessionCharts'
 import { TestConditionsForm } from '../components/test/TestConditionsForm'
+import { EmotionalContextSummary } from '../features/emotion-lab/components/EmotionalContextSummary'
+import { hasEmotionalContent } from '../features/emotion-lab/emotionalContext'
 import { computeBaselineStats } from '../statistics'
 import { evaluatePrimaryZ } from '../statistics/zscore'
 import { getSession } from '../storage/repository'
@@ -59,13 +61,14 @@ function renderConditionSection(title: string, data: any) {
 
 export function Results() {
   const { sessionId } = useParams()
-  const { sessions, loading: appLoading, refresh, editSessionConditions } = useApp()
+  const { sessions, settings, loading: appLoading, refresh, editSessionConditions } = useApp()
   const [loadState, setLoadState] = useState<ResultsLoadState>('loading')
   const [session, setSession] = useState<SessionRecord | undefined>()
   const [loadError, setLoadError] = useState<string | null>(null)
   const [editingConditions, setEditingConditions] = useState(false)
   const [savingConditions, setSavingConditions] = useState(false)
   const [conditionsSaved, setConditionsSaved] = useState(false)
+  const [conditionsError, setConditionsError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -131,20 +134,30 @@ export function Results() {
     if (!session) return
     setSavingConditions(true)
     setConditionsSaved(false)
-    await editSessionConditions(session.sessionId, conditions)
-    setSession({
-      ...session,
-      checkIn: conditions,
-      result: session.result
-        ? {
-            ...session.result,
-            checkIn: conditions,
-          }
-        : session.result,
-    })
-    setSavingConditions(false)
-    setEditingConditions(false)
-    setConditionsSaved(true)
+    setConditionsError(null)
+    try {
+      await editSessionConditions(session.sessionId, conditions)
+      setSession({
+        ...session,
+        checkIn: conditions,
+        result: session.result
+          ? {
+              ...session.result,
+              checkIn: conditions,
+            }
+          : session.result,
+      })
+      setEditingConditions(false)
+      setConditionsSaved(true)
+    } catch {
+      // Falha de persistência não pode deixar o formulário preso em "Salvando...".
+      // Mensagem sem detalhe do conteúdo: contexto emocional não vai para log.
+      setConditionsError(
+        'Não foi possível salvar as condições. Seus resultados e ensaios não foram alterados. Tente novamente.'
+      )
+    } finally {
+      setSavingConditions(false)
+    }
   }
 
   return (
@@ -259,6 +272,25 @@ export function Results() {
         </div>
       )}
 
+      {/*
+        Contexto emocional — seção própria e sempre visível quando existe.
+        Puramente descritiva: não entra em nenhuma métrica acima nem é
+        relacionada ao desempenho da sessão.
+      */}
+      {hasEmotionalContent(session.checkIn?.emotionalContext) && (
+        <section className="card p-5 mb-8">
+          <h3 className="text-sm font-medium text-lab-muted uppercase tracking-wide mb-4">
+            Contexto emocional
+          </h3>
+          <div className="text-sm text-lab-muted">
+            <EmotionalContextSummary
+              context={session.checkIn?.emotionalContext}
+              relationshipLabel={settings.relationshipLabel}
+            />
+          </div>
+        </section>
+      )}
+
       <details className="mb-8 bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
         <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
           Condições da Sessão
@@ -272,6 +304,7 @@ export function Results() {
               onClick={() => {
                 setEditingConditions((value) => !value)
                 setConditionsSaved(false)
+                setConditionsError(null)
               }}
             >
               {editingConditions ? 'Cancelar edicao' : 'Editar condicoes'}
@@ -282,10 +315,15 @@ export function Results() {
             <p className="text-lab-success mb-4">Condicoes atualizadas.</p>
           )}
 
+          {conditionsError && (
+            <p className="text-lab-danger mb-4" role="alert">{conditionsError}</p>
+          )}
+
           {editingConditions ? (
             <TestConditionsForm
               compact
               showLoadPrevious={false}
+              relationshipLabel={settings.relationshipLabel}
               initialConditions={session.checkIn}
               title="Editar condicoes"
               description="Atualize apenas o contexto da sessao. Os trials e as metricas nao serao recalculados."
