@@ -11,6 +11,10 @@ import {
   type TrendPoint,
 } from './chartSelectors'
 import { useChartTheme, tooltipStyle, type ChartTheme } from './useChartTheme'
+import {
+  formatMetricValue,
+  sessionMedianPresentationKey,
+} from '../../metrics/presentation'
 
 /**
  * Gráficos das sessões.
@@ -101,10 +105,40 @@ export function BlockChart({ session }: Props) {
         <BarChart data={blocks} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} vertical={false} />
           <XAxis dataKey="blockIndex" {...axisProps(theme)} />
-          <YAxis {...axisProps(theme)} />
-          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ fill: theme.grid, opacity: 0.4 }} />
-          <Bar dataKey="medianRT" name="RT mediano (ms)" fill={theme.series} radius={[2, 2, 0, 0]} />
-          <Bar dataKey="accuracy" name="Precisão" fill={theme.seriesAlt} radius={[2, 2, 0, 0]} />
+          <YAxis
+            yAxisId="rt"
+            tickFormatter={(value: number) => formatMetricValue('medianRT', value)}
+            {...axisProps(theme)}
+          />
+          <YAxis
+            yAxisId="accuracy"
+            orientation="right"
+            domain={[0, 1]}
+            tickFormatter={(value: number) => formatMetricValue('accuracy', value)}
+            {...axisProps(theme)}
+          />
+          <Tooltip
+            contentStyle={tooltipStyle(theme)}
+            cursor={{ fill: theme.grid, opacity: 0.4 }}
+            formatter={(value, name, item) => {
+              const metricKey = item.dataKey === 'accuracy' ? 'accuracy' : 'medianRT'
+              return [formatMetricValue(metricKey, Number(value)), name]
+            }}
+          />
+          <Bar
+            yAxisId="rt"
+            dataKey="medianRT"
+            name="TR mediano"
+            fill={theme.series}
+            radius={[2, 2, 0, 0]}
+          />
+          <Bar
+            yAxisId="accuracy"
+            dataKey="accuracy"
+            name="Precisão"
+            fill={theme.seriesAlt}
+            radius={[2, 2, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
@@ -113,6 +147,8 @@ export function BlockChart({ session }: Props) {
 
 export function RTDistribution({ session }: Props) {
   const theme = useChartTheme()
+  const medianMetricKey = sessionMedianPresentationKey(session.testId)
+  const isCorsi = session.testId === 'corsi'
   const rts = session.trials
     .filter((t) => t.correct && t.reactionTimeMs !== null && t.reactionTimeMs >= 150)
     .map((t) => t.reactionTimeMs!)
@@ -133,13 +169,21 @@ export function RTDistribution({ session }: Props) {
   })
 
   return (
-    <ChartFrame title="Distribuição de RT" note="Ensaios corretos, em milissegundos.">
+    <ChartFrame
+      title={isCorsi ? 'Distribuição do tempo de reprodução' : 'Distribuição de RT'}
+      note={isCorsi ? 'Sequências corretas, em milissegundos.' : 'Ensaios corretos, em milissegundos.'}
+    >
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={histogram} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} vertical={false} />
           <XAxis dataKey="range" {...axisProps(theme, 10)} />
           <YAxis {...axisProps(theme)} />
-          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ fill: theme.grid, opacity: 0.4 }} />
+          <Tooltip
+            contentStyle={tooltipStyle(theme)}
+            cursor={{ fill: theme.grid, opacity: 0.4 }}
+            labelFormatter={(value) => formatMetricValue(medianMetricKey, Number(value))}
+            formatter={(value) => [formatMetricValue('histogramCount', Number(value)), 'Ensaios']}
+          />
           <Bar dataKey="count" fill={theme.seriesThird} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
@@ -206,7 +250,10 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
             tickFormatter={(key: string) => axisLabels.get(key) ?? ''}
             {...axisProps(theme)}
           />
-          <YAxis {...axisProps(theme)} />
+          <YAxis
+            tickFormatter={(value: number) => formatMetricValue(metricKey, value)}
+            {...axisProps(theme)}
+          />
           <Tooltip
             cursor={{ stroke: theme.grid }}
             wrapperStyle={{ outline: 'none' }}
@@ -251,10 +298,11 @@ export function ScatterTooltip({
     <div className="card px-3 py-2 text-xs shadow-none">
       <div className="text-lab-muted">{point.fullLabel}</div>
       <div className="mt-1 text-lab-fg">
-        RT mediano: <span className="metric-value">{formatTrendValue('medianCorrectRT', point.speed)}</span>
+        RT mediano:{' '}
+        <span className="metric-value">{formatTrendValue('medianCorrectRT', point.speed)}</span>
       </div>
       <div className="text-lab-fg">
-        Precisão: <span className="metric-value">{formatTrendValue('accuracy', point.accuracy / 100)}</span>
+        Precisão: <span className="metric-value">{formatTrendValue('accuracy', point.accuracy)}</span>
       </div>
     </div>
   )
@@ -272,7 +320,7 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
       key: s.sessionId,
       fullLabel: formatFullDate(s.startedAt),
       speed: s.result!.rtMetrics.medianCorrectRT as number,
-      accuracy: s.result!.accuracyMetrics.accuracy * 100,
+      accuracy: s.result!.accuracyMetrics.accuracy,
     }))
 
   if (data.length === 0) return null
@@ -291,16 +339,16 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
             type="number"
             dataKey="speed"
             name="RT mediano"
-            unit=" ms"
             domain={['dataMin - 20', 'dataMax + 20']}
+            tickFormatter={(value: number) => formatMetricValue('medianCorrectRT', value)}
             {...axisProps(theme)}
           />
           <YAxis
             type="number"
             dataKey="accuracy"
             name="Precisão"
-            unit="%"
-            domain={[0, 100]}
+            domain={[0, 1]}
+            tickFormatter={(value: number) => formatMetricValue('accuracy', value)}
             {...axisProps(theme)}
           />
           <Tooltip

@@ -1,44 +1,41 @@
-const EXPLANATIONS: Record<string, string> = {
-  medianCorrectRT: 'Tempo central das suas respostas corretas. É menos afetada por respostas extremamente lentas que a média.',
-  rtCV: 'Mostra o quanto seu tempo de reação variou em relação à sua velocidade média.',
-  dPrime: 'Estima a capacidade de distinguir alvos de não alvos, separando discriminação de tendência geral de responder.',
-  stroopCostRT: 'Diferença entre respostas incongruentes e congruentes. Deve ser interpretada junto às condições originais.',
-  switchCost: 'Tempo adicional observado quando a regra muda em comparação com quando a regra se repete.',
-  mixingCost: 'Tempo adicional em blocos mistos comparado a blocos com uma única regra.',
-  accuracy: 'Proporção de respostas corretas entre todos os ensaios.',
-  anticipationRate: 'Proporção de respostas muito rápidas, possivelmente antes do processamento completo do estímulo.',
-  lapseRate: 'Proporção de respostas muito lentas ou ausentes.',
-}
+import {
+  getMetricLabel,
+  getMetricPresentation,
+  presentMetricValue,
+} from '../../metrics/presentation'
 
 interface Props {
   metric: string
-  label: string
-  value: string | number | null
-  unit?: string
+  label?: string
+  value?: string | number | null
   /** Métrica principal da sessão — recebe mais peso visual que as demais. */
   emphasis?: boolean
 }
 
-export function MetricCard({ metric, label, value, unit, emphasis = false }: Props) {
-  const explanation = EXPLANATIONS[metric]
-  const display = value === null || value === undefined ? '—' : typeof value === 'number' ? value.toFixed(metric.includes('Rate') || metric === 'accuracy' ? 2 : 0) : value
+export function MetricCard({ metric, label, value, emphasis = false }: Props) {
+  const metadata = getMetricPresentation(metric)
+  const displayLabel = getMetricLabel(metric, label)
+  const presented = presentMetricValue(metric, value)
 
   return (
-    <div className="card p-4 flex flex-col" title={explanation}>
-      <div className="section-title">{label}</div>
+    <div className="card p-4 flex flex-col" title={metadata.explanation}>
+      <div className="section-title">{displayLabel}</div>
       {/*
         Número e unidade separados: a unidade em peso menor deixa a magnitude
         legível de relance, que é o que se procura numa grade de métricas.
       */}
       <div className="mt-2 flex items-baseline gap-1">
-        <span className={emphasis ? 'metric-value text-3xl' : 'metric-value text-2xl'}>
-          {display}
+        <span
+          className={emphasis ? 'metric-value text-3xl' : 'metric-value text-2xl'}
+          aria-label={presented.text}
+        >
+          {presented.valueText}
         </span>
-        {unit && value !== null && value !== undefined && (
-          <span className="text-xs text-lab-muted">{unit.trim()}</span>
+        {presented.unitText && !presented.unavailable && (
+          <span className="text-xs text-lab-muted">{presented.unitText}</span>
         )}
       </div>
-      {explanation && <p className="help-text mt-2 flex-1">{explanation}</p>}
+      {metadata.explanation && <p className="help-text mt-2 flex-1">{metadata.explanation}</p>}
     </div>
   )
 }

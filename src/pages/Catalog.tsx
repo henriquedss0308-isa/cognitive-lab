@@ -4,6 +4,11 @@ import { ALL_TESTS, DOMAIN_LABELS } from '../tests/registry'
 import { computeBaselineStats } from '../statistics/baseline'
 import { Badge } from '../components/common/Badge'
 import { Page, PageHeader } from '../components/common/Page'
+import {
+  formatMetricValue,
+  getMetricPresentation,
+  sessionMedianPresentationKey,
+} from '../metrics/presentation'
 
 const PHASE_LABELS: Record<string, string> = {
   familiarization: 'Familiarização',
@@ -27,6 +32,7 @@ export function Catalog() {
           const stats = computeBaselineStats(sessions, test.id, test.protocolVersion, test.baselineMetricKeys)
           const last = sessions.find((s) => s.testId === test.id && s.mode === 'assessment')
           const phaseLabel = PHASE_LABELS[stats.phase] ?? stats.phase
+          const medianMetricKey = sessionMedianPresentationKey(test.id)
 
           return (
             <article
@@ -46,8 +52,9 @@ export function Catalog() {
               <div className="flex items-center gap-2 flex-wrap mt-4">
                 <Badge>{phaseLabel}</Badge>
                 {last?.result?.rtMetrics.medianCorrectRT != null && (
-                  <Badge title="RT mediano da última avaliação">
-                    Último RT · {last.result.rtMetrics.medianCorrectRT.toFixed(0)} ms
+                  <Badge title={`${getMetricPresentation(medianMetricKey).label} da última avaliação`}>
+                    {getMetricPresentation(medianMetricKey).label} ·{' '}
+                    {formatMetricValue(medianMetricKey, last.result.rtMetrics.medianCorrectRT)}
                   </Badge>
                 )}
               </div>

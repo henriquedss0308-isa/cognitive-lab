@@ -1,4 +1,5 @@
 import type { SessionRecord } from '../../types'
+import { formatMetricValue } from '../../metrics/presentation'
 
 export interface TrendSelection {
   /** Sessões plotáveis, ordenadas por startedAt crescente. */
@@ -83,26 +84,11 @@ export function formatFullDate(iso: string): string {
 /**
  * Formata o valor de uma métrica para leitura humana.
  *
- * Existe porque o tooltip mostrava o número cru do ponto flutuante
- * ("268.300048828125"). A classificação segue a mesma convenção de unidades já
- * usada nos cards de resultado.
+ * Cards e gráficos delegam ao mesmo registry explícito. Métrica desconhecida
+ * recebe apresentação neutra — nunca unidade inferida pelo nome.
  */
 export function formatTrendValue(metricKey: string, value: number): string {
-  const number = (v: number, digits: number) =>
-    new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(v)
-
-  // Proporções são gravadas em 0–1; exibir em % é só apresentação.
-  if (metricKey.includes('accuracy') || /Rate$/.test(metricKey)) {
-    return `${number(value * 100, 1)}%`
-  }
-  if (/span/i.test(metricKey)) return number(value, 0)
-  if (metricKey.includes('RT') || metricKey.includes('Cost') || metricKey.includes('Slowing')) {
-    return `${number(value, 1)} ms`
-  }
-  return number(value, 2)
+  return formatMetricValue(metricKey, value)
 }
 
 /**

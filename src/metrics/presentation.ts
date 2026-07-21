@@ -168,6 +168,7 @@ export const METRIC_PRESENTATIONS = {
   validTrialCount: count('Ensaios válidos'),
   invalidTrialCount: count('Ensaios com TR inválido'),
   validTrials: count('Ensaios válidos'),
+  histogramCount: count('Ensaios'),
   blockIndex: count('Bloco'),
 } as const satisfies Record<string, MetricPresentation>
 

@@ -27,6 +27,7 @@ import {
   SessionPersistenceError,
 } from '../storage/sessionCompletion'
 import { canResumeSession } from '../storage/sessionRecovery'
+import { formatMetricValue } from '../metrics/presentation'
 
 
 type Step =
@@ -327,8 +328,8 @@ export function TestFlow() {
       <div className="px-6 py-10 sm:px-10 max-w-lg mx-auto">
         <h2 className="page-title mb-2">Treino não atingiu o critério</h2>
         <p className="text-sm text-lab-muted mb-4">
-          Precisão: {(practiceEval.accuracy * 100).toFixed(0)}% (mínimo{' '}
-          {(practiceCriteria.minAccuracy * 100).toFixed(0)}%)
+          Precisão: {formatMetricValue('accuracy', practiceEval.accuracy)} (mínimo{' '}
+          {formatMetricValue('accuracy', practiceCriteria.minAccuracy)})
         </p>
         {practiceEval.errors.length > 0 && (
           <ul className="text-sm text-lab-muted mb-6 space-y-1.5">
