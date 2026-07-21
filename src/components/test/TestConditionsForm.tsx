@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { TestConditions } from '../../types'
 import { getLatestConditions } from '../../storage/repository'
+import { EmotionalContextFields } from '../../features/emotion-lab/components/EmotionalContextFields'
+import { touchEmotionalContext } from '../../features/emotion-lab/emotionalContext'
 
 interface Props {
   onConfirm: (conditions: TestConditions) => void
@@ -12,6 +14,8 @@ interface Props {
   skipLabel?: string
   showLoadPrevious?: boolean
   compact?: boolean
+  /** Rótulo local opcional da relação acompanhada (Emotion Lab). */
+  relationshipLabel?: string
 }
 
 export function TestConditionsForm({
@@ -24,6 +28,7 @@ export function TestConditionsForm({
   skipLabel = 'Iniciar sem registrar condicoes',
   showLoadPrevious = true,
   compact = false,
+  relationshipLabel,
 }: Props) {
   const [form, setForm] = useState<TestConditions>(initialConditions ?? {})
   const [loadingLatest, setLoadingLatest] = useState(false)
@@ -46,7 +51,9 @@ export function TestConditionsForm({
     setLoadingLatest(true)
     const latest = await getLatestConditions()
     if (latest) {
-      setForm(latest)
+      // `getLatestConditions` já não devolve contexto emocional (é momentâneo);
+      // o que a pessoa acabou de registrar agora também não pode ser apagado.
+      setForm((prev) => ({ ...latest, emotionalContext: prev.emotionalContext }))
     }
     setLoadingLatest(false)
   }
@@ -71,10 +78,15 @@ export function TestConditionsForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onConfirm({
-      ...form,
-      recordedAt: new Date().toISOString(),
-    })
+    // Sanea e carimba `updatedAt` só se o conteúdo emocional mudou de fato.
+    const emotionalContext = touchEmotionalContext(
+      initialConditions?.emotionalContext,
+      form.emotionalContext
+    )
+    const conditions: TestConditions = { ...form, recordedAt: new Date().toISOString() }
+    if (emotionalContext) conditions.emotionalContext = emotionalContext
+    else delete conditions.emotionalContext
+    onConfirm(conditions)
   }
 
   return (
@@ -310,6 +322,23 @@ export function TestConditionsForm({
                 onChange={(e) => setNested('environment', 'distractions', e.target.checked)} />
               <span className="text-sm">Presença de distrações (pessoas, etc)</span>
             </label>
+          </div>
+        </details>
+
+        {/* Contexto emocional e relacional — Emotion Lab */}
+        <details className="bg-lab-surface-2 border border-lab-border rounded-lg overflow-hidden group">
+          <summary className="p-4 cursor-pointer font-medium select-none flex items-center justify-between">
+            Contexto emocional e relacional
+            <span className="text-lab-muted group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div className="p-4 pt-4 border-t border-lab-border">
+            <EmotionalContextFields
+              value={form.emotionalContext}
+              relationshipLabel={relationshipLabel}
+              onChange={(emotionalContext) =>
+                setForm((prev) => ({ ...prev, emotionalContext }))
+              }
+            />
           </div>
         </details>
 
