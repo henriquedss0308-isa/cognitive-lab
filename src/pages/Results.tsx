@@ -251,7 +251,14 @@ export function Results() {
           label={`Métrica principal · ${primaryLabel}`}
           value={primaryValue}
         />
-        <MetricCard metric="accuracy" value={result.accuracyMetrics.accuracy} />
+        <MetricCard metric="accuracy"
+  label={
+    session.testId === 'simple_rt'
+      ? test.metricLabels['simple.accuracy']
+      : undefined
+  }
+  value={result.accuracyMetrics.accuracy}
+/>
         <MetricCard metric={medianPresentationKey} value={result.rtMetrics.medianCorrectRT} />
         <MetricCard metric="rtCV" label="Variabilidade (CV)" value={result.rtMetrics.rtCoefficientOfVariation} />
       </div>

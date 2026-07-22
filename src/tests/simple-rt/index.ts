@@ -132,14 +132,14 @@ export const testDefinition: CognitiveTestDefinition = {
   primaryMetricKey: 'medianCorrectRT',
   baselineMetricKeys: ['medianCorrectRT', 'rtCV', 'lapseRate', 'anticipationRate', 'postErrorSlowing'],
   metricLabels: {
-    isiEarlyPresses: 'Teclas fora da janela (fixação/ISI)',
+    isiEarlyPresses: 'Antecipações durante a espera',
     medianCorrectRT: 'TR mediano (corretos)',
     rtCV: 'Coeficiente de variação do TR',
     lapseRate: 'Taxa de lapsos',
     anticipationRate: 'Taxa de antecipação',
     postErrorSlowing: 'Abrandamento pós-erro',
     'simple.medianRT': 'TR mediano',
-    'simple.accuracy': 'Precisão',
+    'simple.accuracy': 'Precisão após o estímulo',
   },
   metricDirections: {
     isiEarlyPresses: -1,

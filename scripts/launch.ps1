@@ -2,7 +2,7 @@
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.Windows.Forms
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
-$Port = 5173
+$Port = 10020
 $Url = "http://localhost:$Port"
 
 function Test-ServerReady {
@@ -26,8 +26,10 @@ if (-not (Test-Path "node_modules")) {
     npm install
 }
 
-if (-not (Test-Path "dist\index.html")) {
-    npm run build
+npm run build
+
+if ($LASTEXITCODE -ne 0) {
+    exit 1
 }
 
 # Inicia servidor em janela minimizada (feche a janela para encerrar o app)

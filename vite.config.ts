@@ -17,6 +17,11 @@ export default defineConfig(async ({ mode }) => {
 
   return {
     plugins,
+	  server: {
+    port: 10020,
+    strictPort: true,
+  },
+
     test: {
       globals: true,
       environment: 'jsdom',
