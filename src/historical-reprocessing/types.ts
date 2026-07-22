@@ -75,4 +75,3 @@ export interface HistoricalReprocessingReport extends CorsiDryRunAnalysis {
 }
 
 export type ResultHasher = (value: unknown) => string | Promise<string>
-

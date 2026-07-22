@@ -36,4 +36,3 @@ function canonicalize(value: unknown, seen: Set<object>): unknown {
 export function stableStringify(value: unknown): string {
   return JSON.stringify(canonicalize(value, new Set()))
 }
-

@@ -437,4 +437,3 @@ describe('CLI somente-dry-run', () => {
     expect(() => parseCliArguments(['--input', 'in.json', '--dry-run'])).toThrow('--report')
   })
 })
-

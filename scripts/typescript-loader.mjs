@@ -21,4 +21,3 @@ export async function resolve(specifier, context, nextResolve) {
     throw originalError
   }
 }
-
