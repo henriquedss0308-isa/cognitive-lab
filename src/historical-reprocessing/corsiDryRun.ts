@@ -118,18 +118,6 @@ function validateTrial(trial: unknown, position: number): AuditReason | null {
   ) {
     return reason('missing_sequence', `${prefix} não possui metadata.sequence válida.`)
   }
-  if (typeof trial.metadata.userResponse !== 'string') {
-    return reason('missing_metadata_response', `${prefix} não possui metadata.userResponse persistida.`)
-  }
-  if (
-    typeof trial.metadata.partialPositionsCorrect !== 'number' ||
-    !Number.isInteger(trial.metadata.partialPositionsCorrect)
-  ) {
-    return reason(
-      'missing_partial_positions',
-      `${prefix} não possui metadata.partialPositionsCorrect inteira.`
-    )
-  }
   return null
 }
 

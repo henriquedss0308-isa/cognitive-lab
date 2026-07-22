@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { DeviceInfo, TrialRecord } from '../../types'
 import { testDefinition as corsi } from '../../tests/corsi'
 import {
@@ -10,7 +10,11 @@ import {
   runHistoricalReprocessor,
   sha256Canonical,
 } from '../../../scripts/historical-reprocessor'
-import { analyzeCorsiDryRun, BackupValidationError } from '../corsiDryRun'
+import {
+  analyzeCorsiDryRun,
+  BackupValidationError,
+  projectRelevantResult,
+} from '../corsiDryRun'
 import {
   LEGACY_CORSI_SCORING_VERSION,
   REPLAY_CORSI_SCORING_VERSION,
@@ -261,16 +265,67 @@ describe('núcleo puro da auditoria Corsi', () => {
     expect(candidateReasonCode(result)).toBe('missing_response')
   })
 
-  it.each([
-    ['metadata.userResponse', 'userResponse', 'missing_metadata_response'],
-    ['metadata.partialPositionsCorrect', 'partialPositionsCorrect', 'missing_partial_positions'],
-  ])('recusa candidata sem %s', async (_label, field, expectedReason) => {
+  it('recusa candidata com expectedResponse ausente', async () => {
     const session = legacyCorsiSession()
-    delete (session.trials as TrialRecord[])[0].metadata?.[field]
+    delete (session.trials as unknown as Record<string, unknown>[])[0].expectedResponse
 
     const result = await analyze([session])
 
-    expect(candidateReasonCode(result)).toBe(expectedReason)
+    expect(candidateReasonCode(result)).toBe('missing_expected_response')
+  })
+
+  it('recusa candidata com trialIndex ausente', async () => {
+    const session = legacyCorsiSession()
+    delete (session.trials as unknown as Record<string, unknown>[])[0].trialIndex
+
+    const result = await analyze([session])
+
+    expect(candidateReasonCode(result)).toBe('invalid_trial_index')
+  })
+
+  it('reprocessa deterministicamente metadata derivada ausente sem fabricar campos', async () => {
+    const session = legacyCorsiSession()
+    const trials = session.trials as TrialRecord[]
+    for (const currentTrial of trials) {
+      delete currentTrial.metadata?.userResponse
+      delete currentTrial.metadata?.partialPositionsCorrect
+    }
+    const directScore = corsi.scoreSession(structuredClone(trials), 'assessment', DEVICE, {})
+    const receivedTrials: TrialRecord[][] = []
+    const realScoreSession = corsi.scoreSession
+    const scoreSpy = vi.spyOn(corsi, 'scoreSession').mockImplementation((input, ...rest) => {
+      receivedTrials.push(structuredClone(input))
+      return realScoreSession(input, ...rest)
+    })
+
+    try {
+      const first = await analyze([session])
+      const second = await analyze([session])
+
+      expect(first.candidateSessions[0].eligibility).toBe('eligible')
+      expect(second).toEqual(first)
+      expect(first.candidateSessions[0].recalculatedResult).toEqual(
+        projectRelevantResult(directScore)
+      )
+      expect(first.candidateSessions[0].recalculatedResultHash).toBe(
+        second.candidateSessions[0].recalculatedResultHash
+      )
+    } finally {
+      scoreSpy.mockRestore()
+    }
+
+    expect(receivedTrials).toHaveLength(2)
+    for (const receivedTrialSet of receivedTrials) {
+      for (const receivedTrial of receivedTrialSet) {
+        expect(receivedTrial.actualResponse).toEqual(expect.any(String))
+        expect(receivedTrial.metadata).not.toHaveProperty('userResponse')
+        expect(receivedTrial.metadata).not.toHaveProperty('partialPositionsCorrect')
+      }
+    }
+    for (const currentTrial of trials) {
+      expect(currentTrial.metadata).not.toHaveProperty('userResponse')
+      expect(currentTrial.metadata).not.toHaveProperty('partialPositionsCorrect')
+    }
   })
 
   it('pula Corsi sem scoringVersion', async () => {

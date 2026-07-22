@@ -53,10 +53,14 @@ protocolo Corsi atual, possuir `sessionId`, `startedAt`, `mode`, `deviceInfo` e
 explicitamente; por compatibilidade histórica, `status` ausente também é
 tratado como concluído. Qualquer outro valor explícito é recusado. As flags
 `incomplete` da sessão ou do resultado sempre prevalecem e tornam a candidata
-inelegível. Cada trial precisa conter os campos usados pelo scorer e as
-evidências persistidas de replay:
-`expectedResponse`, `actualResponse`, `metadata.sequence`,
-`metadata.userResponse` e `metadata.partialPositionsCorrect`.
+inelegível. Cada trial precisa conter os campos efetivamente usados pelo replay,
+incluindo `trialIndex`, `expectedResponse` e `actualResponse`, além dos demais
+campos necessários ao `scoreSession` e ao `buildBaseResult`.
+`metadata.sequence` continua obrigatória como evidência auditável e nunca
+substitui `expectedResponse`. Já `metadata.userResponse` e
+`metadata.partialPositionsCorrect` não são requisitos históricos: o replay os
+deriva de `expectedResponse` e `actualResponse`, sem fabricar ou injetar campos
+nos trials.
 
 São registradas como puladas, sem chamada ao scorer:
 
