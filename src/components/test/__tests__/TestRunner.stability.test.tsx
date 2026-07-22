@@ -87,6 +87,7 @@ function makeTest(
     description: id,
     duration: 'test',
     protocolVersion: config.version,
+    scoringVersion: 'sdt-hautus-1',
     practiceConfig: config,
     assessmentConfig: config,
     instructions: {

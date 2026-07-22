@@ -1,5 +1,6 @@
 import type { EmotionalContext } from '../features/emotion-lab/types'
 import type { MedicationContext } from '../features/context-aware-baseline/types'
+import type { LongitudinalSeriesKey } from '../longitudinal/series'
 
 export type { EmotionalContext, MedicationContext }
 
@@ -170,8 +171,8 @@ export interface SDTMetrics {
   misses: number
   falseAlarms: number
   correctRejections: number
-  hitRate: number
-  falseAlarmRate: number
+  hitRate: number | null
+  falseAlarmRate: number | null
   dPrime: number | null
   criterion: number | null
 }
@@ -228,12 +229,18 @@ export interface SessionRecord {
 export interface BaselineStats {
   testId: TestId
   protocolVersion: string
+  /** Versão normalizada que completa a identidade longitudinal. */
+  scoringVersion: string
+  /** Chave canônica (testId, protocolVersion, scoringVersion). */
+  seriesKey: LongitudinalSeriesKey
   phase: BaselinePhase
   sessionCount: number
   familiarizationCount: number
   baselineCount: number
   /** Sessões da janela de baseline com quality 'valid_with_warnings' (spec §2). */
   warningCount: number
+  /** Elegíveis preservadas no histórico, mas incompatíveis por scoring. */
+  incompatibleScoringCount: number
   metrics: Record<string, { median: number | null; mad: number | null; n: number }>
 }
 

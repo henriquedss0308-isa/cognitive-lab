@@ -44,17 +44,18 @@ diferenças de contexto — nada mais.
 
 ## 3. Referência geral × referências contextuais
 
-Para cada par `testId + protocolVersion` podem existir três referências.
+Para cada identidade `testId + protocolVersion + scoringVersion` podem existir
+três referências. Sessões sem versão registrada pertencem somente à série
+reservada `legacy-unversioned`.
 
 ### 3.1 Referência geral
 
 É a referência que o Cognitive Lab já tinha: as sessões elegíveis **nº 4–11**,
 com as três primeiras servindo de familiarização (spec §3.2).
 
-Ela continua usando as regras atuais e **produz exatamente os mesmos valores
-que produzia antes desta missão**. Nada nesta funcionalidade altera seu
-conjunto de sessões ou seus números — há testes de regressão que falham se
-isso mudar ([`regression.test.ts`](../src/features/context-aware-baseline/__tests__/regression.test.ts)).
+Ela continua usando as mesmas fórmulas, mas somente dentro da identidade
+longitudinal compatível. Nenhum valor persistido é recalculado; sessões de
+outro scoring permanecem no histórico e não entram na janela.
 
 No código, `buildGeneralReference` **delega inteiramente** a
 `computeBaselineStats`; não existe um segundo caminho que recalcule a

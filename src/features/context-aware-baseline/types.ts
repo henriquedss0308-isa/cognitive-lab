@@ -10,6 +10,7 @@
  * apresentados como CONTEXTO DESCRITIVO e não entram em nenhum cálculo.
  */
 import type { BaselineStats, SessionRecord, TestId } from '../../types'
+import type { LongitudinalSeriesKey } from '../../longitudinal/series'
 
 /**
  * Estado do registro de lisdexanfetamina em uma sessão.
@@ -77,6 +78,8 @@ export interface ReferenceMetadata {
   kind: ReferenceKind
   testId: TestId
   protocolVersion: string
+  scoringVersion: string
+  seriesKey: LongitudinalSeriesKey
   /** IDs das sessões que compõem a janela, em ordem determinística. */
   sessionIds: string[]
   sessionCount: number

@@ -3,20 +3,33 @@ import { evaluatePrimaryZ } from '../zscore'
 import { ALL_TESTS, TEST_MAP } from '../../tests/registry'
 import type { BaselineStats } from '../../types'
 import type { CognitiveTestDefinition } from '../../tests/types'
+import { currentLongitudinalSeries, getLongitudinalSeriesKey } from '../../longitudinal/series'
+
+function seriesFor(test: CognitiveTestDefinition) {
+  return currentLongitudinalSeries(test.id, test.protocolVersion, test.scoringVersion)
+}
 
 function baselineFor(
   test: CognitiveTestDefinition,
   metric: { median: number | null; mad: number | null; n: number },
   phase: BaselineStats['phase'] = 'monitoring'
 ): BaselineStats {
+  const series = {
+    testId: test.id,
+    protocolVersion: test.protocolVersion,
+    result: { scoringVersion: test.scoringVersion },
+  }
   return {
     testId: test.id,
     protocolVersion: test.protocolVersion,
+    scoringVersion: test.scoringVersion,
+    seriesKey: getLongitudinalSeriesKey(series),
     phase,
     sessionCount: 12,
     familiarizationCount: 3,
     baselineCount: 8,
     warningCount: 0,
+    incompatibleScoringCount: 0,
     metrics: { [test.primaryMetricKey]: metric },
   }
 }
@@ -47,25 +60,45 @@ describe('evaluatePrimaryZ', () => {
   const gonogo = TEST_MAP.gonogo
 
   it('d′ acima da mediana produz z POSITIVO (melhora)', () => {
-    const out = evaluatePrimaryZ(3.0, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 8 }), gonogo)
+    const out = evaluatePrimaryZ(
+      3.0,
+      baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 8 }),
+      gonogo,
+      seriesFor(gonogo)
+    )
     expect(out.kind).toBe('ok')
     if (out.kind === 'ok') expect(out.z).toBeGreaterThan(0)
   })
 
   it('RT abaixo da mediana produz z POSITIVO (melhora)', () => {
     const simple = TEST_MAP.simple_rt
-    const out = evaluatePrimaryZ(280, baselineFor(simple, { median: 320, mad: 20, n: 8 }), simple)
+    const out = evaluatePrimaryZ(
+      280,
+      baselineFor(simple, { median: 320, mad: 20, n: 8 }),
+      simple,
+      seriesFor(simple)
+    )
     expect(out.kind).toBe('ok')
     if (out.kind === 'ok') expect(out.z).toBeGreaterThan(0)
   })
 
   it('valor nulo NUNCA vira z de 0 — retorna value_missing', () => {
-    const out = evaluatePrimaryZ(null, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 8 }), gonogo)
+    const out = evaluatePrimaryZ(
+      null,
+      baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 8 }),
+      gonogo,
+      seriesFor(gonogo)
+    )
     expect(out.kind).toBe('value_missing')
   })
 
   it('NaN é tratado como ausente', () => {
-    const out = evaluatePrimaryZ(NaN, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 8 }), gonogo)
+    const out = evaluatePrimaryZ(
+      NaN,
+      baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 8 }),
+      gonogo,
+      seriesFor(gonogo)
+    )
     expect(out.kind).toBe('value_missing')
   })
 
@@ -73,14 +106,20 @@ describe('evaluatePrimaryZ', () => {
     const out = evaluatePrimaryZ(
       3.0,
       baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 5 }, 'baseline_building'),
-      gonogo
+      gonogo,
+      seriesFor(gonogo)
     )
     expect(out.kind).toBe('not_monitoring')
   })
 
   it('MAD zero vira zero_mad com delta bruto, nunca divisão degenerada', () => {
     const corsi = TEST_MAP.corsi
-    const out = evaluatePrimaryZ(6, baselineFor(corsi, { median: 5, mad: 0, n: 8 }), corsi)
+    const out = evaluatePrimaryZ(
+      6,
+      baselineFor(corsi, { median: 5, mad: 0, n: 8 }),
+      corsi,
+      seriesFor(corsi)
+    )
     expect(out.kind).toBe('zero_mad')
     if (out.kind === 'zero_mad') {
       expect(out.median).toBe(5)
@@ -91,17 +130,29 @@ describe('evaluatePrimaryZ', () => {
   it('métrica ausente do baseline retorna no_baseline_metric', () => {
     const base = baselineFor(gonogo, { median: 2, mad: 0.3, n: 8 })
     base.metrics = {}
-    expect(evaluatePrimaryZ(3.0, base, gonogo).kind).toBe('no_baseline_metric')
+    expect(evaluatePrimaryZ(3.0, base, gonogo, seriesFor(gonogo)).kind).toBe(
+      'no_baseline_metric'
+    )
   })
 
   it('n abaixo do mínimo suprime o z com motivo (spec §3.2)', () => {
-    const out = evaluatePrimaryZ(3.0, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 5 }), gonogo)
+    const out = evaluatePrimaryZ(
+      3.0,
+      baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 5 }),
+      gonogo,
+      seriesFor(gonogo)
+    )
     expect(out.kind).toBe('insufficient_n')
     if (out.kind === 'insufficient_n') expect(out.n).toBe(5)
   })
 
   it('n exatamente no mínimo ainda produz z', () => {
-    const out = evaluatePrimaryZ(3.0, baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 6 }), gonogo)
+    const out = evaluatePrimaryZ(
+      3.0,
+      baselineFor(gonogo, { median: 2.0, mad: 0.3, n: 6 }),
+      gonogo,
+      seriesFor(gonogo)
+    )
     expect(out.kind).toBe('ok')
   })
 })

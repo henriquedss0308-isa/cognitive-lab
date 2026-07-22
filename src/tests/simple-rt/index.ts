@@ -107,6 +107,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Mede a velocidade de resposta motora a um estímulo visual simples, indicador básico de alerta e velocidade de processamento.',
   duration: '~4 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

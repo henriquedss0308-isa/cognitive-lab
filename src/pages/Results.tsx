@@ -26,6 +26,13 @@ import { ReferenceComposition } from '../features/context-aware-baseline/compone
 import { SessionContextComparison } from '../features/context-aware-baseline/components/SessionContextComparison'
 import { getSession } from '../storage/repository'
 import { loadResultsSession, type ResultsLoadState } from '../storage/resultsLoader'
+import {
+  formatMetricDelta,
+  formatMetricValue,
+  getMetricLabel,
+  sessionMedianPresentationKey,
+} from '../metrics/presentation'
+import { resolvePrimaryMetricValue } from '../metrics/primaryMetric'
 import type { SessionRecord, TestConditions } from '../types'
 
 const PHASE_LABELS: Record<string, string> = {
@@ -135,6 +142,7 @@ export function Results() {
     session.protocolVersion,
     test.baselineMetricKeys,
   ] as const
+  const scoringVersion = result.scoringVersion
 
   const selection = selectReference({
     sessions: pool,
@@ -146,13 +154,17 @@ export function Results() {
   const reference = selection.reference
   const baseline = reference.stats
 
-  const primaryValue = result.customMetrics[test.primaryMetricKey] ??
-    result.rtMetrics.medianCorrectRT
+  const primaryValue = resolvePrimaryMetricValue(test, result)
+  const primaryLabel = getMetricLabel(
+    test.primaryMetricKey,
+    test.metricLabels[test.primaryMetricKey]
+  )
+  const medianPresentationKey = sessionMedianPresentationKey(session.testId)
 
   // Sessão demo nunca é comparada ao baseline real do usuário.
   const zOutcome = session.isDemo
     ? ({ kind: 'not_monitoring' } as const)
-    : evaluatePrimaryZ(primaryValue, baseline, test)
+    : evaluatePrimaryZ(primaryValue, baseline, test, session)
 
   const contextComparison = buildContextComparison(session, reference.sessions)
   const medicationRecord = getSessionMedicationRecord(session)
@@ -210,10 +222,10 @@ export function Results() {
       {/* Estado da sessão: qualidade e fase juntas, uma linha só. */}
       <div className="card px-4 py-3 mb-6 flex items-center gap-3 flex-wrap">
         <QualityBadge quality={result.quality} />
-        {result.baselinePhase && (
+        {baseline.phase && (
           <>
             <span aria-hidden="true" className="text-lab-faint">·</span>
-            <span className="text-sm text-lab-muted">{PHASE_LABELS[result.baselinePhase]}</span>
+            <span className="text-sm text-lab-muted">{PHASE_LABELS[baseline.phase]}</span>
           </>
         )}
       </div>
@@ -233,19 +245,38 @@ export function Results() {
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-        <MetricCard emphasis metric={test.primaryMetricKey} label="Métrica principal"
-          value={primaryValue} unit={test.primaryMetricKey.includes('accuracy') || test.primaryMetricKey.includes('span') ? '' : ' ms'} />
-        <MetricCard metric="accuracy" label="Precisão" value={result.accuracyMetrics.accuracy * 100} unit="%" />
-        <MetricCard metric="medianCorrectRT" label="RT mediano" value={result.rtMetrics.medianCorrectRT} unit=" ms" />
+        <MetricCard
+          emphasis
+          metric={test.primaryMetricKey}
+          label={`Métrica principal · ${primaryLabel}`}
+          value={primaryValue}
+        />
+        <MetricCard metric="accuracy" value={result.accuracyMetrics.accuracy} />
+        <MetricCard metric={medianPresentationKey} value={result.rtMetrics.medianCorrectRT} />
         <MetricCard metric="rtCV" label="Variabilidade (CV)" value={result.rtMetrics.rtCoefficientOfVariation} />
       </div>
+
+      {!session.isDemo && baseline.incompatibleScoringCount > 0 && (
+        <div className="card p-4 mb-6 border-lab-warning/40" role="note">
+          <p className="text-sm text-lab-muted">
+            Existem {baseline.incompatibleScoringCount}{' '}
+            {baseline.incompatibleScoringCount === 1
+              ? 'sessão histórica'
+              : 'sessões históricas'} deste protocolo com outra regra
+            de scoring. Os registros continuam preservados no histórico, mas não completam nem
+            entram nesta referência.
+          </p>
+        </div>
+      )}
 
       {zOutcome.kind !== 'not_monitoring' && zOutcome.kind !== 'no_baseline_metric' && (
         <div className="card p-5 mb-6">
           <h3 className="section-title">Comparado ao seu próprio baseline</h3>
           {zOutcome.kind === 'ok' && (
             <>
-              <p className="metric-value text-3xl mt-3">z = {zOutcome.z.toFixed(2)}</p>
+              <p className="metric-value text-3xl mt-3">
+                z = {formatMetricValue('zScore', zOutcome.z)}
+              </p>
               <p className="help-text mt-2 max-w-prose">
                 z positivo = melhor que o seu habitual nesta métrica.
                 Baseado em {zOutcome.n} de {baseline.baselineCount} sessões de baseline
@@ -268,10 +299,17 @@ export function Results() {
           {zOutcome.kind === 'zero_mad' && (
             <p className="text-sm text-lab-muted mt-2 max-w-prose">
               A variabilidade do seu baseline nesta métrica é ≈ 0 (valores quase idênticos), então o
-              desvio padronizado não é informativo. Mediana do baseline: {zOutcome.median?.toFixed(2)}
+              desvio padronizado não é informativo. Mediana do baseline:{' '}
+              {formatMetricValue(test.primaryMetricKey, zOutcome.median)}
               {zOutcome.delta !== null &&
-                ` · diferença desta sessão: ${zOutcome.delta > 0 ? '+' : ''}${zOutcome.delta.toFixed(2)}`}
+                ` · diferença desta sessão: ${formatMetricDelta(test.primaryMetricKey, zOutcome.delta)}`}
               .
+            </p>
+          )}
+          {zOutcome.kind === 'incompatible_series' && (
+            <p className="text-sm text-lab-muted mt-2 max-w-prose">
+              Comparação indisponível: a sessão e a referência usam regras de scoring
+              diferentes.
             </p>
           )}
           {/* Qual referência serviu de comparação, e por quê. */}
@@ -294,8 +332,12 @@ export function Results() {
         <Section title="Métricas específicas">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {Object.entries(result.customMetrics).map(([key, val]) => (
-              <MetricCard key={key} metric={key} label={test.metricLabels[key] ?? key} value={val}
-                unit={key.includes('Rate') || key.includes('accuracy') ? '' : key.includes('Cost') || key.includes('RT') ? ' ms' : ''} />
+              <MetricCard
+                key={key}
+                metric={key}
+                label={getMetricLabel(key, test.metricLabels[key])}
+                value={val}
+              />
             ))}
           </div>
         </Section>
@@ -313,9 +355,9 @@ export function Results() {
                       key={k}
                       className="flex justify-between gap-3 text-sm py-1.5 border-b border-lab-border last:border-b-0"
                     >
-                      <dt className="text-lab-muted">{k}</dt>
+                      <dt className="text-lab-muted">{getMetricLabel(k)}</dt>
                       <dd className="metric-value text-sm">
-                        {v !== null ? (typeof v === 'number' ? v.toFixed(1) : v) : '—'}
+                        {formatMetricValue(k, v)}
                       </dd>
                     </div>
                   ))}
@@ -347,9 +389,9 @@ export function Results() {
           <div className="px-4 pb-5 pt-4 border-t border-lab-border">
             <ReferenceComposition
               selection={selection}
-              general={buildGeneralReference(...referenceArgs)}
-              taken={buildContextualReference(...referenceArgs, 'taken')}
-              notTaken={buildContextualReference(...referenceArgs, 'not_taken')}
+              general={buildGeneralReference(...referenceArgs, scoringVersion)}
+              taken={buildContextualReference(...referenceArgs, 'taken', scoringVersion)}
+              notTaken={buildContextualReference(...referenceArgs, 'not_taken', scoringVersion)}
             />
           </div>
         </details>

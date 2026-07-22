@@ -16,6 +16,10 @@
  * "baseline em construção".
  */
 import type { SessionRecord, TestId } from '../../types'
+import {
+  getLongitudinalSeriesIdentity,
+  type LongitudinalSeriesSource,
+} from '../../longitudinal/series'
 import { getEligibleSessions, getContextualProgress } from './contextualEligibility'
 import { buildContextualReference, buildGeneralReference } from './contextualReference'
 import { getSessionLisdexamfetamineStatus } from './medicationContext'
@@ -44,7 +48,8 @@ export interface SelectReferenceInput {
    * a primeira comparável à sua referência já completa.
    */
   sessions: SessionRecord[]
-  session: Pick<SessionRecord, 'checkIn' | 'testId' | 'protocolVersion'>
+  session: Pick<SessionRecord, 'checkIn' | 'testId' | 'protocolVersion'> &
+    Pick<LongitudinalSeriesSource, 'result'>
   testId: TestId
   protocolVersion: string
   metricKeys: string[]
@@ -63,14 +68,21 @@ export function selectReference({
   metricKeys,
 }: SelectReferenceInput): ReferenceSelection {
   const sessionStatus: LisdexamfetamineStatus = getSessionLisdexamfetamineStatus(session)
-  const eligible = getEligibleSessions(sessions, testId, protocolVersion)
+  const { scoringVersion } = getLongitudinalSeriesIdentity(session)
+  const eligible = getEligibleSessions(sessions, testId, protocolVersion, scoringVersion)
 
   const progress = {
     taken: getContextualProgress(eligible, 'taken'),
     notTaken: getContextualProgress(eligible, 'not_taken'),
   }
 
-  const general = buildGeneralReference(sessions, testId, protocolVersion, metricKeys)
+  const general = buildGeneralReference(
+    sessions,
+    testId,
+    protocolVersion,
+    metricKeys,
+    scoringVersion
+  )
   // Sem referência geral consolidada não há comparação a apresentar. Devolver a
   // geral "em construção" aqui manteria o comportamento anterior da tela, que
   // já sabe não exibir z fora de monitoring.
@@ -89,7 +101,8 @@ export function selectReference({
     testId,
     protocolVersion,
     metricKeys,
-    sessionStatus
+    sessionStatus,
+    scoringVersion
   )
 
   if (contextual.metadata.composition === 'complete') {

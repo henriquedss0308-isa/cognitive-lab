@@ -23,6 +23,7 @@ const POINT: TrendPoint = {
   shortLabel: '21/07/2026',
   fullLabel: '21/07/2026 às 12:42:05',
   value: 245.4000244140625,
+  scoringVersion: 'sdt-hautus-1',
 }
 
 /**
@@ -90,6 +91,39 @@ describe('SessionTooltip', () => {
 
     expect(screen.getByText('100,0%')).toBeInTheDocument()
   })
+
+  it('informa a scoringVersion da série sem exibir identidade interna', () => {
+    const { container } = renderAsRecharts(
+      <SessionTooltip metricKey="confirmedSpan" metricLabel="Amplitude confirmada" />,
+      { payload: { ...POINT, scoringVersion: 'sdt-hautus-1;corsi-replay-1' } }
+    )
+
+    expect(screen.getByText('Scoring: sdt-hautus-1;corsi-replay-1')).toBeInTheDocument()
+    expect(container.textContent).not.toContain(SESSION_ID)
+  })
+
+  it('rotula explicitamente scoring ausente como legado sem versão', () => {
+    renderAsRecharts(
+      <SessionTooltip metricKey="confirmedSpan" metricLabel="Amplitude confirmada" />,
+      { payload: { ...POINT, scoringVersion: 'legacy-unversioned' } }
+    )
+
+    expect(screen.getByText('Scoring: Legado sem versão registrada')).toBeInTheDocument()
+  })
+
+  it.each([
+    ['dPrime', 2.4, '2,40'],
+    ['commissionErrorRate', 0.11, '11,0%'],
+    ['confirmedSpan', 5, '5'],
+    ['stroopCostAccuracy', -0.08, '−8,0 pp'],
+  ] as const)('mantém %s consistente com os cards', (metricKey, value, expected) => {
+    renderAsRecharts(
+      <SessionTooltip metricKey={metricKey} metricLabel="Métrica" />,
+      { payload: { ...POINT, value } }
+    )
+
+    expect(screen.getByText(expected)).toBeInTheDocument()
+  })
 })
 
 describe('ScatterTooltip', () => {
@@ -97,7 +131,8 @@ describe('ScatterTooltip', () => {
     key: SESSION_ID,
     fullLabel: '21/07/2026 às 12:42:05',
     speed: 245.4000244140625,
-    accuracy: 97.5,
+    accuracy: 0.975,
+    scoringVersion: 'sdt-hautus-1',
   }
 
   it('não exibe o sessionId', () => {
@@ -113,5 +148,14 @@ describe('ScatterTooltip', () => {
     expect(screen.getByText('21/07/2026 às 12:42:05')).toBeInTheDocument()
     expect(screen.getByText('245,4 ms')).toBeInTheDocument()
     expect(screen.getByText('97,5%')).toBeInTheDocument()
+  })
+
+  it('identifica o tempo de reprodução do Corsi pelo metadado explícito', () => {
+    renderAsRecharts(<ScatterTooltip medianMetricKey="corsiReproductionTime" />, {
+      payload: SCATTER_POINT,
+    })
+
+    expect(screen.getByText(/Tempo mediano de reprodução/)).toBeInTheDocument()
+    expect(screen.getByText('245,4 ms')).toBeInTheDocument()
   })
 })

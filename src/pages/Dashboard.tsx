@@ -21,7 +21,13 @@ export function Dashboard() {
   const lastSession = realSessions[0] ?? sessions[0]
 
   const testsWithBaseline = ALL_TESTS.filter((t) => {
-    const stats = computeBaselineStats(sessions, t.id, t.protocolVersion, t.baselineMetricKeys)
+    const stats = computeBaselineStats(
+      sessions,
+      t.id,
+      t.protocolVersion,
+      t.baselineMetricKeys,
+      t.scoringVersion
+    )
     return stats.phase === 'monitoring'
   }).length
 

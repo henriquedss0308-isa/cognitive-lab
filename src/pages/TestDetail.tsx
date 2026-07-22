@@ -12,6 +12,7 @@ import { selectReference } from '../features/context-aware-baseline/referenceSel
 import { ReferenceComposition } from '../features/context-aware-baseline/components/ReferenceComposition'
 import { Page, PageHeader } from '../components/common/Page'
 import type { TestId } from '../types'
+import { currentLongitudinalSeries, formatScoringVersionLabel } from '../longitudinal/series'
 
 export function TestDetail() {
   const { testId } = useParams<{ testId: TestId }>()
@@ -20,7 +21,13 @@ export function TestDetail() {
 
   if (!test) return <div className="p-8">Teste não encontrado.</div>
 
-  const baseline = computeBaselineStats(sessions, test.id, test.protocolVersion, test.baselineMetricKeys)
+  const baseline = computeBaselineStats(
+    sessions,
+    test.id,
+    test.protocolVersion,
+    test.baselineMetricKeys,
+    test.scoringVersion
+  )
   const testSessions = sessions.filter((s) => s.testId === test.id && s.mode === 'assessment')
 
   const referenceArgs = [sessions, test.id, test.protocolVersion, test.baselineMetricKeys] as const
@@ -28,7 +35,12 @@ export function TestDetail() {
   // então basta um contexto neutro para obter o progresso das duas janelas.
   const selection = selectReference({
     sessions,
-    session: { checkIn: undefined, testId: test.id, protocolVersion: test.protocolVersion },
+    session: {
+      checkIn: undefined,
+      testId: test.id,
+      protocolVersion: test.protocolVersion,
+      result: { scoringVersion: test.scoringVersion },
+    },
     testId: test.id,
     protocolVersion: test.protocolVersion,
     metricKeys: test.baselineMetricKeys,
@@ -60,10 +72,28 @@ export function TestDetail() {
         </div>
       </div>
 
+      {baseline.incompatibleScoringCount > 0 && (
+        <div className="card p-4 mb-6 border-lab-warning/40" role="note">
+          <p className="text-sm text-lab-muted">
+            {baseline.incompatibleScoringCount}{' '}
+            {baseline.incompatibleScoringCount === 1
+              ? 'sessão histórica'
+              : 'sessões históricas'} com scoring diferente permanece
+            {baseline.incompatibleScoringCount === 1 ? '' : 'm'}{' '}
+            {baseline.incompatibleScoringCount === 1 ? 'visível' : 'visíveis'} no histórico,
+            sem compor o
+            baseline atual.
+          </p>
+        </div>
+      )}
+
       <div className="card grid grid-cols-2 md:grid-cols-4 divide-x divide-lab-border mb-8">
         <div className="p-4">
           <div className="section-title">Protocolo</div>
           <div className="metric-value text-sm mt-1.5">{test.protocolVersion}</div>
+          <div className="help-text mt-1">
+            scoring {formatScoringVersionLabel(test.scoringVersion)}
+          </div>
         </div>
         <div className="p-4">
           <div className="section-title">Ensaios</div>
@@ -85,6 +115,11 @@ export function TestDetail() {
           sessions={testSessions}
           metricKey={test.primaryMetricKey}
           label={test.metricLabels[test.primaryMetricKey] ?? test.primaryMetricKey}
+          targetSeries={currentLongitudinalSeries(
+            test.id,
+            test.protocolVersion,
+            test.scoringVersion
+          )}
         />
       )}
 
@@ -96,9 +131,9 @@ export function TestDetail() {
         <div className="px-4 pb-5 pt-4 border-t border-lab-border">
           <ReferenceComposition
             selection={selection}
-            general={buildGeneralReference(...referenceArgs)}
-            taken={buildContextualReference(...referenceArgs, 'taken')}
-            notTaken={buildContextualReference(...referenceArgs, 'not_taken')}
+            general={buildGeneralReference(...referenceArgs, test.scoringVersion)}
+            taken={buildContextualReference(...referenceArgs, 'taken', test.scoringVersion)}
+            notTaken={buildContextualReference(...referenceArgs, 'not_taken', test.scoringVersion)}
           />
         </div>
       </details>

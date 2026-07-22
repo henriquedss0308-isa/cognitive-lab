@@ -42,14 +42,15 @@ export function orderSessionsDeterministically(sessions: SessionRecord[]): Sessi
   })
 }
 
-/** Sessões elegíveis do par (testId, protocolVersion), em ordem determinística. */
+/** Sessões elegíveis da identidade longitudinal, em ordem determinística. */
 export function getEligibleSessions(
   sessions: SessionRecord[],
   testId: TestId,
-  protocolVersion: string
+  protocolVersion: string,
+  scoringVersion?: unknown
 ): SessionRecord[] {
   return orderSessionsDeterministically(
-    getValidAssessmentSessions(sessions, testId, protocolVersion)
+    getValidAssessmentSessions(sessions, testId, protocolVersion, scoringVersion)
   )
 }
 

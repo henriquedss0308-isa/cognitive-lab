@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { buildTrialRecord } from '../trialRecorder'
+import {
+  isEligibleForStimulusContingentScoring,
+  isTruePreOnsetResponse,
+} from '../../scoring/stimulusEligibility'
 import type { GeneratedTrial } from '../../tests/types'
 import { detectDevice } from '../../utils/device'
 
@@ -80,5 +84,25 @@ describe('buildTrialRecord', () => {
       responseTimestamp: 1280,
     })
     expect(r.reactionTimeMs).toBe(280)
+  })
+
+  it('persiste evidência que distingue pré-onset real de pós-onset rápido', () => {
+    const preOnset = record({
+      actualResponse: 'space',
+      responseTimestamp: 950,
+      beforeOnset: true,
+    })
+    const rapidPostOnset = record({
+      actualResponse: 'space',
+      responseTimestamp: 1_050,
+    })
+
+    expect(preOnset.invalidReason).toBe('anticipation')
+    expect(preOnset.metadata?.outcomeKind).toBe('anticipation')
+    expect(isTruePreOnsetResponse(preOnset)).toBe(true)
+
+    expect(rapidPostOnset.invalidReason).toBe('anticipation')
+    expect(rapidPostOnset.metadata?.outcomeKind).toBe('hit')
+    expect(isEligibleForStimulusContingentScoring(rapidPostOnset)).toBe(true)
   })
 })

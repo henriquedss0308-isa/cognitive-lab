@@ -5,6 +5,11 @@ import { ALL_TESTS } from '../tests/registry'
 import { LongitudinalChart, SpeedAccuracyChart } from '../components/charts/SessionCharts'
 import { DemoBadge, QualityBadge } from '../components/common/Badge'
 import { Page, PageHeader } from '../components/common/Page'
+import {
+  formatMetricValue,
+  getMetricPresentation,
+  sessionMedianPresentationKey,
+} from '../metrics/presentation'
 import type { TestId } from '../types'
 
 export function History() {
@@ -74,6 +79,7 @@ export function History() {
         <div className="card divide-y divide-lab-border overflow-hidden">
           {filtered.map((s) => {
             const test = ALL_TESTS.find((t) => t.id === s.testId)
+            const medianMetricKey = sessionMedianPresentationKey(s.testId)
             return (
               <Link
                 key={s.sessionId}
@@ -92,11 +98,13 @@ export function History() {
                 </div>
                 <div className="text-right shrink-0">
                   <div className="metric-value text-sm">
-                    {s.result?.rtMetrics.medianCorrectRT?.toFixed(0) ?? '—'}
-                    <span className="text-lab-muted font-sans text-xs ml-1">ms</span>
+                    <span className="text-lab-muted font-sans text-xs mr-1">
+                      {getMetricPresentation(medianMetricKey).label} ·
+                    </span>
+                    {formatMetricValue(medianMetricKey, s.result?.rtMetrics.medianCorrectRT)}
                   </div>
                   <div className="help-text mt-0.5">
-                    {((s.result?.accuracyMetrics.accuracy ?? 0) * 100).toFixed(0)}% precisão
+                    Precisão · {formatMetricValue('accuracy', s.result?.accuracyMetrics.accuracy)}
                   </div>
                 </div>
               </Link>

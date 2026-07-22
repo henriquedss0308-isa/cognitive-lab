@@ -135,6 +135,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Avalia a velocidade de decisão e resposta motora diante de estímulos que exigem escolha entre duas alternativas.',
   duration: '~5 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

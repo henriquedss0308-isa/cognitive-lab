@@ -1,14 +1,28 @@
 import type { SessionRecord } from '../../types'
+import { formatMetricValue } from '../../metrics/presentation'
+import { resolvePrimaryMetricValue } from '../../metrics/primaryMetric'
+import { getTest } from '../../tests/registry'
+import {
+  getLongitudinalSeriesIdentity,
+  getLongitudinalSeriesKey,
+  type LongitudinalSeriesKey,
+  type LongitudinalSeriesSource,
+} from '../../longitudinal/series'
 
 export interface TrendSelection {
   /** Sessões plotáveis, ordenadas por startedAt crescente. */
   sessions: SessionRecord[]
   /** Sessões de OUTRAS versões de protocolo, ocultadas da série (spec §6). */
   hiddenOtherVersions: number
+  /** Sessões do mesmo protocolo com scoring incompatível, preservadas fora da linha. */
+  hiddenOtherScoringVersions: number
   /** Sessões excluídas por quality === 'invalid'. */
   hiddenInvalid: number
   /** Versão de protocolo efetivamente plotada (a da sessão mais recente). */
   protocolVersion: string | null
+  /** Versão de scoring efetivamente plotada. */
+  scoringVersion: string | null
+  seriesKey: LongitudinalSeriesKey | null
 }
 
 /**
@@ -16,10 +30,15 @@ export interface TrendSelection {
  * - apenas avaliações completas com result;
  * - nunca demo;
  * - sessões invalid ficam FORA da série (eram plotadas silenciosamente);
- * - uma única protocolVersion por série — a mais recente; as demais são
- *   contadas para aviso, nunca misturadas.
+ * - uma única identidade (teste + protocolo + scoring) por linha; sem alvo
+ *   explícito, usa a sessão válida mais recente;
+ * - protocolos e scorings incompatíveis são contados para aviso, nunca
+ *   misturados.
  */
-export function selectTrendSessions(sessions: SessionRecord[]): TrendSelection {
+export function selectTrendSessions(
+  sessions: SessionRecord[],
+  target?: LongitudinalSeriesSource
+): TrendSelection {
   const base = sessions
     .filter((s) => s.result && s.mode === 'assessment' && !s.isDemo)
     .sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime())
@@ -28,17 +47,40 @@ export function selectTrendSessions(sessions: SessionRecord[]): TrendSelection {
   const hiddenInvalid = base.length - valid.length
 
   if (valid.length === 0) {
-    return { sessions: [], hiddenOtherVersions: 0, hiddenInvalid, protocolVersion: null }
+    return {
+      sessions: [],
+      hiddenOtherVersions: 0,
+      hiddenOtherScoringVersions: 0,
+      hiddenInvalid,
+      protocolVersion: null,
+      scoringVersion: null,
+      seriesKey: null,
+    }
   }
 
-  const currentVersion = valid[valid.length - 1].protocolVersion
-  const sameVersion = valid.filter((s) => s.protocolVersion === currentVersion)
+  const selectedSeries = target ?? valid[valid.length - 1]
+  const identity = getLongitudinalSeriesIdentity(selectedSeries)
+  const seriesKey = getLongitudinalSeriesKey(selectedSeries)
+  const sameSeries = valid.filter((s) => getLongitudinalSeriesKey(s) === seriesKey)
+  const hiddenOtherVersions = valid.filter(
+    (s) =>
+      s.testId !== identity.testId || s.protocolVersion !== identity.protocolVersion
+  ).length
+  const hiddenOtherScoringVersions = valid.filter(
+    (s) =>
+      s.testId === identity.testId &&
+      s.protocolVersion === identity.protocolVersion &&
+      getLongitudinalSeriesKey(s) !== seriesKey
+  ).length
 
   return {
-    sessions: sameVersion,
-    hiddenOtherVersions: valid.length - sameVersion.length,
+    sessions: sameSeries,
+    hiddenOtherVersions,
+    hiddenOtherScoringVersions,
     hiddenInvalid,
-    protocolVersion: currentVersion,
+    protocolVersion: identity.protocolVersion,
+    scoringVersion: identity.scoringVersion,
+    seriesKey,
   }
 }
 
@@ -61,11 +103,15 @@ export interface TrendPoint {
   /** Data + horário, para o tooltip distinguir sessões do mesmo dia. */
   fullLabel: string
   value: number
+  /** Versão normalizada, exibida no tooltip sem expor identidade interna. */
+  scoringVersion: string
 }
 
 function metricValue(session: SessionRecord, metricKey: string): number | null {
   const result = session.result
   if (!result) return null
+  const test = getTest(session.testId)
+  if (metricKey === test.primaryMetricKey) return resolvePrimaryMetricValue(test, result)
   if (metricKey === 'medianCorrectRT') return result.rtMetrics.medianCorrectRT
   if (metricKey === 'accuracy') return result.accuracyMetrics.accuracy
   return result.customMetrics[metricKey] ?? null
@@ -83,26 +129,11 @@ export function formatFullDate(iso: string): string {
 /**
  * Formata o valor de uma métrica para leitura humana.
  *
- * Existe porque o tooltip mostrava o número cru do ponto flutuante
- * ("268.300048828125"). A classificação segue a mesma convenção de unidades já
- * usada nos cards de resultado.
+ * Cards e gráficos delegam ao mesmo registry explícito. Métrica desconhecida
+ * recebe apresentação neutra — nunca unidade inferida pelo nome.
  */
 export function formatTrendValue(metricKey: string, value: number): string {
-  const number = (v: number, digits: number) =>
-    new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(v)
-
-  // Proporções são gravadas em 0–1; exibir em % é só apresentação.
-  if (metricKey.includes('accuracy') || /Rate$/.test(metricKey)) {
-    return `${number(value * 100, 1)}%`
-  }
-  if (/span/i.test(metricKey)) return number(value, 0)
-  if (metricKey.includes('RT') || metricKey.includes('Cost') || metricKey.includes('Slowing')) {
-    return `${number(value, 1)} ms`
-  }
-  return number(value, 2)
+  return formatMetricValue(metricKey, value)
 }
 
 /**
@@ -122,6 +153,7 @@ export function buildTrendPoints(sessions: SessionRecord[], metricKey: string): 
       shortLabel: formatShortDate(session.startedAt),
       fullLabel: formatFullDate(session.startedAt),
       value,
+      scoringVersion: getLongitudinalSeriesIdentity(session).scoringVersion,
     })
   }
   return points

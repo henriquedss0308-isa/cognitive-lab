@@ -8,6 +8,11 @@
  */
 import type { BaselineStats, SessionRecord, TestId } from '../../types'
 import {
+  getLongitudinalSeriesIdentity,
+  getLongitudinalSeriesKey,
+  type LongitudinalSeriesSource,
+} from '../../longitudinal/series'
+import {
   BASELINE_SESSIONS,
   FAMILIARIZATION_SESSIONS,
   computeBaselineStats,
@@ -62,10 +67,11 @@ export function buildGeneralReference(
   sessions: SessionRecord[],
   testId: TestId,
   protocolVersion: string,
-  metricKeys: string[]
+  metricKeys: string[],
+  scoringVersion?: unknown
 ): ContextualReference {
-  const stats = computeBaselineStats(sessions, testId, protocolVersion, metricKeys)
-  const eligible = getEligibleSessions(sessions, testId, protocolVersion)
+  const stats = computeBaselineStats(sessions, testId, protocolVersion, metricKeys, scoringVersion)
+  const eligible = getEligibleSessions(sessions, testId, protocolVersion, scoringVersion)
 
   // Mesma janela posicional de `computeBaselineStats`, para que a composição
   // exibida seja a das sessões realmente usadas no cálculo.
@@ -79,6 +85,8 @@ export function buildGeneralReference(
       kind: 'general',
       testId,
       protocolVersion,
+      scoringVersion: stats.scoringVersion,
+      seriesKey: stats.seriesKey,
       sessionIds: window.map((s) => s.sessionId),
       sessionCount: window.length,
       composition: stats.phase === 'monitoring' ? 'complete' : window.length > 0 ? 'building' : 'empty',
@@ -109,20 +117,31 @@ export function buildContextualReference(
   testId: TestId,
   protocolVersion: string,
   metricKeys: string[],
-  status: Exclude<LisdexamfetamineStatus, 'unknown'>
+  status: Exclude<LisdexamfetamineStatus, 'unknown'>,
+  scoringVersion?: unknown
 ): ContextualReference {
-  const eligible = getEligibleSessions(sessions, testId, protocolVersion)
+  const target: LongitudinalSeriesSource = {
+    testId,
+    protocolVersion,
+    result: { scoringVersion },
+  }
+  const identity = getLongitudinalSeriesIdentity(target)
+  const eligible = getEligibleSessions(sessions, testId, protocolVersion, scoringVersion)
+  const general = computeBaselineStats(sessions, testId, protocolVersion, metricKeys, scoringVersion)
   const window = getContextualWindow(eligible, status)
   const composition = compositionOf(window.length)
 
   const stats: BaselineStats = {
     testId,
     protocolVersion,
+    scoringVersion: identity.scoringVersion,
+    seriesKey: getLongitudinalSeriesKey(target),
     phase: composition === 'complete' ? 'monitoring' : 'baseline_building',
     sessionCount: window.length,
     familiarizationCount: Math.min(eligible.length, FAMILIARIZATION_SESSIONS),
     baselineCount: window.length,
     warningCount: window.filter((s) => s.quality === 'valid_with_warnings').length,
+    incompatibleScoringCount: general.incompatibleScoringCount,
     metrics: computeMetricStats(window, metricKeys),
   }
 
@@ -131,6 +150,8 @@ export function buildContextualReference(
       kind: referenceKindForStatus(status),
       testId,
       protocolVersion,
+      scoringVersion: identity.scoringVersion,
+      seriesKey: getLongitudinalSeriesKey(target),
       sessionIds: window.map((s) => s.sessionId),
       sessionCount: window.length,
       composition,

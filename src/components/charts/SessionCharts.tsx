@@ -11,6 +11,17 @@ import {
   type TrendPoint,
 } from './chartSelectors'
 import { useChartTheme, tooltipStyle, type ChartTheme } from './useChartTheme'
+import {
+  formatMetricValue,
+  getMetricLabel,
+  sessionMedianPresentationKey,
+  type KnownMetricKey,
+} from '../../metrics/presentation'
+import {
+  formatScoringVersionLabel,
+  normalizeScoringVersion,
+  type LongitudinalSeriesSource,
+} from '../../longitudinal/series'
 
 /**
  * Gráficos das sessões.
@@ -68,6 +79,9 @@ export function SessionTooltip({
         {metricLabel}:{' '}
         <span className="metric-value">{formatTrendValue(metricKey, point.value)}</span>
       </div>
+      <div className="mt-1 text-lab-muted">
+        Scoring: {formatScoringVersionLabel(point.scoringVersion)}
+      </div>
     </div>
   )
 }
@@ -93,6 +107,8 @@ function ChartFrame({
 export function BlockChart({ session }: Props) {
   const theme = useChartTheme()
   const blocks = session.result?.blockMetrics ?? []
+  const medianMetricKey = sessionMedianPresentationKey(session.testId)
+  const medianMetricLabel = getMetricLabel(medianMetricKey)
   if (blocks.length === 0) return null
 
   return (
@@ -101,10 +117,40 @@ export function BlockChart({ session }: Props) {
         <BarChart data={blocks} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} vertical={false} />
           <XAxis dataKey="blockIndex" {...axisProps(theme)} />
-          <YAxis {...axisProps(theme)} />
-          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ fill: theme.grid, opacity: 0.4 }} />
-          <Bar dataKey="medianRT" name="RT mediano (ms)" fill={theme.series} radius={[2, 2, 0, 0]} />
-          <Bar dataKey="accuracy" name="Precisão" fill={theme.seriesAlt} radius={[2, 2, 0, 0]} />
+          <YAxis
+            yAxisId="rt"
+            tickFormatter={(value: number) => formatMetricValue(medianMetricKey, value)}
+            {...axisProps(theme)}
+          />
+          <YAxis
+            yAxisId="accuracy"
+            orientation="right"
+            domain={[0, 1]}
+            tickFormatter={(value: number) => formatMetricValue('accuracy', value)}
+            {...axisProps(theme)}
+          />
+          <Tooltip
+            contentStyle={tooltipStyle(theme)}
+            cursor={{ fill: theme.grid, opacity: 0.4 }}
+            formatter={(value, name, item) => {
+              const metricKey = item.dataKey === 'accuracy' ? 'accuracy' : medianMetricKey
+              return [formatMetricValue(metricKey, Number(value)), name]
+            }}
+          />
+          <Bar
+            yAxisId="rt"
+            dataKey="medianRT"
+            name={medianMetricLabel}
+            fill={theme.series}
+            radius={[2, 2, 0, 0]}
+          />
+          <Bar
+            yAxisId="accuracy"
+            dataKey="accuracy"
+            name="Precisão"
+            fill={theme.seriesAlt}
+            radius={[2, 2, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </ChartFrame>
@@ -113,6 +159,8 @@ export function BlockChart({ session }: Props) {
 
 export function RTDistribution({ session }: Props) {
   const theme = useChartTheme()
+  const medianMetricKey = sessionMedianPresentationKey(session.testId)
+  const isCorsi = session.testId === 'corsi'
   const rts = session.trials
     .filter((t) => t.correct && t.reactionTimeMs !== null && t.reactionTimeMs >= 150)
     .map((t) => t.reactionTimeMs!)
@@ -133,13 +181,21 @@ export function RTDistribution({ session }: Props) {
   })
 
   return (
-    <ChartFrame title="Distribuição de RT" note="Ensaios corretos, em milissegundos.">
+    <ChartFrame
+      title={isCorsi ? 'Distribuição do tempo de reprodução' : 'Distribuição de RT'}
+      note={isCorsi ? 'Sequências corretas, em milissegundos.' : 'Ensaios corretos, em milissegundos.'}
+    >
       <ResponsiveContainer width="100%" height={200}>
         <BarChart data={histogram} margin={{ top: 4, right: 4, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} vertical={false} />
           <XAxis dataKey="range" {...axisProps(theme, 10)} />
           <YAxis {...axisProps(theme)} />
-          <Tooltip contentStyle={tooltipStyle(theme)} cursor={{ fill: theme.grid, opacity: 0.4 }} />
+          <Tooltip
+            contentStyle={tooltipStyle(theme)}
+            cursor={{ fill: theme.grid, opacity: 0.4 }}
+            labelFormatter={(value) => formatMetricValue(medianMetricKey, Number(value))}
+            formatter={(value) => [formatMetricValue('histogramCount', Number(value)), 'Ensaios']}
+          />
           <Bar dataKey="count" fill={theme.seriesThird} radius={[2, 2, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
@@ -151,11 +207,18 @@ interface LongitudinalProps {
   sessions: SessionRecord[]
   metricKey: string
   label: string
+  /** Quando informado, somente esta identidade longitudinal pode formar a linha. */
+  targetSeries?: LongitudinalSeriesSource
 }
 
-export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalProps) {
+export function LongitudinalChart({
+  sessions,
+  metricKey,
+  label,
+  targetSeries,
+}: LongitudinalProps) {
   const theme = useChartTheme()
-  const selection = selectTrendSessions(sessions)
+  const selection = selectTrendSessions(sessions, targetSeries)
   const data = buildTrendPoints(selection.sessions, metricKey)
   // O eixo recebe o id da sessão e precisa devolver a data curta.
   const axisLabels = new Map(data.map((p) => [p.key, p.shortLabel]))
@@ -164,6 +227,9 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
     selection.hiddenInvalid > 0 ? `${selection.hiddenInvalid} inválida(s) não plotada(s)` : null,
     selection.hiddenOtherVersions > 0
       ? `${selection.hiddenOtherVersions} de versão anterior do protocolo oculta(s)`
+      : null,
+    selection.hiddenOtherScoringVersions > 0
+      ? `${selection.hiddenOtherScoringVersions} histórica(s) com scoring diferente preservada(s), fora desta série`
       : null,
   ]
     .filter(Boolean)
@@ -189,9 +255,9 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
         anteriores", o que sugeria que a mais recente ficava de fora — este
         gráfico não exclui sessão nenhuma por ser a atual (ele nem é exibido na
         página de uma sessão). Fora da série ficam apenas os casos listados em
-        `hiddenNote`: inválidas e de outra versão de protocolo.
+        `hiddenNote`: inválidas e de outra identidade longitudinal.
       */
-      note={`${data.length} sessões, da mais antiga à mais recente — todas as elegíveis entram, inclusive a última.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
+      note={`${data.length} sessões comparáveis, da mais antiga à mais recente. Scoring: ${formatScoringVersionLabel(selection.scoringVersion!)}.${hiddenNote ? ` ${hiddenNote}.` : ''}`}
     >
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
@@ -206,7 +272,10 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
             tickFormatter={(key: string) => axisLabels.get(key) ?? ''}
             {...axisProps(theme)}
           />
-          <YAxis {...axisProps(theme)} />
+          <YAxis
+            tickFormatter={(value: number) => formatMetricValue(metricKey, value)}
+            {...axisProps(theme)}
+          />
           <Tooltip
             cursor={{ stroke: theme.grid }}
             wrapperStyle={{ outline: 'none' }}
@@ -228,6 +297,7 @@ export function LongitudinalChart({ sessions, metricKey, label }: LongitudinalPr
 
 interface SpeedAccuracyProps {
   sessions: SessionRecord[]
+  targetSeries?: LongitudinalSeriesSource
 }
 
 /**
@@ -240,9 +310,13 @@ interface SpeedAccuracyProps {
 export function ScatterTooltip({
   active,
   payload,
+  medianMetricKey = 'medianCorrectRT',
 }: {
   active?: boolean
-  payload?: { payload?: { fullLabel: string; speed: number; accuracy: number } }[]
+  payload?: {
+    payload?: { fullLabel: string; speed: number; accuracy: number; scoringVersion: string }
+  }[]
+  medianMetricKey?: KnownMetricKey
 }) {
   const point = active ? payload?.[0]?.payload : undefined
   if (!point) return null
@@ -251,19 +325,28 @@ export function ScatterTooltip({
     <div className="card px-3 py-2 text-xs shadow-none">
       <div className="text-lab-muted">{point.fullLabel}</div>
       <div className="mt-1 text-lab-fg">
-        RT mediano: <span className="metric-value">{formatTrendValue('medianCorrectRT', point.speed)}</span>
+        {getMetricLabel(medianMetricKey)}:{' '}
+        <span className="metric-value">{formatTrendValue(medianMetricKey, point.speed)}</span>
       </div>
       <div className="text-lab-fg">
-        Precisão: <span className="metric-value">{formatTrendValue('accuracy', point.accuracy / 100)}</span>
+        Precisão: <span className="metric-value">{formatTrendValue('accuracy', point.accuracy)}</span>
+      </div>
+      <div className="mt-1 text-lab-muted">
+        Scoring: {formatScoringVersionLabel(point.scoringVersion)}
       </div>
     </div>
   )
 }
 
-export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
+export function SpeedAccuracyChart({ sessions, targetSeries }: SpeedAccuracyProps) {
   const theme = useChartTheme()
-  const data = selectTrendSessions(sessions)
-    .sessions
+  const selectedSessions = selectTrendSessions(sessions, targetSeries).sessions
+  const medianMetricKey = selectedSessions[0]
+    ? sessionMedianPresentationKey(selectedSessions[0].testId)
+    : 'medianCorrectRT'
+  const medianMetricLabel = getMetricLabel(medianMetricKey)
+  const isCorsi = selectedSessions[0]?.testId === 'corsi'
+  const data = selectedSessions
     .filter((s) => s.result!.rtMetrics.medianCorrectRT !== null)
     .map((s) => ({
       // Mesma correção do longitudinal: identidade pelo id da sessão, e o
@@ -272,13 +355,14 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
       key: s.sessionId,
       fullLabel: formatFullDate(s.startedAt),
       speed: s.result!.rtMetrics.medianCorrectRT as number,
-      accuracy: s.result!.accuracyMetrics.accuracy * 100,
+      accuracy: s.result!.accuracyMetrics.accuracy,
+      scoringVersion: normalizeScoringVersion(s.result!.scoringVersion),
     }))
 
   if (data.length === 0) return null
 
   return (
-    <ChartFrame title="Velocidade vs Precisão">
+    <ChartFrame title={isCorsi ? 'Tempo de reprodução vs Precisão' : 'Velocidade vs Precisão'}>
       <ResponsiveContainer width="100%" height={240}>
         <ScatterChart margin={{ top: 4, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={theme.grid} />
@@ -290,23 +374,23 @@ export function SpeedAccuracyChart({ sessions }: SpeedAccuracyProps) {
           <XAxis
             type="number"
             dataKey="speed"
-            name="RT mediano"
-            unit=" ms"
+            name={medianMetricLabel}
             domain={['dataMin - 20', 'dataMax + 20']}
+            tickFormatter={(value: number) => formatMetricValue(medianMetricKey, value)}
             {...axisProps(theme)}
           />
           <YAxis
             type="number"
             dataKey="accuracy"
             name="Precisão"
-            unit="%"
-            domain={[0, 100]}
+            domain={[0, 1]}
+            tickFormatter={(value: number) => formatMetricValue('accuracy', value)}
             {...axisProps(theme)}
           />
           <Tooltip
             cursor={{ stroke: theme.grid }}
             wrapperStyle={{ outline: 'none' }}
-            content={<ScatterTooltip />}
+            content={<ScatterTooltip medianMetricKey={medianMetricKey} />}
           />
           <Legend wrapperStyle={{ fontSize: 12, color: theme.axis }} />
           <Scatter name="Sessões" data={data} fill={theme.series} />

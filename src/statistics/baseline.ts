@@ -1,4 +1,9 @@
 import type { BaselinePhase, BaselineStats, SessionRecord, TestId } from '../types'
+import {
+  getLongitudinalSeriesIdentity,
+  getLongitudinalSeriesKey,
+  type LongitudinalSeriesSource,
+} from '../longitudinal/series'
 import { mad, median } from './basic'
 
 const FAMILIARIZATION_SESSIONS = 3
@@ -16,13 +21,21 @@ export function getBaselinePhase(
 export function getValidAssessmentSessions(
   sessions: SessionRecord[],
   testId: TestId,
-  protocolVersion: string
+  protocolVersion: string,
+  scoringVersion?: unknown
 ): SessionRecord[] {
+  const target: LongitudinalSeriesSource = {
+    testId,
+    protocolVersion,
+    result: { scoringVersion },
+  }
+  const seriesKey = getLongitudinalSeriesKey(target)
   return sessions
     .filter(
       (s) =>
         s.testId === testId &&
         s.protocolVersion === protocolVersion &&
+        getLongitudinalSeriesKey(s) === seriesKey &&
         s.mode === 'assessment' &&
         s.quality !== 'invalid' &&
         !s.isDemo &&
@@ -38,9 +51,28 @@ export function computeBaselineStats(
   sessions: SessionRecord[],
   testId: TestId,
   protocolVersion: string,
-  metricKeys: string[]
+  metricKeys: string[],
+  scoringVersion?: unknown
 ): BaselineStats {
-  const valid = getValidAssessmentSessions(sessions, testId, protocolVersion)
+  const target: LongitudinalSeriesSource = {
+    testId,
+    protocolVersion,
+    result: { scoringVersion },
+  }
+  const identity = getLongitudinalSeriesIdentity(target)
+  const valid = getValidAssessmentSessions(sessions, testId, protocolVersion, scoringVersion)
+  const allScoringVersions = sessions.filter(
+    (s) =>
+      s.testId === testId &&
+      s.protocolVersion === protocolVersion &&
+      s.mode === 'assessment' &&
+      s.quality !== 'invalid' &&
+      !s.isDemo &&
+      (!s.status || s.status === 'completed') &&
+      s.completedAt &&
+      s.result &&
+      !s.flags.insufficientPractice
+  )
   const phase = getBaselinePhase(valid.length)
 
   const baselineSessions =
@@ -53,11 +85,14 @@ export function computeBaselineStats(
   return {
     testId,
     protocolVersion,
+    scoringVersion: identity.scoringVersion,
+    seriesKey: getLongitudinalSeriesKey(target),
     phase,
     sessionCount: valid.length,
     familiarizationCount: Math.min(valid.length, FAMILIARIZATION_SESSIONS),
     baselineCount: Math.max(0, Math.min(valid.length - FAMILIARIZATION_SESSIONS, BASELINE_SESSIONS)),
     warningCount: baselineSessions.filter((s) => s.quality === 'valid_with_warnings').length,
+    incompatibleScoringCount: allScoringVersions.length - valid.length,
     metrics,
   }
 }
@@ -122,22 +157,35 @@ export function getMetricValue(session: SessionRecord, key: string): number | nu
 export function recomputeStoredBaselinePhases(
   sessions: SessionRecord[]
 ): Map<string, BaselinePhase> {
-  const byKey = (s: SessionRecord) => `${s.testId}::${s.protocolVersion}`
   const order = (a: SessionRecord, b: SessionRecord) => {
     const t = new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime()
     return t !== 0 ? t : a.sessionId.localeCompare(b.sessionId)
   }
 
-  const groups = new Map<string, SessionRecord[]>()
+  const groups = new Map<TestId, Map<string, SessionRecord[]>>()
   for (const s of sessions) {
-    const key = byKey(s)
-    if (!groups.has(key)) groups.set(key, [])
-    groups.get(key)!.push(s)
+    if (!groups.has(s.testId)) groups.set(s.testId, new Map())
+    const protocols = groups.get(s.testId)!
+    if (!protocols.has(s.protocolVersion)) protocols.set(s.protocolVersion, [])
+    protocols.get(s.protocolVersion)!.push(s)
   }
 
   const phases = new Map<string, BaselinePhase>()
-  for (const group of groups.values()) {
-    const eligible = getValidAssessmentSessions(group, group[0].testId, group[0].protocolVersion)
+  for (const group of [...groups.values()].flatMap((protocols) => [...protocols.values()])) {
+    // Migração histórica v3 preservada exatamente como foi executada. Ela
+    // não é reaberta para reclassificar resultados já gravados por scoring;
+    // a separação nova vale para seleções derivadas e novas conclusões.
+    const eligible = group
+      .filter(
+        (s) =>
+          s.mode === 'assessment' &&
+          s.quality !== 'invalid' &&
+          !s.isDemo &&
+          (!s.status || s.status === 'completed') &&
+          s.completedAt &&
+          s.result &&
+          !s.flags.insufficientPractice
+      )
       .sort(order)
     for (const s of group) {
       if (!s.result) continue

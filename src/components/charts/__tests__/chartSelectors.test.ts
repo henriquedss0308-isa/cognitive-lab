@@ -215,7 +215,7 @@ describe('formatTrendValue', () => {
     // O tooltip mostrava "268.300048828125".
     expect(formatTrendValue('medianCorrectRT', 268.300048828125)).toBe('268,3 ms')
     expect(formatTrendValue('simple.medianRT', 245)).toBe('245,0 ms')
-    expect(formatTrendValue('switchCost', 12.34)).toBe('12,3 ms')
+    expect(formatTrendValue('switchCostRT', 12.34)).toBe('12,3 ms')
   })
 
   it('exibe proporções como porcentagem', () => {
@@ -225,7 +225,11 @@ describe('formatTrendValue', () => {
   })
 
   it('mantém span inteiro e métricas sem unidade com duas casas', () => {
-    expect(formatTrendValue('corsiSpan', 5)).toBe('5')
+    expect(formatTrendValue('confirmedSpan', 5)).toBe('5')
     expect(formatTrendValue('rtCV', 0.0312)).toBe('0,03')
+  })
+
+  it('não inventa unidade para métrica desconhecida', () => {
+    expect(formatTrendValue('unknownRTCost', 12.34)).toBe('12,34')
   })
 })

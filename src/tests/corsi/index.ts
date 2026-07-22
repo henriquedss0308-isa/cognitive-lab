@@ -101,6 +101,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de memória visuoespacial. Reproduza a sequência de blocos iluminados na ordem correta.',
   duration: '~5 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: 'sdt-hautus-1;corsi-replay-1',
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {

@@ -159,6 +159,25 @@ describe('importBackup — política não destrutiva', () => {
     expect(r.message).toMatch(/recompor/)
   })
 
+  it('não avisa recomposição quando a sessão anterior usa outro scoring', async () => {
+    const local = makeBackupSession({
+      sessionId: 'local-current',
+      startedAt: '2026-07-01T10:00:00.000Z',
+      result: { scoringVersion: 'sdt-hautus-1;corsi-replay-1' } as SessionRecord['result'],
+    })
+    const imported = makeBackupSession({
+      sessionId: 'importada-legacy',
+      startedAt: '2026-05-01T10:00:00.000Z',
+      result: { scoringVersion: 'sdt-hautus-1' } as SessionRecord['result'],
+    })
+    getAllSessions.mockResolvedValue([local])
+
+    const report = await importBackup(backupWith([imported]))
+
+    expect(report.baselineWarning).toBe(false)
+    expect(report.message).not.toMatch(/recompor/)
+  })
+
   it('JSON de tipo errado falha cedo com mensagem', async () => {
     expect((await importBackup(null)).success).toBe(false)
     expect((await importBackup([1, 2])).success).toBe(false)

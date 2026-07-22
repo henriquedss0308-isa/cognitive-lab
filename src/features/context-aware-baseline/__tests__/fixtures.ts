@@ -8,6 +8,7 @@ import type { LisdexamfetamineStatus } from '../types'
 
 export const TEST_ID = 'simple_rt' as const
 export const PROTOCOL = 'reaction.simple.v1.0'
+export const LEGACY_SERIES = { testId: TEST_ID, protocolVersion: PROTOCOL } as const
 
 export const DEVICE: SessionRecord['deviceInfo'] = {
   deviceType: 'desktop',

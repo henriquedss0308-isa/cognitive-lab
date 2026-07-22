@@ -1,4 +1,5 @@
 import type { AppBackup, SessionRecord, TestConditions } from '../types'
+import { getLongitudinalSeriesKey } from '../longitudinal/series'
 import { withSanitizedEmotionalContext } from '../features/emotion-lab/emotionalContext'
 import { withSanitizedMedicationContext } from '../features/context-aware-baseline/medicationContext'
 import {
@@ -277,13 +278,13 @@ export async function importBackup(data: unknown): Promise<ImportReport> {
   const addedSet = new Set(added)
   const newestLocalByKey = new Map<string, number>()
   for (const s of localBefore) {
-    const key = `${s.testId}::${s.protocolVersion}`
+    const key = getLongitudinalSeriesKey(s)
     const t = new Date(s.startedAt).getTime()
     newestLocalByKey.set(key, Math.max(newestLocalByKey.get(key) ?? -Infinity, t))
   }
   const baselineWarning = acceptable.some((s) => {
     if (!addedSet.has(s.sessionId) || s.mode !== 'assessment') return false
-    const newest = newestLocalByKey.get(`${s.testId}::${s.protocolVersion}`)
+    const newest = newestLocalByKey.get(getLongitudinalSeriesKey(s))
     return newest !== undefined && new Date(s.startedAt).getTime() < newest
   })
 

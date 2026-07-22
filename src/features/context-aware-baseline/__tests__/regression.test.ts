@@ -8,7 +8,14 @@ import { evaluatePrimaryZ } from '../../../statistics/zscore'
 import { getTest } from '../../../tests/registry'
 import { sanitizeEmotionalContext } from '../../emotion-lab/emotionalContext'
 import { selectReference } from '../referenceSelection'
-import { METRIC_KEYS, PROTOCOL, TEST_ID, makeSession, sequence } from './fixtures'
+import {
+  LEGACY_SERIES,
+  METRIC_KEYS,
+  PROTOCOL,
+  TEST_ID,
+  makeSession,
+  sequence,
+} from './fixtures'
 import type { SessionRecord, TrialRecord } from '../../../types'
 
 const test = getTest(TEST_ID)
@@ -81,8 +88,8 @@ describe('2. z-scores gerais idênticos quando não há referência contextual',
 
     expect(selection.reference.stats).toEqual(before)
     for (const value of [280, 300, 320, 350, null]) {
-      expect(evaluatePrimaryZ(value, selection.reference.stats, test)).toEqual(
-        evaluatePrimaryZ(value, before, test)
+      expect(evaluatePrimaryZ(value, selection.reference.stats, test, LEGACY_SERIES)).toEqual(
+        evaluatePrimaryZ(value, before, test, LEGACY_SERIES)
       )
     }
   })
@@ -104,8 +111,8 @@ describe('2. z-scores gerais idênticos quando não há referência contextual',
     })
 
     expect(selection.reference.metadata.kind).toBe('general')
-    expect(evaluatePrimaryZ(300, selection.reference.stats, test)).toEqual(
-      evaluatePrimaryZ(300, general, test)
+    expect(evaluatePrimaryZ(300, selection.reference.stats, test, LEGACY_SERIES)).toEqual(
+      evaluatePrimaryZ(300, general, test, LEGACY_SERIES)
     )
   })
 })

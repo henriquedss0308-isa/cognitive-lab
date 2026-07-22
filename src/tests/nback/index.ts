@@ -1,5 +1,9 @@
 import type { DeviceInfo, TestMode, TrialRecord } from '../../types'
 import { buildBaseResult, conditionRTAndAccuracy } from '../../scoring/common'
+import {
+  isEligibleForStimulusContingentScoring,
+  PREONSET_EXCLUSION_SCORING_VERSION,
+} from '../../scoring/stimulusEligibility'
 import { computeSDT } from '../../statistics'
 import { randomInt, seededRandom } from '../../utils/random'
 import type { CognitiveTestDefinition, GeneratedTrial, ProtocolConfig } from '../types'
@@ -147,26 +151,22 @@ function scoreNBackByLevel(
   cleaning: typeof CLEANING
 ) {
   const levelTrials = trials.filter((t) => t.metadata?.nBack === n)
-  const targetTrials = levelTrials.filter((t) => t.metadata?.isTarget === true)
-  const nonTargetTrials = levelTrials.filter((t) => t.metadata?.isTarget === false)
+  const eligibleLevelTrials = levelTrials.filter(isEligibleForStimulusContingentScoring)
+  const targetTrials = eligibleLevelTrials.filter((t) => t.metadata?.isTarget === true)
+  const nonTargetTrials = eligibleLevelTrials.filter((t) => t.metadata?.isTarget === false)
 
-  const hits = targetTrials.filter(
-    (t) => t.correct && t.actualResponse === 'space'
-  ).length
-  const misses = targetTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
+  const hits = targetTrials.filter((t) => t.correct).length
+  const misses = targetTrials.length - hits
   const falseAlarms = nonTargetTrials.filter(
     (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
   ).length
-  const correctRejections = nonTargetTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
+  const correctRejections = nonTargetTrials.length - falseAlarms
 
   const sdt = computeSDT({ hits, misses, falseAlarms, correctRejections })
   const targetMetrics = conditionRTAndAccuracy(targetTrials, `${n}back`, cleaning)
+  const targetAccuracy = targetTrials.length > 0 ? targetMetrics.accuracy : null
 
-  return { sdt, targetMetrics, levelTrials, targetTrials, nonTargetTrials }
+  return { sdt, targetMetrics, targetAccuracy, levelTrials, targetTrials, nonTargetTrials }
 }
 
 function scoreNBackSession(
@@ -194,26 +194,25 @@ function scoreNBackSession(
   const twoBack =
     mode === 'assessment' ? scoreNBackByLevel(trials, 2, config.cleaningRules) : null
 
-  const overallTargets = trials.filter((t) => t.metadata?.isTarget === true)
-  const overallNonTargets = trials.filter((t) => t.metadata?.isTarget === false)
+  const eligibleTrials = trials.filter(isEligibleForStimulusContingentScoring)
+  const overallTargets = eligibleTrials.filter((t) => t.metadata?.isTarget === true)
+  const overallNonTargets = eligibleTrials.filter((t) => t.metadata?.isTarget === false)
 
+  const overallHits = overallTargets.filter((t) => t.correct).length
+  const overallFalseAlarms = overallNonTargets.filter(
+    (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
+  ).length
   const sdtMetrics = computeSDT({
-    hits: overallTargets.filter((t) => t.correct && t.actualResponse === 'space').length,
-    misses: overallTargets.filter(
-      (t) => t.actualResponse === '' || t.actualResponse === 'none'
-    ).length,
-    falseAlarms: overallNonTargets.filter(
-      (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
-    ).length,
-    correctRejections: overallNonTargets.filter(
-      (t) => t.actualResponse === '' || t.actualResponse === 'none'
-    ).length,
+    hits: overallHits,
+    misses: overallTargets.length - overallHits,
+    falseAlarms: overallFalseAlarms,
+    correctRejections: overallNonTargets.length - overallFalseAlarms,
   })
 
   const conditionMetrics: Record<string, Record<string, number | null>> = {
     '1back': {
       medianRT: oneBack.targetMetrics.medianRT,
-      accuracy: oneBack.targetMetrics.accuracy,
+      accuracy: oneBack.targetAccuracy,
       dPrime: oneBack.sdt.dPrime,
       hitRate: oneBack.sdt.hitRate,
       falseAlarmRate: oneBack.sdt.falseAlarmRate,
@@ -230,14 +229,14 @@ function scoreNBackSession(
     dPrime2Back: twoBack?.sdt.dPrime ?? null,
     medianRT1Back: oneBack.targetMetrics.medianRT,
     medianRT2Back: twoBack?.targetMetrics.medianRT ?? null,
-    accuracy1Back: oneBack.targetMetrics.accuracy,
-    accuracy2Back: twoBack?.targetMetrics.accuracy ?? null,
+    accuracy1Back: oneBack.targetAccuracy,
+    accuracy2Back: twoBack?.targetAccuracy ?? null,
   }
 
   if (twoBack) {
     conditionMetrics['2back'] = {
       medianRT: twoBack.targetMetrics.medianRT,
-      accuracy: twoBack.targetMetrics.accuracy,
+      accuracy: twoBack.targetAccuracy,
       dPrime: twoBack.sdt.dPrime,
       hitRate: twoBack.sdt.hitRate,
       falseAlarmRate: twoBack.sdt.falseAlarmRate,
@@ -246,6 +245,7 @@ function scoreNBackSession(
 
   return {
     ...base,
+    scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
     sdtMetrics,
     conditionMetrics,
     customMetrics,
@@ -262,6 +262,7 @@ export const testDefinition: CognitiveTestDefinition = {
     'Tarefa de memória de trabalho espacial. Indique quando a posição atual coincide com a de N ensaios atrás.',
   duration: '~8 min',
   protocolVersion: PROTOCOL_VERSION,
+  scoringVersion: PREONSET_EXCLUSION_SCORING_VERSION,
   practiceConfig: PRACTICE_CONFIG,
   assessmentConfig: ASSESSMENT_CONFIG,
   instructions: {
