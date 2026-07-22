@@ -49,8 +49,12 @@ result.scoringVersion === "sdt-hautus-1"
 
 Para ser reprocessável, a candidata também precisa estar concluída, usar o
 protocolo Corsi atual, possuir `sessionId`, `startedAt`, `mode`, `deviceInfo` e
-`flags` válidos, além de pelo menos um trial. Cada trial precisa conter os
-campos usados pelo scorer e as evidências persistidas de replay:
+`flags` válidos, além de pelo menos um trial. `status: "completed"` é aceito
+explicitamente; por compatibilidade histórica, `status` ausente também é
+tratado como concluído. Qualquer outro valor explícito é recusado. As flags
+`incomplete` da sessão ou do resultado sempre prevalecem e tornam a candidata
+inelegível. Cada trial precisa conter os campos usados pelo scorer e as
+evidências persistidas de replay:
 `expectedResponse`, `actualResponse`, `metadata.sequence`,
 `metadata.userResponse` e `metadata.partialPositionsCorrect`.
 
@@ -118,8 +122,9 @@ Divergência significa alteração no conteúdo relevante produzido pelo scorer.
 - O diretório do report precisa existir; a ferramenta não cria diretórios.
 - O input é lido novamente após a análise. O report só é escrito se os bytes
   permanecerem idênticos e os hashes antes/depois coincidirem.
-- Somente o arquivo indicado por `--report` é escrito. Se ele já existir, é
-  substituído porque esse caminho foi autorizado explicitamente.
+- Somente o arquivo indicado por `--report` é escrito, por criação exclusiva.
+  Se ele já existir, a execução aborta sem truncar ou modificar o conteúdo. Não
+  existe opção `--force` nesta versão.
 - A CLI não importa o repositório IndexedDB, não cria sessões e não contém
   código para gerar backup migrado.
 - Outros testes são classificados como pulados antes de qualquer validação ou

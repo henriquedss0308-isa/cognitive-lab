@@ -172,10 +172,19 @@ export async function runHistoricalReprocessor(
     ...analysis,
   }
 
-  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, {
-    encoding: 'utf8',
-    flag: 'w',
-  })
+  try {
+    await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, {
+      encoding: 'utf8',
+      flag: 'wx',
+    })
+  } catch (error) {
+    if (isRecord(error) && error.code === 'EEXIST') {
+      throw new CliArgumentError(
+        `O arquivo de --report já existe; informe um caminho novo: ${reportPath}.`
+      )
+    }
+    throw error
+  }
   return report
 }
 

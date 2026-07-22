@@ -302,9 +302,40 @@ describe('núcleo puro da auditoria Corsi', () => {
     expect(result.skippedSessions[0].reason.code).toBe('missing_result')
   })
 
-  it('recusa sessão Corsi incompleta', async () => {
+  it('aceita status legacy ausente como sessão concluída', async () => {
     const session = legacyCorsiSession()
-    session.status = 'interrupted'
+    delete session.status
+
+    const result = await analyze([session])
+
+    expect(result.candidateSessions[0].eligibility).toBe('eligible')
+  })
+
+  it('aceita status completed explícito', async () => {
+    const session = legacyCorsiSession()
+    session.status = 'completed'
+
+    const result = await analyze([session])
+
+    expect(result.candidateSessions[0].eligibility).toBe('eligible')
+  })
+
+  it.each(['interrupted', 'abandoned'])(
+    'recusa status explicitamente não concluído: %s',
+    async (status) => {
+      const session = legacyCorsiSession()
+      session.status = status
+
+      const result = await analyze([session])
+
+      expect(candidateReasonCode(result)).toBe('incomplete_session')
+    }
+  )
+
+  it('flag incomplete prevalece quando o status legacy está ausente', async () => {
+    const session = legacyCorsiSession()
+    delete session.status
+    session.flags = { incomplete: true }
 
     const result = await analyze([session])
 
@@ -393,6 +424,23 @@ describe('CLI somente-dry-run', () => {
     expect(report.inputFile.sizeBytes).toBe(originalBytes.byteLength)
     expect(report.inputFile.sha256After).toBe(report.inputFile.sha256Before)
     expect(report.dryRun).toBe(true)
+  })
+
+  it('recusa report existente sem alterar report ou input', async () => {
+    const directory = await temporaryDirectory()
+    const input = join(directory, 'synthetic-backup.json')
+    const reportPath = join(directory, 'existing-report.json')
+    const inputBytes = Buffer.from(`${JSON.stringify(backup([legacyCorsiSession()]), null, 2)}\n`)
+    const sentinelBytes = Buffer.from('SENTINELA: relatório anterior deve permanecer intacto.\n')
+    await writeFile(input, inputBytes)
+    await writeFile(reportPath, sentinelBytes)
+
+    await expect(
+      runHistoricalReprocessor(['--input', input, '--report', reportPath, '--dry-run'])
+    ).rejects.toThrow('arquivo de --report já existe')
+
+    expect(await readFile(reportPath)).toEqual(sentinelBytes)
+    expect(await readFile(input)).toEqual(inputBytes)
   })
 
   it('o relatório não contém cópias integrais de trials', async () => {

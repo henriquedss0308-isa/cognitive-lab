@@ -153,7 +153,7 @@ function candidateIneligibility(session: Record<string, unknown>): AuditReason |
     return reason('invalid_mode', `Modo Corsi inválido: ${String(session.mode)}.`)
   }
   if (
-    session.status !== 'completed' ||
+    (session.status !== undefined && session.status !== 'completed') ||
     (isRecord(session.flags) && session.flags.incomplete === true) ||
     (isRecord(session.result) && isRecord(session.result.flags) && session.result.flags.incomplete === true)
   ) {
