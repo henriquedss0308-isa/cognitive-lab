@@ -1,9 +1,19 @@
-# Auditoria histórica do Corsi (somente dry-run)
+# Reprocessamento histórico do Corsi
 
-Esta ferramenta audita, sem migrar dados, sessões Corsi gravadas com o scorer
+O fluxo possui duas ferramentas e duas fases deliberadamente separadas:
+
+1. auditoria estritamente somente leitura;
+2. geração opcional de uma nova cópia migrada, vinculada ao relatório aprovado.
+
+A segunda fase nunca altera o backup de entrada e não transforma a CLI de
+auditoria em ferramenta de escrita.
+
+## Fase 1 — Auditoria dry-run
+
+A auditoria examina, sem migrar dados, sessões Corsi gravadas com o scorer
 legacy `sdt-hautus-1`. Ela chama diretamente o `scoreSession` atual exportado
 por `src/tests/corsi` e propõe a identidade
-`sdt-hautus-1;corsi-replay-1` apenas no relatório.
+`sdt-hautus-1;corsi-replay-1` apenas no relatório dry-run.
 
 ## Uso
 
@@ -32,6 +42,13 @@ argumentos, caminhos, JSON ou estrutura básica do backup são inválidos.
 - `src/historical-reprocessing/types.ts`: contrato versionado do relatório.
 - `scripts/historical-reprocessor.ts`: fronteira de terminal, leitura somente
   do input, SHA-256, verificação byte a byte e escrita do relatório explícito.
+- `src/historical-reprocessing/corsiMigration.ts`: validação pura do vínculo
+  com a auditoria, reconstrução do resultado persistido e invariantes de
+  preservação do backup.
+- `src/historical-reprocessing/migrationTypes.ts`: contrato do relatório de
+  migração.
+- `scripts/historical-migrator.ts`: CLI separada, promoção exclusiva de
+  temporários completos, verificações pós-escrita e rollback.
 - `scripts/typescript-loader.mjs`: resolve em memória os imports TypeScript já
   usados pelo aplicativo; não transpila para disco nem cria cache.
 
@@ -147,15 +164,93 @@ O núcleo não consulta data ou hora. Duas análises do mesmo objeto produzem os
 mesmos resultados, deltas e hashes. Somente `generatedAt`, acrescentado pela
 CLI, depende do relógio atual.
 
-## Limitações desta versão
+## Limitações da auditoria dry-run
 
 - Reprocessa somente Corsi `sdt-hautus-1` no protocolo suportado pelo scorer
   atual; não tenta converter versões desconhecidas.
 - Carrega o JSON inteiro em memória; não há processamento por streaming.
-- Não gera backup migrado, patch, SQL, importação ou comando de aplicação.
+- A fase de auditoria não gera backup migrado, patch, SQL, importação ou comando
+  de aplicação.
 - Não compara campos de persistência acrescentados ao redor do scorer, como
   `baselinePhase`, nem recalcula contexto longitudinal.
 - Requer Node.js 24, usado pelo projeto para executar TypeScript com remoção
   nativa de tipos.
 - O relatório contém IDs e métricas de sessões. Ele deve receber a mesma
   proteção do backup, embora não inclua os trials completos.
+
+## Fase 2 — Geração de cópia migrada
+
+Somente após revisar e aprovar o relatório da fase 1, execute a CLI separada:
+
+```powershell
+npm run historical:migrate -- `
+  --input "C:\caminho\backup-copy.json" `
+  --audit-report "C:\caminho\corsi-audit-report.json" `
+  --output "C:\caminho\new-migrated-backup.json" `
+  --migration-report "C:\caminho\new-migration-report.json" `
+  --write-migrated-copy
+```
+
+Todos os argumentos são obrigatórios. Não existem opções `--force`,
+`--overwrite` ou `--in-place`; opções desconhecidas são recusadas. `output` e
+`migration-report` precisam ser caminhos novos e todos os quatro caminhos
+precisam ser distintos, inclusive após normalização, resolução de symlinks e
+comparação de arquivos existentes por identidade do filesystem.
+
+### Vínculo com a auditoria
+
+Antes de qualquer escrita, a fase 2:
+
+- valida versão, estrutura e `dryRun: true` do relatório aprovado;
+- confere tamanho e SHA-256 do input, os hashes antes/depois e `unchanged`;
+- refaz a análise com o código atual;
+- exige correspondência integral de backup, resumo, candidatas e sessões
+  puladas, incluindo elegibilidade, versões, divergência e hashes;
+- recusa qualquer candidata não reprocessável;
+- recusa relatórios sem candidatas, evitando migração vazia silenciosa.
+
+O resultado projetado do relatório nunca é persistido. Para cada candidata, o
+scorer Corsi real é chamado novamente e sua saída completa recebe somente o
+envelope persistido necessário (`sessionId`, timestamps, `isDemo` e campos
+contextuais padronizados já existentes). Somente `session.result` é substituído.
+Trials, sua ordem e seus campos permanecem intactos; nenhum campo é fabricado.
+
+Sessões numericamente idênticas também são migradas para
+`sdt-hautus-1;corsi-replay-1`. Sessões já atuais, outros testes e sessões não
+aprovadas permanecem logicamente idênticos. A ordem das sessões, a estrutura
+superior, `settings`, `exportedAt` e campos desconhecidos fora do resultado
+substituído são preservados.
+
+### Escrita e verificações
+
+O output é serializado e validado integralmente em memória, gravado em um
+temporário exclusivo no mesmo diretório e promovido por hard link exclusivo.
+Assim, um caminho final preexistente nunca é truncado ou sobrescrito, e o nome
+final só referencia bytes completos. Se uma etapa posterior falhar, arquivos
+finais criados por aquela execução e temporários são removidos.
+
+Após promover o output, a ferramenta:
+
+- relê e valida o JSON e o SHA-256;
+- confirma novamente os bytes e o hash do input e do relatório dry-run;
+- refaz a auditoria sobre o output;
+- exige zero candidatas legacy restantes;
+- confirma totais de sessões/Corsi e a distribuição esperada de
+  `scoringVersion`;
+- confirma que nenhuma sessão fora do conjunto aprovado mudou.
+
+O relatório de migração registra hashes e tamanhos dos três arquivos de
+entrada/saída, hashes do input antes/depois, IDs e hashes completos dos
+resultados migrados, deltas numéricos, sessões idênticas mas versionadas,
+sessões puladas, distribuição Corsi e todas as verificações pós-escrita. Ele não
+contém trials completos.
+
+### Fora do escopo
+
+A CLI apenas gera uma nova cópia JSON. Importar essa cópia no aplicativo é uma
+etapa manual, posterior e fora do escopo. A ferramenta não acessa IndexedDB,
+não cria sessões locais e não inicia importação automaticamente.
+
+A fase 2 carrega o backup inteiro em memória e depende de suporte do filesystem
+a hard links no diretório escolhido. Tanto o backup migrado quanto os dois
+relatórios contêm dados sensíveis e devem ser protegidos adequadamente.
