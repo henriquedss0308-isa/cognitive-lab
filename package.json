@@ -11,7 +11,8 @@
     "desktop": "powershell -ExecutionPolicy Bypass -File scripts/launch.ps1",
     "desktop:install": "python scripts/convert-icon.py && powershell -ExecutionPolicy Bypass -File scripts/create-desktop-shortcut.ps1",
     "test": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vitest/vitest.mjs run --pool=threads --maxWorkers=1 --no-file-parallelism",
-    "test:watch": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vitest/vitest.mjs --pool=threads --maxWorkers=1 --no-file-parallelism"
+    "test:watch": "node --require ./scripts/vite-safe-realpath.cjs ./node_modules/vitest/vitest.mjs --pool=threads --maxWorkers=1 --no-file-parallelism",
+    "historical:dry-run": "node --experimental-strip-types --no-warnings=ExperimentalWarning --experimental-loader ./scripts/typescript-loader.mjs ./scripts/historical-reprocessor.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
