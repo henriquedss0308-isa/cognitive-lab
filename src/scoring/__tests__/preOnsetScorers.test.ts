@@ -14,7 +14,12 @@ const DEVICE: DeviceInfo = {
   userAgent: 'anonymous-test',
 }
 
-type ResponseKind = 'response' | 'no-response' | 'pre-onset' | 'rapid-post-onset'
+type ResponseKind =
+  | 'response'
+  | 'incorrect-response'
+  | 'no-response'
+  | 'pre-onset'
+  | 'rapid-post-onset'
 
 interface TrialSpec {
   signal: boolean
@@ -30,6 +35,7 @@ function makeTrials(testId: keyof typeof DEFINITIONS, specs: TrialSpec[]): Trial
     const hasResponse = spec.response !== 'no-response'
     const preOnset = spec.response === 'pre-onset'
     const rapid = spec.response === 'rapid-post-onset'
+    const incorrect = spec.response === 'incorrect-response'
     const condition =
       testId === 'gonogo'
         ? spec.signal
@@ -42,6 +48,8 @@ function makeTrials(testId: keyof typeof DEFINITIONS, specs: TrialSpec[]): Trial
           : `${spec.nBack ?? 1}back`
     const outcomeKind = preOnset
       ? 'anticipation'
+      : incorrect
+        ? 'incorrect'
       : spec.signal
         ? hasResponse
           ? 'hit'
@@ -61,8 +69,8 @@ function makeTrials(testId: keyof typeof DEFINITIONS, specs: TrialSpec[]): Trial
       condition,
       stimulus: spec.signal ? 'signal' : 'noise',
       expectedResponse: spec.signal ? 'space' : 'none',
-      actualResponse: hasResponse ? 'space' : '',
-      correct: preOnset ? false : spec.signal ? hasResponse : !hasResponse,
+      actualResponse: hasResponse ? (incorrect ? 'x' : 'space') : '',
+      correct: preOnset || incorrect ? false : spec.signal ? hasResponse : !hasResponse,
       reactionTimeMs: hasResponse && !preOnset && !rapid ? 300 : null,
       stimulusOnsetTimestamp: 1_000 + index * 1_000,
       responseTimestamp: hasResponse
@@ -105,6 +113,34 @@ const STANDARD: TrialSpec[] = [
   { signal: false, response: 'response' },
   { signal: false, response: 'no-response' },
 ]
+
+describe('partição sinal/alvo com resposta incorreta pós-onset', () => {
+  it.each(['gonogo', 'nback', 'sart'] as const)(
+    '%s conta "x" como miss, preservando rápido correto e exclusão pré-onset',
+    (testId) => {
+      const trials = makeTrials(testId, [
+        { signal: true, response: 'incorrect-response' },
+        { signal: true, response: 'rapid-post-onset' },
+        { signal: true, response: 'pre-onset' },
+        { signal: false, response: 'response' },
+        { signal: false, response: 'no-response' },
+        { signal: false, response: 'pre-onset' },
+      ])
+      const incorrect = trials[0]
+      const result = DEFINITIONS[testId].scoreSession(trials, 'assessment', DEVICE, {})
+
+      expect(incorrect).toMatchObject({
+        actualResponse: 'x',
+        correct: false,
+        metadata: { outcomeKind: 'incorrect' },
+      })
+      expect(incorrect.responseTimestamp).toBeGreaterThan(incorrect.stimulusOnsetTimestamp)
+      expectSdt(result.sdtMetrics, [1, 1, 1, 1])
+      expect(result.sdtMetrics!.hits + result.sdtMetrics!.misses).toBe(2)
+      expect(result.sdtMetrics!.falseAlarms + result.sdtMetrics!.correctRejections).toBe(2)
+    }
+  )
+})
 
 describe('Go/No-Go — exclusão simétrica e respostas rápidas', () => {
   it.each([

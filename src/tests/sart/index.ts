@@ -113,18 +113,12 @@ function scoreSartSession(
   const eligibleGoTrials = goTrials.filter(isEligibleForStimulusContingentScoring)
   const eligibleNoGoTrials = noGoTrials.filter(isEligibleForStimulusContingentScoring)
 
-  const hits = eligibleGoTrials.filter(
-    (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
-  ).length
-  const misses = eligibleGoTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
+  const hits = eligibleGoTrials.filter((t) => t.correct).length
+  const misses = eligibleGoTrials.length - hits
   const falseAlarms = eligibleNoGoTrials.filter(
     (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
   ).length
-  const correctRejections = eligibleNoGoTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
+  const correctRejections = eligibleNoGoTrials.length - falseAlarms
 
   const sdtMetrics = computeSDT({ hits, misses, falseAlarms, correctRejections })
 

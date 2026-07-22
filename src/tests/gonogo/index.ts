@@ -238,10 +238,10 @@ function scoreSession(
   const go = conditionRTAndAccuracy(eligibleGoTrials, 'go', CLEANING)
   const nogo = conditionRTAndAccuracy(eligibleNogoTrials, 'nogo', CLEANING)
 
-  const hits = eligibleGoTrials.filter((t) => !isNoResponse(t.actualResponse)).length
-  const misses = eligibleGoTrials.filter((t) => isNoResponse(t.actualResponse)).length
+  const hits = eligibleGoTrials.filter((t) => t.correct).length
+  const misses = eligibleGoTrials.length - hits
   const falseAlarms = eligibleNogoTrials.filter((t) => !isNoResponse(t.actualResponse)).length
-  const correctRejections = eligibleNogoTrials.filter((t) => isNoResponse(t.actualResponse)).length
+  const correctRejections = eligibleNogoTrials.length - falseAlarms
 
   const sdt = computeSDT({ hits, misses, falseAlarms, correctRejections })
 

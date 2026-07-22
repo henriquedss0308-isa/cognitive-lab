@@ -155,16 +155,12 @@ function scoreNBackByLevel(
   const targetTrials = eligibleLevelTrials.filter((t) => t.metadata?.isTarget === true)
   const nonTargetTrials = eligibleLevelTrials.filter((t) => t.metadata?.isTarget === false)
 
-  const hits = targetTrials.filter((t) => t.actualResponse !== '' && t.actualResponse !== 'none').length
-  const misses = targetTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
+  const hits = targetTrials.filter((t) => t.correct).length
+  const misses = targetTrials.length - hits
   const falseAlarms = nonTargetTrials.filter(
     (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
   ).length
-  const correctRejections = nonTargetTrials.filter(
-    (t) => t.actualResponse === '' || t.actualResponse === 'none'
-  ).length
+  const correctRejections = nonTargetTrials.length - falseAlarms
 
   const sdt = computeSDT({ hits, misses, falseAlarms, correctRejections })
   const targetMetrics = conditionRTAndAccuracy(targetTrials, `${n}back`, cleaning)
@@ -202,17 +198,15 @@ function scoreNBackSession(
   const overallTargets = eligibleTrials.filter((t) => t.metadata?.isTarget === true)
   const overallNonTargets = eligibleTrials.filter((t) => t.metadata?.isTarget === false)
 
+  const overallHits = overallTargets.filter((t) => t.correct).length
+  const overallFalseAlarms = overallNonTargets.filter(
+    (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
+  ).length
   const sdtMetrics = computeSDT({
-    hits: overallTargets.filter((t) => t.actualResponse !== '' && t.actualResponse !== 'none').length,
-    misses: overallTargets.filter(
-      (t) => t.actualResponse === '' || t.actualResponse === 'none'
-    ).length,
-    falseAlarms: overallNonTargets.filter(
-      (t) => t.actualResponse !== '' && t.actualResponse !== 'none'
-    ).length,
-    correctRejections: overallNonTargets.filter(
-      (t) => t.actualResponse === '' || t.actualResponse === 'none'
-    ).length,
+    hits: overallHits,
+    misses: overallTargets.length - overallHits,
+    falseAlarms: overallFalseAlarms,
+    correctRejections: overallNonTargets.length - overallFalseAlarms,
   })
 
   const conditionMetrics: Record<string, Record<string, number | null>> = {
